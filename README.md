@@ -1,6 +1,6 @@
 # Solaris Packet Protocol (SPP)
 
-A C library for handling packet protocols in the Solaris system, designed to be compiled as a static library with full cross-compilation support and embedded systems compatibility.
+Designed for the edge of space, optimized for the embedded world — a packet protocol library for projects that fly high and fail never.
 
 ## Description
 
