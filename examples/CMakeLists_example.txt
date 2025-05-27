@@ -1,0 +1,52 @@
+# Example CMakeLists.txt for using the SPP library
+# This file shows how to integrate SPP into your project
+
+cmake_minimum_required(VERSION 3.16)
+project(MyProjectWithSPP VERSION 1.0.0 LANGUAGES C)
+
+# C standard configuration
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Find SPP library
+find_package(spp REQUIRED)
+
+# Create your executable
+add_executable(my_application
+    main.c
+    # Add more source files here
+)
+
+# Link with SPP
+target_link_libraries(my_application
+    PRIVATE
+        spp::spp
+)
+
+# Configure include directories if needed
+target_include_directories(my_application
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# Configure compilation options
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(my_application PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
+endif()
+
+# Debug/Release configuration
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(my_application PRIVATE DEBUG=1)
+    target_compile_options(my_application PRIVATE -g -O0)
+else()
+    target_compile_options(my_application PRIVATE -O2)
+endif()
+
+# Install executable
+install(TARGETS my_application
+    RUNTIME DESTINATION bin
+) 
