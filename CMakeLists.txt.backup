@@ -87,7 +87,7 @@ if(SPP_BUILD_HAL)
 endif()
 
 if(SPP_BUILD_OSAL)
-    list(APPEND SPP_INSTALL_TARGETS spp_osal)
+    list(APPEND SPP_INSTALL_TARGETS spp_osal spp_osal_freertos)
 endif()
 
 # Install library (only once)

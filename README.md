@@ -1,6 +1,6 @@
 # Solaris Packet Protocol (SPP)
 
-Designed for the edge of space, optimized for the embedded world — a packet protocol library for projects that fly high and fail never.
+A C library for handling packet protocols in the Solaris system, designed to be compiled as a static library with full cross-compilation support and embedded systems compatibility.
 
 ## Description
 
@@ -8,7 +8,8 @@ The Solaris Packet Protocol (SPP) library provides a robust framework for handli
 
 - **Core**: Basic initialization and management functionalities
 - **Services**: Specialized services like DataBank for packet pool management
-- **Drivers**: Hardware driver interface (extensible)
+- **HAL (Hardware Abstraction Layer)**: Hardware interface abstractions (SPI, I2C, etc.)
+- **OSAL (Operating System Abstraction Layer)**: OS interface abstractions (FreeRTOS, etc.)
 - **Components**: Additional modular components (extensible)
 - **Third Party**: Integration with FreeRTOS and other operating systems
 
@@ -23,6 +24,8 @@ The Solaris Packet Protocol (SPP) library provides a robust framework for handli
 - ✅ Robust error handling
 - ✅ ESP32-S3 and ESP-IDF support
 - ✅ FreeRTOS integration
+- ✅ Hardware Abstraction Layer (HAL)
+- ✅ Operating System Abstraction Layer (OSAL)
 
 ## Project Structure
 
@@ -45,8 +48,17 @@ spp/
 │       ├── CMakeLists.txt
 │       ├── databank.h
 │       └── databank.c
+├── hal/                        # Hardware Abstraction Layer
+│   ├── CMakeLists.txt
+│   └── spi/                   # SPI HAL
+│       ├── CMakeLists.txt
+│       └── spi.h
+├── osal/                       # Operating System Abstraction Layer
+│   ├── CMakeLists.txt
+│   └── freertos/              # FreeRTOS OSAL
+│       ├── CMakeLists.txt
+│       └── freertos_osal.h
 ├── components/                 # Components (extensible)
-├── drivers/                    # Drivers (extensible)
 ├── examples/                   # Usage examples
 │   ├── basic_usage.c
 │   ├── CMakeLists.txt
