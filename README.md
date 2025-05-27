@@ -1,77 +1,248 @@
 # Solaris Packet Protocol (SPP)
 
-A C library for handling packet protocols in the Solaris system, designed to be compiled as a static library with full cross-compilation support and embedded systems compatibility.
+A comprehensive C library for handling packet protocols in embedded and real-time systems, featuring Hardware Abstraction Layer (HAL) and Operating System Abstraction Layer (OSAL) for maximum portability and flexibility.
 
 ## Description
 
-The Solaris Packet Protocol (SPP) library provides a robust framework for handling data packets in embedded and real-time systems. It includes:
+The Solaris Packet Protocol (SPP) library provides a robust, modular framework for handling data packets in embedded and real-time systems. The library is designed with a layered architecture that promotes code reusability, portability, and maintainability across different hardware platforms and operating systems.
 
-- **Core**: Basic initialization and management functionalities
-- **Services**: Specialized services like DataBank for packet pool management
-- **HAL (Hardware Abstraction Layer)**: Hardware interface abstractions (SPI, I2C, etc.)
-- **OSAL (Operating System Abstraction Layer)**: OS interface abstractions (FreeRTOS, etc.)
-- **Components**: Additional modular components (extensible)
-- **Third Party**: Integration with FreeRTOS and other operating systems
+## Key Features
 
-## Features
+- ✅ **Modular Architecture**: Core, Services, HAL, and OSAL layers
+- ✅ **Hardware Abstraction Layer (HAL)**: Platform-independent hardware interfaces
+- ✅ **Operating System Abstraction Layer (OSAL)**: RTOS-agnostic OS primitives
+- ✅ **Static Library Compilation**: Optimized for embedded systems
+- ✅ **Full Cross-Compilation Support**: ARM, RISC-V, ESP32-S3, and more
+- ✅ **CMake 3.16+ Compatible**: Modern build system
+- ✅ **C99 Standard Compliance**: Wide compiler compatibility
+- ✅ **Efficient Packet Pool Management**: DataBank service
+- ✅ **Robust Error Handling**: Comprehensive return codes
+- ✅ **ESP32-S3 and ESP-IDF Support**: Ready for ESP32 development
+- ✅ **FreeRTOS Integration**: Real-time operating system support
+- ✅ **Weak Function Implementation**: Easy platform-specific overrides
 
-- ✅ Static library compilation
-- ✅ Full cross-compilation support
-- ✅ CMake 3.16+ compatible
-- ✅ C99 standard
-- ✅ Modular architecture
-- ✅ Efficient packet pool
-- ✅ Robust error handling
-- ✅ ESP32-S3 and ESP-IDF support
-- ✅ FreeRTOS integration
-- ✅ Hardware Abstraction Layer (HAL)
-- ✅ Operating System Abstraction Layer (OSAL)
+## Architecture Overview
+
+The SPP library follows a layered architecture:
+
+```
+┌─────────────────────────────────────────┐
+│              Application                │
+├─────────────────────────────────────────┤
+│              Services                   │
+│          (DataBank, etc.)               │
+├─────────────────────────────────────────┤
+│               Core                      │
+│        (Initialization, Types)          │
+├─────────────────────────────────────────┤
+│               OSAL                      │
+│    (Tasks, Queues, Mutexes, etc.)       │
+├─────────────────────────────────────────┤
+│               HAL                       │
+│         (SPI, GPIO, etc.)               │
+├─────────────────────────────────────────┤
+│          Hardware Platform              │
+│      (ESP32-S3, ARM, RISC-V, etc.)      │
+└─────────────────────────────────────────┘
+```
 
 ## Project Structure
 
 ```
 spp/
-├── CMakeLists.txt              # Main CMake file
+├── CMakeLists.txt              # Main CMake configuration
 ├── build.sh                    # Automated build script
 ├── README.md                   # This file
 ├── CROSS_COMPILATION.md        # Cross-compilation guide
 ├── .gitmodules                 # Submodules configuration
-├── core/                       # Core module
+│
+├── core/                       # Core Module
 │   ├── CMakeLists.txt
-│   ├── core.h
+│   ├── core.h                  # Core initialization
 │   ├── core.c
-│   ├── macros.h
-│   └── returntypes.h
-├── services/                   # Services
+│   ├── macros.h                # Common macros
+│   └── returntypes.h           # Return codes and types
+│
+├── hal/                        # Hardware Abstraction Layer
+│   ├── CMakeLists.txt
+│   ├── README.md               # HAL documentation
+│   └── spi/                    # SPI HAL implementation
+│       ├── CMakeLists.txt
+│       ├── spi.h               # SPI interface
+│       └── spi.c               # Weak SPI implementations
+│
+├── osal/                       # Operating System Abstraction Layer
+│   ├── CMakeLists.txt
+│   ├── README.md               # OSAL documentation
+│   ├── osal.h                  # Main OSAL interface
+│   ├── osal.c                  # OSAL initialization
+│   ├── task.h                  # Task management
+│   ├── task.c                  # Task implementations
+│   ├── queue.h                 # Queue management
+│   ├── queue.c                 # Queue implementations
+│   ├── mutex.h                 # Mutex management
+│   ├── mutex.c                 # Mutex implementations
+│   ├── semaphore.h             # Semaphore management
+│   └── semaphore.c             # Semaphore implementations
+│
+├── services/                   # Services Layer
 │   ├── CMakeLists.txt
 │   └── databank/              # DataBank service
 │       ├── CMakeLists.txt
-│       ├── databank.h
+│       ├── databank.h          # Packet pool management
 │       └── databank.c
-├── hal/                        # Hardware Abstraction Layer
+│
+├── examples/                   # Implementation Examples
 │   ├── CMakeLists.txt
-│   └── spi/                   # SPI HAL
-│       ├── CMakeLists.txt
-│       └── spi.h
-├── osal/                       # Operating System Abstraction Layer
-│   ├── CMakeLists.txt
-│   └── freertos/              # FreeRTOS OSAL
-│       ├── CMakeLists.txt
-│       └── freertos_osal.h
-├── components/                 # Components (extensible)
-├── examples/                   # Usage examples
-│   ├── basic_usage.c
-│   ├── CMakeLists.txt
-│   └── CMakeLists_example.txt
-├── third_party/               # External dependencies
+│   ├── README.md               # Examples documentation
+│   ├── basic_usage.c           # Basic usage example
+│   ├── hal/                    # HAL implementation examples
+│   │   └── esp32spi/          # ESP32-S3 SPI implementation
+│   │       ├── CMakeLists.txt
+│   │       ├── esp32_spi.h
+│   │       └── esp32_spi.c
+│   └── osal/                   # OSAL implementation examples
+│       └── freertos/          # FreeRTOS OSAL implementation
+│           ├── CMakeLists.txt
+│           ├── freertos_osal_impl.h
+│           └── freertos_osal_impl.c
+│
+├── components/                 # Additional Components (extensible)
+├── third_party/               # External Dependencies
 │   └── OS/
 │       └── FreeRTOS/          # FreeRTOS Kernel (submodule)
-└── cmake/                      # CMake configuration
+└── cmake/                      # CMake Configuration
     ├── spp-config.cmake.in
     └── toolchains/            # Toolchain files
         ├── arm-linux-gnueabihf.cmake
         ├── riscv64-linux-gnu.cmake
-        └── esp32s3.cmake
+        ├── esp32s3.cmake
+        └── toolchain.template
+```
+
+## Hardware Abstraction Layer (HAL)
+
+The HAL provides a standardized interface for hardware peripherals, allowing the same application code to run on different hardware platforms.
+
+### Features:
+- **SPI Interface**: Complete SPI communication abstraction
+- **Weak Function Implementation**: Easy platform-specific overrides
+- **Standardized API**: Consistent interface across platforms
+- **Error Handling**: Comprehensive error reporting
+
+### Supported Peripherals:
+- **SPI**: Serial Peripheral Interface with configurable parameters
+
+See `hal/README.md` for detailed HAL documentation.
+
+## Operating System Abstraction Layer (OSAL)
+
+The OSAL provides a unified interface for operating system primitives, enabling the same application to work with different RTOS or bare-metal systems.
+
+### Features:
+- **Task Management**: Create, delete, suspend, resume tasks
+- **Queue Management**: Inter-task communication with ISR support
+- **Mutex Management**: Mutual exclusion with recursive support
+- **Semaphore Management**: Binary and counting semaphores
+- **Timeout Support**: Configurable timeouts for blocking operations
+- **ISR Safety**: ISR-safe variants for interrupt contexts
+
+### Supported Primitives:
+- **Tasks**: Priority-based task scheduling
+- **Queues**: FIFO message queues with ISR support
+- **Mutexes**: Mutual exclusion with deadlock prevention
+- **Semaphores**: Synchronization primitives
+
+See `osal/README.md` for detailed OSAL documentation.
+
+## Examples and Platform Implementations
+
+The examples directory contains reference implementations for different platforms:
+
+### HAL Examples:
+- **ESP32-S3 SPI**: Complete ESP-IDF SPI driver implementation
+
+### OSAL Examples:
+- **FreeRTOS**: Complete FreeRTOS OSAL implementation
+
+See `examples/README.md` for detailed examples documentation.
+
+## Quick Start
+
+### 1. Initialize Submodules
+```bash
+./build.sh -s
+```
+
+### 2. Basic Build
+```bash
+./build.sh
+```
+
+### 3. Cross-Compilation for ESP32-S3
+```bash
+source $IDF_PATH/export.sh
+./build.sh -x esp32s3 -s
+```
+
+### 4. Using in Your Project
+```c
+#include "core/core.h"
+#include "services/databank/databank.h"
+#include "osal/osal.h"
+#include "hal/spi/spi.h"
+
+int main() {
+    // Initialize SPP layers
+    Core_Init();
+    OSAL_Init();
+    SPI_Init();
+    
+    // Your application code here
+    
+    return 0;
+}
+```
+
+## Platform Integration
+
+### Adding HAL Support for New Platform
+
+1. Create platform-specific implementation files
+2. Override weak functions from `hal/spi/spi.c`
+3. Link your implementation with the HAL library
+
+Example:
+```c
+// Override weak SPI functions
+retval_t SPI_Init(void) {
+    // Your platform-specific SPI initialization
+    return SPP_OK;
+}
+
+retval_t spi_write_data(uint8_t *data, uint16_t size) {
+    // Your platform-specific SPI write
+    return SPP_OK;
+}
+```
+
+### Adding OSAL Support for New RTOS
+
+1. Create RTOS-specific implementation files
+2. Override weak functions from OSAL modules
+3. Map OSAL types to your RTOS types
+
+Example:
+```c
+// Override weak OSAL functions
+retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task, 
+                        const char *name,
+                        OSAL_TaskFunction_t function,
+                        void *parameters,
+                        OSAL_TaskPriority_t priority) {
+    // Your RTOS-specific task creation
+    return SPP_OK;
+}
 ```
 
 ## Requirements
