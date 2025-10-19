@@ -15,22 +15,10 @@
 /**
  * @brief Default (weak) task creation
  */
-__attribute__((weak)) retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
-                                              uint32_t stack_size, void* parameters, osal_priority_t priority,
-                                              osal_task_handle_t* task_handle)
+__attribute__((weak)) retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr)
+
 {
-    if (task_function == NULL || task_handle == NULL) {
-        return SPP_ERROR_NULL_POINTER;
-    }
-    
-    // Default implementation - simulate task creation
-    *task_handle = (void*)0x12345678;
-    (void)name;
-    (void)stack_size;
-    (void)parameters;
-    (void)priority;
-    
-    return SPP_OK;
+    return SPP_ERROR;
 }
 
 /**

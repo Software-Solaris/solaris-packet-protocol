@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "core/returntypes.h"
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,19 +52,38 @@ typedef enum {
 } osal_task_state_t;
 
 /**
- * @brief Create a task
- * 
- * @param task_function Task function pointer
- * @param name Task name
- * @param stack_size Stack size in bytes
- * @param parameters Task parameters
- * @param priority Task priority
- * @param task_handle Pointer to store task handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @brief Task parameters
  */
-retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
-                         uint32_t stack_size, void* parameters, osal_priority_t priority,
-                         osal_task_handle_t* task_handle);
+typedef struct {
+    const char *name;
+    spp_task_func_t entry;
+    void *arg;
+    unsigned int stack_size;
+    unsigned int priority;
+    int core;   // -1 for any core
+} spp_task_attr_t;
+
+/**
+ * @brief Create a new task/thread in the underlying RTOS.
+ *
+ * This function creates a task using the attributes provided in @p attr. 
+ * The implementation depends on the RTOS in use (e.g., FreeRTOS, Zephyr, ThreadX).
+ * 
+ * @param[out] handle   Pointer to a task handle where the created task identifier will be stored.
+ * @param[in]  attr     Pointer to a structure containing the task attributes:
+ *                      - name:       Human-readable task name (for debugging).
+ *                      - entry:      Function pointer to the task entry function.
+ *                      - arg:        Parameter passed to the task function.
+ *                      - stack_size: Stack size in bytes.
+ *                      - priority:   Task priority (higher value = higher priority).
+ *                      - core:       Core affinity (-1 for any, or specific core number if supported).
+ *
+ * @return retval_t
+ *         - SPP_OK if the task was created successfully.
+ *         - Error code otherwise.
+ */
+retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr);
+
 
 /**
  * @brief Delete a task
