@@ -61,7 +61,7 @@ typedef enum {
  * @param task_handle Pointer to store task handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
+retval_t SPP_OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
                          uint32_t stack_size, void* parameters, osal_priority_t priority,
                          osal_task_handle_t* task_handle);
 
