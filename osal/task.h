@@ -72,7 +72,7 @@ retval_t SPP_OSAL_TaskCreate(osal_task_function_t task_function, const char* nam
  * @param task_handle Task handle (NULL for current task)
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskDelete(osal_task_handle_t task_handle);
+retval_t SPP_OSAL_TaskDelete(osal_task_handle_t task_handle);
 
 /**
  * @brief Delay task execution
@@ -80,7 +80,7 @@ retval_t OSAL_TaskDelete(osal_task_handle_t task_handle);
  * @param delay_ms Delay in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskDelay(uint32_t delay_ms);
+retval_t SPP_OSAL_TaskDelay(uint32_t delay_ms);
 
 /**
  * @brief Suspend a task
