@@ -22,52 +22,52 @@ extern "C" {
 /**
  * @brief OSAL Task handle type
  */
-typedef void* osal_task_handle_t;
+typedef void* SPP_OSAL_task_handle_t;
 
 /**
  * @brief OSAL Mutex handle type
  */
-typedef void* osal_mutex_handle_t;
+typedef void* SPP_OSAL_mutex_handle_t;
 
 /**
  * @brief OSAL Queue handle type
  */
-typedef void* osal_queue_handle_t;
+typedef void* SPP_OSAL_queue_handle_t;
 
 /**
  * @brief OSAL Semaphore handle type
  */
-typedef void* osal_semaphore_handle_t;
+typedef void* SPP_OSAL_semaphore_handle_t;
 
 /**
  * @brief Task function pointer type
  */
-typedef void (*osal_task_function_t)(void* parameters);
+typedef void (*SPP_OSAL_task_function_t)(void* parameters);
 
 /**
  * @brief Task priority levels
  */
 typedef enum {
-    OSAL_PRIORITY_IDLE = 0,
-    OSAL_PRIORITY_LOW = 1,
-    OSAL_PRIORITY_NORMAL = 2,
-    OSAL_PRIORITY_HIGH = 3,
-    OSAL_PRIORITY_CRITICAL = 4
-} osal_priority_t;
+    SPP_OSAL_PRIORITY_IDLE = 0,
+    SPP_OSAL_PRIORITY_LOW = 1,
+    SPP_OSAL_PRIORITY_NORMAL = 2,
+    SPP_OSAL_PRIORITY_HIGH = 3,
+    SPP_OSAL_PRIORITY_CRITICAL = 4
+} SPP_OSAL_priority_t;
 
 /**
  * @brief Initialize OSAL
  * 
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_Init(void);
+retval_t SPP_OSAL_Init(void);
 
 /**
  * @brief Deinitialize OSAL
  * 
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_Deinit(void);
+retval_t SPP_OSAL_Deinit(void);
 
 /**
  * @brief Create a task
@@ -80,9 +80,9 @@ retval_t OSAL_Deinit(void);
  * @param task_handle Pointer to store task handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
-                         uint32_t stack_size, void* parameters, osal_priority_t priority,
-                         osal_task_handle_t* task_handle);
+retval_t SPP_OSAL_TaskCreate(SPP_OSAL_task_function_t task_function, const char* name,
+                         uint32_t stack_size, void* parameters, SPP_OSAL_priority_t priority,
+                         SPP_OSAL_task_handle_t* task_handle);
 
 /**
  * @brief Delete a task
@@ -90,7 +90,7 @@ retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
  * @param task_handle Task handle (NULL for current task)
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskDelete(osal_task_handle_t task_handle);
+retval_t SPP_OSAL_TaskDelete(SPP_OSAL_task_handle_t task_handle);
 
 /**
  * @brief Delay task execution
@@ -98,7 +98,7 @@ retval_t OSAL_TaskDelete(osal_task_handle_t task_handle);
  * @param delay_ms Delay in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_TaskDelay(uint32_t delay_ms);
+retval_t SPP_OSAL_TaskDelay(uint32_t delay_ms);
 
 /**
  * @brief Create a mutex
@@ -106,7 +106,7 @@ retval_t OSAL_TaskDelay(uint32_t delay_ms);
  * @param mutex_handle Pointer to store mutex handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle);
+retval_t SPP_OSAL_MutexCreate(SPP_OSAL_mutex_handle_t* mutex_handle);
 
 /**
  * @brief Delete a mutex
@@ -114,7 +114,7 @@ retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle);
  * @param mutex_handle Mutex handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle);
+retval_t SPP_OSAL_MutexDelete(SPP_OSAL_mutex_handle_t mutex_handle);
 
 /**
  * @brief Take (lock) a mutex
@@ -123,7 +123,7 @@ retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle);
  * @param timeout_ms Timeout in milliseconds (0 = no wait, UINT32_MAX = wait forever)
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms);
+retval_t SPP_OSAL_MutexTake(SPP_OSAL_mutex_handle_t mutex_handle, uint32_t timeout_ms);
 
 /**
  * @brief Give (unlock) a mutex
@@ -131,7 +131,7 @@ retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms);
  * @param mutex_handle Mutex handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle);
+retval_t SPP_OSAL_MutexGive(SPP_OSAL_mutex_handle_t mutex_handle);
 
 /**
  * @brief Create a queue
@@ -141,7 +141,7 @@ retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle);
  * @param item_size Size of each item in bytes
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
+retval_t SPP_OSAL_QueueCreate(SPP_OSAL_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
 
 /**
  * @brief Delete a queue
@@ -149,7 +149,7 @@ retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_leng
  * @param queue_handle Queue handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
+retval_t SPP_OSAL_QueueDelete(SPP_OSAL_queue_handle_t queue_handle);
 
 /**
  * @brief Send item to queue
@@ -159,7 +159,7 @@ retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueSend(SPP_OSAL_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
 
 /**
  * @brief Receive item from queue
@@ -169,7 +169,7 @@ retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueReceive(SPP_OSAL_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
 
 /**
  * @brief Create a semaphore
@@ -179,7 +179,7 @@ retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_
  * @param initial_count Initial count value
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count);
+retval_t SPP_OSAL_SemaphoreCreate(SPP_OSAL_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count);
 
 /**
  * @brief Delete a semaphore
@@ -187,7 +187,7 @@ retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_
  * @param semaphore_handle Semaphore handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle);
+retval_t SPP_OSAL_SemaphoreDelete(SPP_OSAL_semaphore_handle_t semaphore_handle);
 
 /**
  * @brief Take a semaphore
@@ -196,7 +196,7 @@ retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle);
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms);
+retval_t SPP_OSAL_SemaphoreTake(SPP_OSAL_semaphore_handle_t semaphore_handle, uint32_t timeout_ms);
 
 /**
  * @brief Give a semaphore
@@ -204,14 +204,14 @@ retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t t
  * @param semaphore_handle Semaphore handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle);
+retval_t SPP_OSAL_SemaphoreGive(SPP_OSAL_semaphore_handle_t semaphore_handle);
 
 /**
  * @brief Get system tick count
  * 
  * @return uint32_t Current tick count
  */
-uint32_t OSAL_GetTickCount(void);
+uint32_t SPP_OSAL_GetTickCount(void);
 
 /**
  * @brief Convert milliseconds to ticks
@@ -219,14 +219,14 @@ uint32_t OSAL_GetTickCount(void);
  * @param ms Milliseconds
  * @return uint32_t Equivalent ticks
  */
-uint32_t OSAL_MsToTicks(uint32_t ms);
+uint32_t SPP_OSAL_MsToTicks(uint32_t ms);
 
 /**
  * @brief Start the RTOS scheduler
  * 
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_StartScheduler(void);
+retval_t SPP_OSAL_StartScheduler(void);
 
 #ifdef __cplusplus
 }
