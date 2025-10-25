@@ -3,15 +3,9 @@
 
 typedef unsigned char  SPP_uint8_t;
 typedef unsigned short SPP_uint16_t;
-typedef unsigned long  SPP_uint32_t;
+typedef unsigned long  Spp_uint32_t;
 
-typedef SPP_uint32_t      SPP_size_t;
-
-// OSAL
-typedef void (*SPP_OSAL_task_function_t)(void *arg);
-typedef void* SPP_OSAL_task_handle_t;
-/** @brief Idle hook callback type */
-typedef void (*SPP_OSAL_IdleHook)(void);
+typedef Spp_uint32_t      SPP_size_t;
 //---Init types---
 typedef enum{
     SPP_SPI_MODE0 = 0,
@@ -39,6 +33,10 @@ typedef struct{
     unsigned int queue_size;
 }SPP_SPI_InitCfg;
 
+
+/*--------------------------------------------OSAL-------------------------------------------------------------------*/
+/** @brief Idle hook callback type */
+typedef void (*SPP_OSAL_IdleHook)(void);
 /**
  * @brief Task priority levels
  */
@@ -48,7 +46,7 @@ typedef enum {
     SPP_OSAL_PRIORITY_NORMAL = 2,
     SPP_OSAL_PRIORITY_HIGH = 3,
     SPP_OSAL_PRIORITY_CRITICAL = 4
-} SPP_OSAL_priority_t;
+} SppPriority_t;
 
 /**
  * @brief Task state enumeration
@@ -59,7 +57,7 @@ typedef enum {
     SPP_OSAL_TASK_BLOCKED = 2,
     SPP_OSAL_TASK_SUSPENDED = 3,
     SPP_OSAL_TASK_DELETED = 4
-} SPP_OSAL_task_state_t;
+} SppTaskState;
 
 //---End Init Types---
 //hola

@@ -32,9 +32,9 @@ extern "C" {
  * @param task_handle Pointer to store task handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskCreate(SPP_OSAL_task_function_t task_function, const char* name,
-                         SPP_uint32_t stack_size, void* parameters, SPP_OSAL_priority_t priority,
-                         SPP_OSAL_task_handle_t* task_handle);
+SppRet_t SPP_OSAL_TaskCreate(void* task_function, const char* name,
+                         Spp_uint32_t stack_size, void* parameters, SppPriority_t priority,
+                         void* task_handle);
 
 /**
  * @brief Delete a task
@@ -42,7 +42,7 @@ SPP_OSAL_retval_t SPP_OSAL_TaskCreate(SPP_OSAL_task_function_t task_function, co
  * @param task_handle Task handle (NULL for current task)
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskDelete(SPP_OSAL_task_handle_t task_handle);
+SppRet_t SPP_OSAL_TaskDelete(void* task_handle);
 
 /**
  * @brief Delay task execution
@@ -50,7 +50,7 @@ SPP_OSAL_retval_t SPP_OSAL_TaskDelete(SPP_OSAL_task_handle_t task_handle);
  * @param delay_ms Delay in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskDelay(SPP_uint32_t delay_ms);
+SppRet_t SPP_OSAL_TaskDelay(Spp_uint32_t delay_ms);
 
 /**
  * @brief Suspend a task
@@ -58,7 +58,7 @@ SPP_OSAL_retval_t SPP_OSAL_TaskDelay(SPP_uint32_t delay_ms);
  * @param task_handle Task handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskSuspend(SPP_OSAL_task_handle_t task_handle);
+SppRet_t SPP_OSAL_TaskSuspend(void* task_handle);
 
 /**
  * @brief Resume a task
@@ -66,29 +66,29 @@ SPP_OSAL_retval_t SPP_OSAL_TaskSuspend(SPP_OSAL_task_handle_t task_handle);
  * @param task_handle Task handle
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskResume(SPP_OSAL_task_handle_t task_handle);
+SppRet_t SPP_OSAL_TaskResume(void* task_handle);
 
 /**
  * @brief Get current task handle
  * 
- * @return SPP_OSAL_task_handle_t Current task handle
+ * @return void* Current task handle
  */
-SPP_OSAL_task_handle_t SPP_OSAL_TaskGetCurrent(void);
+void* SPP_OSAL_TaskGetCurrent(void);
 
 /**
  * @brief Get task state
  * 
  * @param task_handle Task handle
- * @return SPP_OSAL_task_state_t Task state
+ * @return SppTaskState Task state
  */
-SPP_OSAL_task_state_t SPP_OSAL_TaskGetState(SPP_OSAL_task_handle_t task_handle);
+SppTaskState SPP_OSAL_TaskGetState(void* task_handle);
 
 /**
  * @brief Yield CPU to other tasks
  * 
  * @return retval_t SPP_OK on success, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskYield(void);
+SppRet_t SPP_OSAL_TaskYield(void);
 
 
 /**
@@ -99,8 +99,8 @@ SPP_OSAL_retval_t SPP_OSAL_TaskYield(void);
  * @param period_ms periodo en miliseconds
  * @return SPP_OK everything ok, error code otherwise
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskDelayUntil(SPP_uint32_t* const io_previous_wake_tick,
-                                          SPP_uint32_t period_ms);
+SppRet_t SPP_OSAL_TaskDelayUntil(Spp_uint32_t* const io_previous_wake_tick,
+                                          Spp_uint32_t period_ms);
 
 /**
  * @brief Set task priority at runtime.
@@ -109,8 +109,8 @@ SPP_OSAL_retval_t SPP_OSAL_TaskDelayUntil(SPP_uint32_t* const io_previous_wake_t
  * @param priority new priority
  * @return SPP_OK everything ok, error if handle invalid
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskPrioritySet(SPP_OSAL_task_handle_t task,
-                                           SPP_OSAL_priority_t priority);
+SppRet_t SPP_OSAL_TaskPrioritySet(void* task,
+                                           SppPriority_t priority);
 
 /**
  * @brief Get task priority.
@@ -119,8 +119,7 @@ SPP_OSAL_retval_t SPP_OSAL_TaskPrioritySet(SPP_OSAL_task_handle_t task,
  * @param out_priority [out] actual priority
  * @return SPP_OK everything ok, error if handle invalid
  */
-SPP_OSAL_retval_t SPP_OSAL_TaskPriorityGet(SPP_OSAL_task_handle_t task,
-                                           SPP_OSAL_priority_t* out_priority);
+SppRet_t SPP_OSAL_TaskPriorityGet(void* task, SppPriority_t* out_priority);
 
 
 
@@ -130,7 +129,7 @@ SPP_OSAL_retval_t SPP_OSAL_TaskPriorityGet(SPP_OSAL_task_handle_t task,
  * @param hook Callback to execute during idle time
  * @return SPP_OK if everything okay
  */
-SPP_OSAL_retval_t SPP_OSAL_IdleHookRegister(SPP_OSAL_IdleHook hook);
+SppRet_t SPP_OSAL_IdleHookRegister(SPP_OSAL_IdleHook hook);
 
 #ifdef __cplusplus
 }
