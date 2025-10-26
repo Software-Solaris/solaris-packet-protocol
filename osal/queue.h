@@ -1,3 +1,7 @@
+// Aquí se definen las funciones que quieres en el queue.c
+
+
+
 /**
  * @file queue.h
  * @brief OSAL Queue Management Interface
@@ -14,7 +18,7 @@
 #include <stdbool.h>
 #include "core/returntypes.h"
 
-#ifdef __cplusplus
+#ifdef __cplusplus // Es un wrapper de compatibilidad entre C y C++
 extern "C" {
 #endif
 
@@ -31,7 +35,7 @@ typedef void* osal_queue_handle_t;
  * @param item_size Size of each item in bytes
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
+retval_t SPP_OSAL_QueueCreate(void* p_queue_handle, uint32_t queue_length, uint32_t item_size);
 
 /**
  * @brief Delete a queue

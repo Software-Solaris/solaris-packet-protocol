@@ -1,3 +1,8 @@
+// Aqui van los weaks de las funciones que crees en queues.c
+
+
+
+
 /**
  * @file queue.c
  * @brief OSAL Queue Management Implementation
