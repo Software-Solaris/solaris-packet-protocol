@@ -22,13 +22,13 @@ typedef enum {
     SPP_RETVAL_ERROR_OS
 } SppRetVal_t;
 
-typedef struct {
-    void (*task_func)(void*);   
-    const char* name;            
-    SppStackSizeBytes stack_bytes;
-    uint32_t priority;          
-    void* params;                
-    SppTaskHandle* out_handle;   
-} SppTaskCreateParams;
+// typedef struct {
+//     void (*task_func)(void*);   
+//     const char* name;            
+//     SppStackSizeBytes stack_bytes;
+//     uint32_t priority;          
+//     void* params;                
+//     SppTaskHandle* out_handle;   
+// } SppTaskCreateParams;
 
 #endif

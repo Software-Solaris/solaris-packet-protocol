@@ -54,14 +54,14 @@ typedef enum {
 /**
  * @brief Task parameters
  */
-typedef struct {
-    const char *name;
-    spp_task_func_t entry;
-    void *arg;
-    unsigned int stack_size;
-    unsigned int priority;
-    int core;   // -1 for any core
-} spp_task_attr_t;
+// typedef struct {
+//     const char *name;
+//     spp_task_func_t entry;
+//     void *arg;
+//     unsigned int stack_size;
+//     unsigned int priority;
+//     int core;   // -1 for any core
+// } spp_task_attr_t;
 
 /**
  * @brief Create a new task/thread in the underlying RTOS.
@@ -82,7 +82,7 @@ typedef struct {
  *         - SPP_OK if the task was created successfully.
  *         - Error code otherwise.
  */
-retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr);
+// retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr);
 
 
 /**

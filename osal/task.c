@@ -15,11 +15,11 @@
 /**
  * @brief Default (weak) task creation
  */
-__attribute__((weak)) retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr)
+// __attribute__((weak)) retval_t OSAL_TaskCreate(spp_task_handle_t *handle, const spp_task_attr_t *attr)
 
-{
-    return SPP_ERROR;
-}
+// {
+//     return SPP_ERROR;
+// }
 
 /**
  * @brief Default (weak) task deletion
