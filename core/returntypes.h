@@ -9,7 +9,7 @@ typedef enum{
     SPP_ERROR_NULL_POINTER,
     SPP_ERROR_NOT_INITIALIZED,
     SPP_ERROR_INVALID_PARAMETER
-}SppRet_t;
+}SppRetVal_t;
 
 
 #endif

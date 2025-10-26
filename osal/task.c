@@ -18,23 +18,23 @@
  * @brief Default (weak) task creation
  */
 
-__attribute__((weak)) SppRet_t SPP_OSAL_TaskCreate(void* task_function, const char* name,
-                    Spp_uint32_t stack_size, void* parameters, SppPriority_t priority,
+__attribute__((weak)) SppRetVal_t SPP_OSAL_TaskCreate(void* task_function, const char* name,
+                    Spp_uint32_t stack_size, void* p_parameters, SppPriority_t priority,
                     void** task_handle)
 {
     if (task_function == NULL || task_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
     *task_handle = (void*)0x12345678;
-    (void)name; (void)stack_size; (void)parameters; (void)priority;
+    (void)name; (void)stack_size; (void)p_parameters; (void)priority;
     return SPP_OK;
 }
 
 /**
  * @brief Default (weak) task deletion
  */
-__attribute__((weak)) SppRet_t
-SPP_OSAL_TaskDelete(void* task_handle)
+__attribute__((weak)) SppRetVal_t
+SPP_OSAL_TaskDelete(SppTaskHandle_t)
 {
     (void)task_handle;
     return SPP_OK;
@@ -43,7 +43,7 @@ SPP_OSAL_TaskDelete(void* task_handle)
 /**
  * @brief Default (weak) task delay
  */
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskDelay(Spp_uint32_t delay_ms)
 {
     volatile Spp_uint32_t count = delay_ms * 1000;
@@ -56,8 +56,8 @@ SPP_OSAL_TaskDelay(Spp_uint32_t delay_ms)
 /**
  * @brief Default (weak) task suspend
  */
-__attribute__((weak)) SppRet_t
-SPP_OSAL_TaskSuspend(void* task_handle)
+__attribute__((weak)) SppRetVal_t
+SPP_OSAL_TaskSuspend(SppTaskHandle_t)
 {
     // Default implementation - just return OK
     (void)task_handle;
@@ -68,8 +68,8 @@ SPP_OSAL_TaskSuspend(void* task_handle)
 /**
  * @brief Default (weak) task resume
  */
-__attribute__((weak)) SppRet_t
-SPP_OSAL_TaskResume(void* task_handle)
+__attribute__((weak)) SppRetVal_t
+SPP_OSAL_TaskResume(SppTaskHandle_t)
 {
     // Default implementation - just return OK
     (void)task_handle;
@@ -91,7 +91,7 @@ SPP_OSAL_TaskGetCurrent(void)
  * @brief Default (weak) get task state
  */
 __attribute__((weak)) SppTaskState
-SPP_OSAL_TaskGetState(void* task_handle)
+SPP_OSAL_TaskGetState(SppTaskHandle_t)
 {   // Default implementation - always return running
     (void)task_handle;
     return SPP_OSAL_TASK_RUNNING;
@@ -101,7 +101,7 @@ SPP_OSAL_TaskGetState(void* task_handle)
 /**
  * @brief Default (weak) task yield
  */ 
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskYield(void)
 {
     // Default implementation - just return OK
@@ -112,7 +112,7 @@ SPP_OSAL_TaskYield(void)
 /**
  * @brief Default (weak) periodic delay (delay-until)
  */
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskDelayUntil(Spp_uint32_t* const io_previous_wake_tick, Spp_uint32_t period_ms)
 {
     if (io_previous_wake_tick == NULL) return SPP_ERROR_NULL_POINTER;
@@ -123,7 +123,7 @@ SPP_OSAL_TaskDelayUntil(Spp_uint32_t* const io_previous_wake_tick, Spp_uint32_t 
 /**
  * @brief Default (weak) set task priority
  */
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskPrioritySet(void* task, SppPriority_t priority)
 {
     if (task == NULL) return SPP_ERROR_NULL_POINTER;
@@ -134,7 +134,7 @@ SPP_OSAL_TaskPrioritySet(void* task, SppPriority_t priority)
 /**
  * @brief Default (weak) get task priority
  */
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskPriorityGet(void* task, SppPriority_t* out_priority)
 {
     if (task == NULL) return SPP_ERROR_NULL_POINTER;
@@ -146,7 +146,7 @@ SPP_OSAL_TaskPriorityGet(void* task, SppPriority_t* out_priority)
 /**
  * @brief Default (weak) idle hook register
  */
-__attribute__((weak)) SppRet_t
+__attribute__((weak)) SppRetVal_t
 SPP_OSAL_IdleHookRegister(SPP_OSAL_IdleHook hook)
 {
     (void)hook; 
