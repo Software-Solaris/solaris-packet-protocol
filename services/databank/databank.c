@@ -8,7 +8,7 @@ static spp_packet_t data_bank[DATA_BANK_SIZE];
 static data_pool_t data_pool;
 static bool is_initialized = false;
 
-retval_t DataBank_Init(void){
+SppRetVal_t DataBank_Init(void){
     if (is_initialized) {
         return SPP_OK; // Already initialized
     }
@@ -49,7 +49,7 @@ spp_packet_t* DataBank_GetPacket(void){
     return p_packet;
 }
 
-retval_t DataBank_ReturnPacket(spp_packet_t* p_packet){
+SppRetVal_t DataBank_ReturnPacket(spp_packet_t* p_packet){
     if (!is_initialized) {
         printf("Error: Data Bank not initialized\n");
         return SPP_ERROR;

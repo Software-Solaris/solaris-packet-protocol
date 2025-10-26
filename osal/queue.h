@@ -29,17 +29,17 @@ typedef void* osal_queue_handle_t;
  * @param queue_handle Pointer to store queue handle
  * @param queue_length Maximum number of items in queue
  * @param item_size Size of each item in bytes
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
+SppRetVal_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
 
 /**
  * @brief Delete a queue
  * 
  * @param queue_handle Queue handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
+SppRetVal_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
 
 /**
  * @brief Send item to queue
@@ -47,9 +47,9 @@ retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
  * @param queue_handle Queue handle
  * @param item Pointer to item to send
  * @param timeout_ms Timeout in milliseconds
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
+SppRetVal_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
 
 /**
  * @brief Send item to queue from ISR
@@ -57,9 +57,9 @@ retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint
  * @param queue_handle Queue handle
  * @param item Pointer to item to send
  * @param higher_priority_task_woken Pointer to flag indicating if higher priority task was woken
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken);
+SppRetVal_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken);
 
 /**
  * @brief Receive item from queue
@@ -67,9 +67,9 @@ retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* ite
  * @param queue_handle Queue handle
  * @param item Pointer to buffer for received item
  * @param timeout_ms Timeout in milliseconds
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
+SppRetVal_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
 
 /**
  * @brief Receive item from queue from ISR
@@ -77,9 +77,9 @@ retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_
  * @param queue_handle Queue handle
  * @param item Pointer to buffer for received item
  * @param higher_priority_task_woken Pointer to flag indicating if higher priority task was woken
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queue_handle, void* item, bool* higher_priority_task_woken);
+SppRetVal_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queue_handle, void* item, bool* higher_priority_task_woken);
 
 /**
  * @brief Peek at item in queue without removing it
@@ -87,9 +87,9 @@ retval_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queue_handle, void* item, 
  * @param queue_handle Queue handle
  * @param item Pointer to buffer for peeked item
  * @param timeout_ms Timeout in milliseconds
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueuePeek(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
+SppRetVal_t OSAL_QueuePeek(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
 
 /**
  * @brief Get number of items in queue
@@ -127,9 +127,9 @@ bool OSAL_QueueIsEmpty(osal_queue_handle_t queue_handle);
  * @brief Reset queue (remove all items)
  * 
  * @param queue_handle Queue handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReset(osal_queue_handle_t queue_handle);
+SppRetVal_t OSAL_QueueReset(osal_queue_handle_t queue_handle);
 
 #ifdef __cplusplus
 }

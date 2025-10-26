@@ -44,20 +44,20 @@ typedef struct {
  * 
  * @param handle Pointer to SPI handle
  * @param config Pointer to SPI configuration
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPP_HAL_SPI_BusInit(void);
+SppRetVal_t SPP_HAL_SPI_BusInit(void);
 void* SPP_HAL_SPI_GetHandler(void);
-retval_t SPP_HAL_SPI_DeviceInit(void* p_handler);
-retval_t SPI_Init(spi_handle_t* handle, const spi_config_t* config);
+SppRetVal_t SPP_HAL_SPI_DeviceInit(void* p_handler);
+SppRetVal_t SPI_Init(spi_handle_t* handle, const spi_config_t* config);
 
 /**
  * @brief Deinitialize SPI peripheral
  * 
  * @param handle Pointer to SPI handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPI_Deinit(spi_handle_t* handle);
+SppRetVal_t SPI_Deinit(spi_handle_t* handle);
 
 /**
  * @brief Transmit data over SPI
@@ -66,9 +66,9 @@ retval_t SPI_Deinit(spi_handle_t* handle);
  * @param data_to_send Pointer to the data to transmit
  * @param data_to_recieve Pointer to where the data recieved will be stored
  * @param length Size of the buffer to transmit data (recieve buffer should be half of the size)
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length);
+SppRetVal_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length);
 
 /**
  * @brief Receive data over SPI
@@ -77,9 +77,9 @@ retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_r
  * @param rx_data Pointer to reception buffer
  * @param length Number of bytes to receive
  * @param timeout_ms Timeout in milliseconds
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx_data, 
+SppRetVal_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx_data, 
                      uint16_t length, uint32_t timeout_ms);
 
 /**
@@ -90,9 +90,9 @@ retval_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx_data,
  * @param rx_data Pointer to reception buffer
  * @param length Number of bytes to transfer
  * @param timeout_ms Timeout in milliseconds
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPI_TransmitReceive(spi_handle_t* handle, const uint8_t* tx_data, 
+SppRetVal_t SPI_TransmitReceive(spi_handle_t* handle, const uint8_t* tx_data, 
                              uint8_t* rx_data, uint16_t length, uint32_t timeout_ms);
 
 /**
@@ -109,9 +109,9 @@ bool SPI_IsBusy(spi_handle_t* handle);
  * @param handle Pointer to SPI handle
  * @param cs_pin Chip select pin number
  * @param active Active state (true = active, false = inactive)
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t cs_pin, bool active);
+SppRetVal_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t cs_pin, bool active);
 
 /**
  * @brief Get SPI data (simplified interface)
@@ -119,9 +119,9 @@ retval_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t cs_pin, bool active);
  * @param spi_id SPI peripheral ID
  * @param data Pointer to data buffer
  * @param length Number of bytes to read
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t spi_get_data(uint8_t spi_id, uint8_t* data, uint16_t length);
+SppRetVal_t spi_get_data(uint8_t spi_id, uint8_t* data, uint16_t length);
 
 /**
  * @brief Write SPI data (simplified interface)
@@ -129,9 +129,9 @@ retval_t spi_get_data(uint8_t spi_id, uint8_t* data, uint16_t length);
  * @param spi_id SPI peripheral ID
  * @param data Pointer to data to write
  * @param length Number of bytes to write
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t spi_write_data(uint8_t spi_id, const uint8_t* data, uint16_t length);
+SppRetVal_t spi_write_data(uint8_t spi_id, const uint8_t* data, uint16_t length);
 
 #ifdef __cplusplus
 }

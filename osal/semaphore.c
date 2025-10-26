@@ -15,7 +15,7 @@
 /**
  * @brief Default (weak) counting semaphore creation
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -35,7 +35,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* sem
 /**
  * @brief Default (weak) binary semaphore creation
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_t* semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_t* semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -49,7 +49,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_
 /**
  * @brief Default (weak) semaphore deletion
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle)
 {
     // Default implementation - just return OK
     (void)semaphore_handle;
@@ -59,7 +59,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t sema
 /**
  * @brief Default (weak) semaphore take
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -73,7 +73,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaph
 /**
  * @brief Default (weak) semaphore give
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -86,7 +86,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaph
 /**
  * @brief Default (weak) semaphore give from ISR
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreGiveFromISR(osal_semaphore_handle_t semaphore_handle, bool* higher_priority_task_woken)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreGiveFromISR(osal_semaphore_handle_t semaphore_handle, bool* higher_priority_task_woken)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -102,7 +102,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreGiveFromISR(osal_semaphore_handle_t
 /**
  * @brief Default (weak) semaphore try take
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreTryTake(osal_semaphore_handle_t semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreTryTake(osal_semaphore_handle_t semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;

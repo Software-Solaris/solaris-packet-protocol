@@ -42,7 +42,7 @@ void ESP32_SPI_GetDefaultConfig(esp32_spi_config_t* config)
 /**
  * @brief Initialize ESP32-S3 SPI with specific configuration
  */
-retval_t ESP32_SPI_Init(const esp32_spi_config_t* config)
+SppRetVal_t ESP32_SPI_Init(const esp32_spi_config_t* config)
 {
     if (config == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -104,7 +104,7 @@ retval_t ESP32_SPI_Init(const esp32_spi_config_t* config)
 /**
  * @brief Deinitialize ESP32-S3 SPI
  */
-retval_t ESP32_SPI_Deinit(void)
+SppRetVal_t ESP32_SPI_Deinit(void)
 {
     if (!is_initialized) {
         return SPP_ERROR_NOT_INITIALIZED;
@@ -127,7 +127,7 @@ retval_t ESP32_SPI_Deinit(void)
 /**
  * @brief ESP32-S3 SPI Initialization (HAL Override)
  */
-retval_t SPI_Init(void)
+SppRetVal_t SPI_Init(void)
 {
     esp32_spi_config_t config;
     ESP32_SPI_GetDefaultConfig(&config);
@@ -137,7 +137,7 @@ retval_t SPI_Init(void)
 /**
  * @brief ESP32-S3 SPI Deinitialization (HAL Override)
  */
-retval_t SPI_Deinit(void)
+SppRetVal_t SPI_Deinit(void)
 {
     return ESP32_SPI_Deinit();
 }
@@ -145,7 +145,7 @@ retval_t SPI_Deinit(void)
 /**
  * @brief ESP32-S3 SPI Transmit (HAL Override)
  */
-retval_t SPI_Transmit(const uint8_t* data, uint16_t size, uint32_t timeout_ms)
+SppRetVal_t SPI_Transmit(const uint8_t* data, uint16_t size, uint32_t timeout_ms)
 {
     if (data == NULL || size == 0) {
         return SPP_ERROR_INVALID_PARAMETER;
@@ -178,7 +178,7 @@ retval_t SPI_Transmit(const uint8_t* data, uint16_t size, uint32_t timeout_ms)
 /**
  * @brief ESP32-S3 SPI Receive (HAL Override)
  */
-retval_t SPI_Receive(uint8_t* data, uint16_t size, uint32_t timeout_ms)
+SppRetVal_t SPI_Receive(uint8_t* data, uint16_t size, uint32_t timeout_ms)
 {
     if (data == NULL || size == 0) {
         return SPP_ERROR_INVALID_PARAMETER;
@@ -212,7 +212,7 @@ retval_t SPI_Receive(uint8_t* data, uint16_t size, uint32_t timeout_ms)
 /**
  * @brief ESP32-S3 SPI Transmit/Receive (HAL Override)
  */
-retval_t SPI_TransmitReceive(const uint8_t* tx_data, uint8_t* rx_data, uint16_t size, uint32_t timeout_ms)
+SppRetVal_t SPI_TransmitReceive(const uint8_t* tx_data, uint8_t* rx_data, uint16_t size, uint32_t timeout_ms)
 {
     if (tx_data == NULL || rx_data == NULL || size == 0) {
         return SPP_ERROR_INVALID_PARAMETER;
@@ -255,7 +255,7 @@ bool SPI_IsBusy(void)
 /**
  * @brief ESP32-S3 SPI Chip Select Control (HAL Override)
  */
-retval_t SPI_SetChipSelect(bool active)
+SppRetVal_t SPI_SetChipSelect(bool active)
 {
     if (!is_initialized) {
         return SPP_ERROR_NOT_INITIALIZED;
@@ -275,7 +275,7 @@ retval_t SPI_SetChipSelect(bool active)
 /**
  * @brief ESP32-S3 SPI Simple Data Read (HAL Override)
  */
-retval_t spi_get_data(uint8_t* data, uint16_t size)
+SppRetVal_t spi_get_data(uint8_t* data, uint16_t size)
 {
     return SPI_Receive(data, size, 1000); // 1 second timeout
 }
@@ -283,7 +283,7 @@ retval_t spi_get_data(uint8_t* data, uint16_t size)
 /**
  * @brief ESP32-S3 SPI Simple Data Write (HAL Override)
  */
-retval_t spi_write_data(const uint8_t* data, uint16_t size)
+SppRetVal_t spi_write_data(const uint8_t* data, uint16_t size)
 {
     return SPI_Transmit(data, size, 1000); // 1 second timeout
 } 

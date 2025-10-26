@@ -497,7 +497,7 @@ cat > main.c << 'EOF'
 int main() {
     printf("=== My SPP Application ===\n");
     
-    retval_t result = Core_Init();
+    SppRetVal_t result = Core_Init();
     if (result != SPP_OK) {
         printf("Error initializing SPP: %d\n", result);
         return -1;
@@ -553,7 +553,7 @@ cmake .. && make && ./my_app
 
 int main() {
     // Initialize SPP
-    retval_t result = Core_Init();
+    SppRetVal_t result = Core_Init();
     if (result != SPP_OK) {
         printf("Error initializing SPP: %d\n", result);
         return -1;

@@ -66,30 +66,30 @@ The SPI interface provides a complete abstraction for SPI communication:
 #include "hal/spi/spi.h"
 
 // Initialize SPI peripheral
-retval_t SPI_Init(void);
+SppRetVal_t SPI_Init(void);
 
 // Deinitialize SPI peripheral
-retval_t SPI_Deinit(void);
+SppRetVal_t SPI_Deinit(void);
 
 // Transmit data
-retval_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout);
+SppRetVal_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout);
 
 // Receive data
-retval_t SPI_Receive(uint8_t *data, uint16_t size, uint32_t timeout);
+SppRetVal_t SPI_Receive(uint8_t *data, uint16_t size, uint32_t timeout);
 
 // Transmit and receive simultaneously
-retval_t SPI_TransmitReceive(uint8_t *tx_data, uint8_t *rx_data, 
+SppRetVal_t SPI_TransmitReceive(uint8_t *tx_data, uint8_t *rx_data, 
                             uint16_t size, uint32_t timeout);
 
 // Check if SPI is busy
 bool SPI_IsBusy(void);
 
 // Control chip select
-retval_t SPI_SetChipSelect(bool active);
+SppRetVal_t SPI_SetChipSelect(bool active);
 
 // Simplified interface functions
-retval_t spi_write_data(uint8_t *data, uint16_t size);
-retval_t spi_get_data(uint8_t *data, uint16_t size);
+SppRetVal_t spi_write_data(uint8_t *data, uint16_t size);
+SppRetVal_t spi_get_data(uint8_t *data, uint16_t size);
 ```
 
 ### Implementation: `hal/spi/spi.c`
@@ -97,12 +97,12 @@ retval_t spi_get_data(uint8_t *data, uint16_t size);
 All functions are implemented as weak symbols, allowing platform-specific overrides:
 
 ```c
-__attribute__((weak)) retval_t SPI_Init(void) {
+__attribute__((weak)) SppRetVal_t SPI_Init(void) {
     // Default implementation - returns not supported
     return SPP_ERROR_NOT_SUPPORTED;
 }
 
-__attribute__((weak)) retval_t spi_write_data(uint8_t *data, uint16_t size) {
+__attribute__((weak)) SppRetVal_t spi_write_data(uint8_t *data, uint16_t size) {
     // Default implementation using standard SPI functions
     return SPI_Transmit(data, size, 1000);
 }
@@ -121,7 +121,7 @@ __attribute__((weak)) retval_t spi_write_data(uint8_t *data, uint16_t size) {
 ```c
 int main() {
     // Initialize SPI
-    retval_t result = SPI_Init();
+    SppRetVal_t result = SPI_Init();
     if (result != SPP_OK) {
         printf("SPI initialization failed: %d\n", result);
         return -1;
@@ -141,7 +141,7 @@ void send_spi_data(void) {
     uint8_t rx_data[4];
     
     // Simple write
-    retval_t result = spi_write_data(tx_data, sizeof(tx_data));
+    SppRetVal_t result = spi_write_data(tx_data, sizeof(tx_data));
     if (result != SPP_OK) {
         printf("SPI write failed: %d\n", result);
         return;
@@ -175,7 +175,7 @@ Create your platform-specific implementation file and override the weak function
 #include "my_platform_spi_driver.h"
 
 // Override the weak SPI_Init function
-retval_t SPI_Init(void) {
+SppRetVal_t SPI_Init(void) {
     // Your platform-specific SPI initialization
     if (my_platform_spi_init() == 0) {
         return SPP_OK;
@@ -184,7 +184,7 @@ retval_t SPI_Init(void) {
 }
 
 // Override the weak spi_write_data function
-retval_t spi_write_data(uint8_t *data, uint16_t size) {
+SppRetVal_t spi_write_data(uint8_t *data, uint16_t size) {
     if (data == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
@@ -210,7 +210,7 @@ For complex platforms, you might want to implement all functions:
 
 static spi_device_handle_t spi_handle = NULL;
 
-retval_t SPI_Init(void) {
+SppRetVal_t SPI_Init(void) {
     spi_bus_config_t bus_config = {
         .miso_io_num = GPIO_NUM_19,
         .mosi_io_num = GPIO_NUM_23,
@@ -236,7 +236,7 @@ retval_t SPI_Init(void) {
     return SPP_OK;
 }
 
-retval_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout) {
+SppRetVal_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout) {
     if (data == NULL || spi_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
@@ -277,7 +277,7 @@ idf_component_register(
 
 ## Error Handling
 
-All HAL functions return `retval_t` status codes defined in `core/returntypes.h`:
+All HAL functions return `SppRetVal_t` status codes defined in `core/returntypes.h`:
 
 ```c
 typedef enum {
@@ -289,13 +289,13 @@ typedef enum {
     SPP_ERROR_TIMEOUT,             // Operation timed out
     SPP_ERROR_BUSY,                // Peripheral is busy
     SPP_ERROR_NOT_SUPPORTED,       // Operation not supported
-} retval_t;
+} SppRetVal_t;
 ```
 
 ### Error Handling Example
 
 ```c
-retval_t result = SPI_Init();
+SppRetVal_t result = SPI_Init();
 switch (result) {
     case SPP_OK:
         printf("SPI initialized successfully\n");
@@ -314,7 +314,7 @@ switch (result) {
 
 ### 1. Always Check Return Values
 ```c
-retval_t result = SPI_Init();
+SppRetVal_t result = SPI_Init();
 if (result != SPP_OK) {
     // Handle error appropriately
     return result;
@@ -323,7 +323,7 @@ if (result != SPP_OK) {
 
 ### 2. Validate Parameters
 ```c
-retval_t my_spi_function(uint8_t *data, uint16_t size) {
+SppRetVal_t my_spi_function(uint8_t *data, uint16_t size) {
     if (data == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
@@ -337,7 +337,7 @@ retval_t my_spi_function(uint8_t *data, uint16_t size) {
 ### 3. Use Timeouts for Blocking Operations
 ```c
 // Use reasonable timeouts
-retval_t result = SPI_Transmit(data, size, 1000); // 1 second timeout
+SppRetVal_t result = SPI_Transmit(data, size, 1000); // 1 second timeout
 ```
 
 ### 4. Check Busy Status
@@ -377,8 +377,8 @@ To add a new peripheral to the HAL:
 #include "core/returntypes.h"
 
 // Function declarations
-retval_t NEW_PERIPHERAL_Init(void);
-retval_t NEW_PERIPHERAL_Deinit(void);
+SppRetVal_t NEW_PERIPHERAL_Init(void);
+SppRetVal_t NEW_PERIPHERAL_Deinit(void);
 // Add more functions as needed
 
 #endif // NEW_PERIPHERAL_H
@@ -388,11 +388,11 @@ retval_t NEW_PERIPHERAL_Deinit(void);
 // hal/new_peripheral/new_peripheral.c
 #include "new_peripheral.h"
 
-__attribute__((weak)) retval_t NEW_PERIPHERAL_Init(void) {
+__attribute__((weak)) SppRetVal_t NEW_PERIPHERAL_Init(void) {
     return SPP_ERROR_NOT_SUPPORTED;
 }
 
-__attribute__((weak)) retval_t NEW_PERIPHERAL_Deinit(void) {
+__attribute__((weak)) SppRetVal_t NEW_PERIPHERAL_Deinit(void) {
     return SPP_ERROR_NOT_SUPPORTED;
 }
 ```
@@ -417,7 +417,7 @@ __attribute__((weak)) retval_t NEW_PERIPHERAL_Deinit(void) {
 
 ```c
 // Add debug prints to verify function calls
-retval_t SPI_Init(void) {
+SppRetVal_t SPI_Init(void) {
     printf("Platform-specific SPI_Init called\n");
     // Your implementation
     return SPP_OK;

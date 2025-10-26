@@ -15,7 +15,7 @@
 /**
  * @brief Default (weak) mutex creation
  */
-__attribute__((weak)) retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type)
+__attribute__((weak)) SppRetVal_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -30,7 +30,7 @@ __attribute__((weak)) retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handl
 /**
  * @brief Default (weak) mutex deletion
  */
-__attribute__((weak)) retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle)
 {
     // Default implementation - just return OK
     (void)mutex_handle;
@@ -40,7 +40,7 @@ __attribute__((weak)) retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle
 /**
  * @brief Default (weak) mutex take
  */
-__attribute__((weak)) retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -54,7 +54,7 @@ __attribute__((weak)) retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, 
 /**
  * @brief Default (weak) mutex give
  */
-__attribute__((weak)) retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -67,7 +67,7 @@ __attribute__((weak)) retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 /**
  * @brief Default (weak) mutex try take
  */
-__attribute__((weak)) retval_t OSAL_MutexTryTake(osal_mutex_handle_t mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexTryTake(osal_mutex_handle_t mutex_handle)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;

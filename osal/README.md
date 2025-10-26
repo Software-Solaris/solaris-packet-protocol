@@ -119,26 +119,26 @@ typedef enum {
 #include "osal/task.h"
 
 // Create a new task
-retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
+SppRetVal_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
                         const char *name,
                         OSAL_TaskFunction_t function,
                         void *parameters,
                         OSAL_TaskPriority_t priority);
 
 // Delete a task
-retval_t OSAL_TaskDelete(OSAL_TaskHandle_t task);
+SppRetVal_t OSAL_TaskDelete(OSAL_TaskHandle_t task);
 
 // Suspend a task
-retval_t OSAL_TaskSuspend(OSAL_TaskHandle_t task);
+SppRetVal_t OSAL_TaskSuspend(OSAL_TaskHandle_t task);
 
 // Resume a task
-retval_t OSAL_TaskResume(OSAL_TaskHandle_t task);
+SppRetVal_t OSAL_TaskResume(OSAL_TaskHandle_t task);
 
 // Delay current task
-retval_t OSAL_TaskDelay(uint32_t milliseconds);
+SppRetVal_t OSAL_TaskDelay(uint32_t milliseconds);
 
 // Yield CPU to other tasks
-retval_t OSAL_TaskYield(void);
+SppRetVal_t OSAL_TaskYield(void);
 
 // Get current task handle
 OSAL_TaskHandle_t OSAL_TaskGetCurrent(void);
@@ -170,7 +170,7 @@ int main() {
     OSAL_Init();
     
     // Create task
-    retval_t result = OSAL_TaskCreate(&task_handle,
+    SppRetVal_t result = OSAL_TaskCreate(&task_handle,
                                      "MyTask",
                                      my_task_function,
                                      &counter,
@@ -196,33 +196,33 @@ int main() {
 #include "osal/queue.h"
 
 // Create a queue
-retval_t OSAL_QueueCreate(OSAL_QueueHandle_t *queue,
+SppRetVal_t OSAL_QueueCreate(OSAL_QueueHandle_t *queue,
                          uint32_t max_items,
                          uint32_t item_size);
 
 // Delete a queue
-retval_t OSAL_QueueDelete(OSAL_QueueHandle_t queue);
+SppRetVal_t OSAL_QueueDelete(OSAL_QueueHandle_t queue);
 
 // Send item to queue
-retval_t OSAL_QueueSend(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueueSend(OSAL_QueueHandle_t queue,
                        const void *item,
                        uint32_t timeout);
 
 // Send item to queue from ISR
-retval_t OSAL_QueueSendFromISR(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueueSendFromISR(OSAL_QueueHandle_t queue,
                               const void *item);
 
 // Receive item from queue
-retval_t OSAL_QueueReceive(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueueReceive(OSAL_QueueHandle_t queue,
                           void *item,
                           uint32_t timeout);
 
 // Receive item from queue from ISR
-retval_t OSAL_QueueReceiveFromISR(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueueReceiveFromISR(OSAL_QueueHandle_t queue,
                                  void *item);
 
 // Peek at queue item without removing
-retval_t OSAL_QueuePeek(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueuePeek(OSAL_QueueHandle_t queue,
                        void *item,
                        uint32_t timeout);
 
@@ -247,7 +247,7 @@ void producer_task(void *parameters) {
         msg.id = counter++;
         snprintf((char*)msg.data, sizeof(msg.data), "Msg %lu", counter);
         
-        retval_t result = OSAL_QueueSend(*queue, &msg, 1000);
+        SppRetVal_t result = OSAL_QueueSend(*queue, &msg, 1000);
         if (result != SPP_OK) {
             printf("Failed to send message: %d\n", result);
         }
@@ -261,7 +261,7 @@ void consumer_task(void *parameters) {
     message_t msg;
     
     while (1) {
-        retval_t result = OSAL_QueueReceive(*queue, &msg, OSAL_WAIT_FOREVER);
+        SppRetVal_t result = OSAL_QueueReceive(*queue, &msg, OSAL_WAIT_FOREVER);
         if (result == SPP_OK) {
             printf("Received message %lu: %s\n", msg.id, msg.data);
         }
@@ -276,7 +276,7 @@ int main() {
     OSAL_Init();
     
     // Create queue for 10 messages
-    retval_t result = OSAL_QueueCreate(&queue, 10, sizeof(message_t));
+    SppRetVal_t result = OSAL_QueueCreate(&queue, 10, sizeof(message_t));
     if (result != SPP_OK) {
         printf("Failed to create queue: %d\n", result);
         return -1;
@@ -304,21 +304,21 @@ typedef enum {
 } OSAL_MutexType_t;
 
 // Create a mutex
-retval_t OSAL_MutexCreate(OSAL_MutexHandle_t *mutex,
+SppRetVal_t OSAL_MutexCreate(OSAL_MutexHandle_t *mutex,
                          OSAL_MutexType_t type);
 
 // Delete a mutex
-retval_t OSAL_MutexDelete(OSAL_MutexHandle_t mutex);
+SppRetVal_t OSAL_MutexDelete(OSAL_MutexHandle_t mutex);
 
 // Take (lock) a mutex
-retval_t OSAL_MutexTake(OSAL_MutexHandle_t mutex,
+SppRetVal_t OSAL_MutexTake(OSAL_MutexHandle_t mutex,
                        uint32_t timeout);
 
 // Give (unlock) a mutex
-retval_t OSAL_MutexGive(OSAL_MutexHandle_t mutex);
+SppRetVal_t OSAL_MutexGive(OSAL_MutexHandle_t mutex);
 
 // Try to take mutex without blocking
-retval_t OSAL_MutexTryTake(OSAL_MutexHandle_t mutex);
+SppRetVal_t OSAL_MutexTryTake(OSAL_MutexHandle_t mutex);
 
 // Get mutex holder
 OSAL_TaskHandle_t OSAL_MutexGetHolder(OSAL_MutexHandle_t mutex);
@@ -335,7 +335,7 @@ void worker_task(void *parameters) {
     
     while (1) {
         // Take mutex to protect shared resource
-        retval_t result = OSAL_MutexTake(shared_resource_mutex, 1000);
+        SppRetVal_t result = OSAL_MutexTake(shared_resource_mutex, 1000);
         if (result == SPP_OK) {
             // Critical section
             int old_value = shared_counter;
@@ -361,7 +361,7 @@ int main() {
     OSAL_Init();
     
     // Create mutex
-    retval_t result = OSAL_MutexCreate(&shared_resource_mutex, OSAL_MUTEX_TYPE_NORMAL);
+    SppRetVal_t result = OSAL_MutexCreate(&shared_resource_mutex, OSAL_MUTEX_TYPE_NORMAL);
     if (result != SPP_OK) {
         printf("Failed to create mutex: %d\n", result);
         return -1;
@@ -389,23 +389,23 @@ typedef enum {
 } OSAL_SemaphoreType_t;
 
 // Create a semaphore
-retval_t OSAL_SemaphoreCreate(OSAL_SemaphoreHandle_t *semaphore,
+SppRetVal_t OSAL_SemaphoreCreate(OSAL_SemaphoreHandle_t *semaphore,
                              OSAL_SemaphoreType_t type,
                              uint32_t max_count,
                              uint32_t initial_count);
 
 // Delete a semaphore
-retval_t OSAL_SemaphoreDelete(OSAL_SemaphoreHandle_t semaphore);
+SppRetVal_t OSAL_SemaphoreDelete(OSAL_SemaphoreHandle_t semaphore);
 
 // Take (wait for) a semaphore
-retval_t OSAL_SemaphoreTake(OSAL_SemaphoreHandle_t semaphore,
+SppRetVal_t OSAL_SemaphoreTake(OSAL_SemaphoreHandle_t semaphore,
                            uint32_t timeout);
 
 // Give (signal) a semaphore
-retval_t OSAL_SemaphoreGive(OSAL_SemaphoreHandle_t semaphore);
+SppRetVal_t OSAL_SemaphoreGive(OSAL_SemaphoreHandle_t semaphore);
 
 // Give semaphore from ISR
-retval_t OSAL_SemaphoreGiveFromISR(OSAL_SemaphoreHandle_t semaphore);
+SppRetVal_t OSAL_SemaphoreGiveFromISR(OSAL_SemaphoreHandle_t semaphore);
 
 // Get semaphore count
 uint32_t OSAL_SemaphoreGetCount(OSAL_SemaphoreHandle_t semaphore);
@@ -421,7 +421,7 @@ void resource_user_task(void *parameters) {
     
     while (1) {
         // Wait for resource availability
-        retval_t result = OSAL_SemaphoreTake(resource_semaphore, 2000);
+        SppRetVal_t result = OSAL_SemaphoreTake(resource_semaphore, 2000);
         if (result == SPP_OK) {
             printf("Task %d: Got resource, using it...\n", task_id);
             
@@ -446,7 +446,7 @@ int main() {
     OSAL_Init();
     
     // Create counting semaphore for 2 resources
-    retval_t result = OSAL_SemaphoreCreate(&resource_semaphore,
+    SppRetVal_t result = OSAL_SemaphoreCreate(&resource_semaphore,
                                           OSAL_SEMAPHORE_TYPE_COUNTING,
                                           2, 2);
     if (result != SPP_OK) {
@@ -476,7 +476,7 @@ Create your RTOS-specific implementation file and override the weak functions:
 #include "task.h"
 
 // Override weak task creation function
-retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
+SppRetVal_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
                         const char *name,
                         OSAL_TaskFunction_t function,
                         void *parameters,
@@ -501,7 +501,7 @@ retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
     return (result == pdPASS) ? SPP_OK : SPP_ERROR_INSUFFICIENT_MEMORY;
 }
 
-retval_t OSAL_TaskDelay(uint32_t milliseconds) {
+SppRetVal_t OSAL_TaskDelay(uint32_t milliseconds) {
     vTaskDelay(pdMS_TO_TICKS(milliseconds));
     return SPP_OK;
 }
@@ -544,7 +544,7 @@ target_compile_definitions(my_app PRIVATE SPP_FREERTOS_AVAILABLE=1)
 
 ## Error Handling
 
-All OSAL functions return `retval_t` status codes:
+All OSAL functions return `SppRetVal_t` status codes:
 
 ```c
 typedef enum {
@@ -557,13 +557,13 @@ typedef enum {
     SPP_ERROR_INSUFFICIENT_MEMORY, // Not enough memory
     SPP_ERROR_QUEUE_FULL,          // Queue is full
     SPP_ERROR_QUEUE_EMPTY,         // Queue is empty
-} retval_t;
+} SppRetVal_t;
 ```
 
 ### Error Handling Example
 
 ```c
-retval_t result = OSAL_TaskCreate(&task, "MyTask", task_func, NULL, OSAL_TASK_PRIORITY_NORMAL);
+SppRetVal_t result = OSAL_TaskCreate(&task, "MyTask", task_func, NULL, OSAL_TASK_PRIORITY_NORMAL);
 switch (result) {
     case SPP_OK:
         printf("Task created successfully\n");
@@ -586,7 +586,7 @@ switch (result) {
 ```c
 int main() {
     // Initialize OSAL before using any OSAL functions
-    retval_t result = OSAL_Init();
+    SppRetVal_t result = OSAL_Init();
     if (result != SPP_OK) {
         printf("OSAL initialization failed: %d\n", result);
         return -1;
@@ -598,7 +598,7 @@ int main() {
 
 ### 2. Check Return Values
 ```c
-retval_t result = OSAL_QueueSend(queue, &data, 1000);
+SppRetVal_t result = OSAL_QueueSend(queue, &data, 1000);
 if (result != SPP_OK) {
     // Handle error appropriately
     printf("Queue send failed: %d\n", result);
@@ -608,13 +608,13 @@ if (result != SPP_OK) {
 ### 3. Use Appropriate Timeouts
 ```c
 // For critical operations, use longer timeouts
-retval_t result = OSAL_MutexTake(critical_mutex, 5000);
+SppRetVal_t result = OSAL_MutexTake(critical_mutex, 5000);
 
 // For non-critical operations, use shorter timeouts
-retval_t result = OSAL_QueueSend(log_queue, &msg, 100);
+SppRetVal_t result = OSAL_QueueSend(log_queue, &msg, 100);
 
 // For polling, use no wait
-retval_t result = OSAL_QueueReceive(queue, &data, OSAL_NO_WAIT);
+SppRetVal_t result = OSAL_QueueReceive(queue, &data, OSAL_NO_WAIT);
 ```
 
 ### 4. Clean Up Resources
@@ -707,9 +707,9 @@ To add support for a new RTOS:
 
 ```c
 // Add debug prints to track OSAL operations
-retval_t OSAL_TaskCreate(...) {
+SppRetVal_t OSAL_TaskCreate(...) {
     printf("Creating task: %s\n", name);
-    retval_t result = /* implementation */;
+    SppRetVal_t result = /* implementation */;
     printf("Task creation result: %d\n", result);
     return result;
 }

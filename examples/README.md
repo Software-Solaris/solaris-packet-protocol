@@ -77,7 +77,7 @@ int main() {
     printf("SPP Basic Usage Example\n");
     
     // Initialize SPP Core
-    retval_t result = Core_Init();
+    SppRetVal_t result = Core_Init();
     if (result != SPP_OK) {
         printf("Core initialization failed: %d\n", result);
         return -1;
@@ -141,7 +141,7 @@ typedef struct {
 } esp32_spi_config_t;
 
 // Initialize ESP32 SPI with configuration
-retval_t ESP32_SPI_InitWithConfig(const esp32_spi_config_t *config);
+SppRetVal_t ESP32_SPI_InitWithConfig(const esp32_spi_config_t *config);
 
 #endif // ESP_PLATFORM
 
@@ -162,7 +162,7 @@ static spi_device_handle_t spi_handle = NULL;
 static bool spi_initialized = false;
 
 // Override weak SPI_Init function
-retval_t SPI_Init(void) {
+SppRetVal_t SPI_Init(void) {
     esp32_spi_config_t default_config = {
         .miso_pin = GPIO_NUM_19,
         .mosi_pin = GPIO_NUM_23,
@@ -175,7 +175,7 @@ retval_t SPI_Init(void) {
     return ESP32_SPI_InitWithConfig(&default_config);
 }
 
-retval_t ESP32_SPI_InitWithConfig(const esp32_spi_config_t *config) {
+SppRetVal_t ESP32_SPI_InitWithConfig(const esp32_spi_config_t *config) {
     if (config == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
@@ -218,7 +218,7 @@ retval_t ESP32_SPI_InitWithConfig(const esp32_spi_config_t *config) {
 }
 
 // Override weak SPI_Transmit function
-retval_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout) {
+SppRetVal_t SPI_Transmit(uint8_t *data, uint16_t size, uint32_t timeout) {
     if (data == NULL) {
         return SPP_ERROR_NULL_POINTER;
     }
@@ -352,7 +352,7 @@ UBaseType_t OSAL_PriorityToFreeRTOS(OSAL_TaskPriority_t osal_priority) {
 }
 
 // Override weak OSAL_TaskCreate function
-retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
+SppRetVal_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
                         const char *name,
                         OSAL_TaskFunction_t function,
                         void *parameters,
@@ -377,13 +377,13 @@ retval_t OSAL_TaskCreate(OSAL_TaskHandle_t *task,
 }
 
 // Override weak OSAL_TaskDelay function
-retval_t OSAL_TaskDelay(uint32_t milliseconds) {
+SppRetVal_t OSAL_TaskDelay(uint32_t milliseconds) {
     vTaskDelay(pdMS_TO_TICKS(milliseconds));
     return SPP_OK;
 }
 
 // Override weak OSAL_QueueCreate function
-retval_t OSAL_QueueCreate(OSAL_QueueHandle_t *queue,
+SppRetVal_t OSAL_QueueCreate(OSAL_QueueHandle_t *queue,
                          uint32_t max_items,
                          uint32_t item_size) {
     
@@ -400,7 +400,7 @@ retval_t OSAL_QueueCreate(OSAL_QueueHandle_t *queue,
 }
 
 // Override weak OSAL_QueueSend function
-retval_t OSAL_QueueSend(OSAL_QueueHandle_t queue,
+SppRetVal_t OSAL_QueueSend(OSAL_QueueHandle_t queue,
                        const void *item,
                        uint32_t timeout) {
     
@@ -424,7 +424,7 @@ retval_t OSAL_QueueSend(OSAL_QueueHandle_t queue,
 }
 
 // Override weak OSAL_MutexCreate function
-retval_t OSAL_MutexCreate(OSAL_MutexHandle_t *mutex,
+SppRetVal_t OSAL_MutexCreate(OSAL_MutexHandle_t *mutex,
                          OSAL_MutexType_t type) {
     
     if (mutex == NULL) {
@@ -707,7 +707,7 @@ idf.py flash monitor
 ### 1. Error Handling
 
 ```c
-retval_t result = SPI_Init();
+SppRetVal_t result = SPI_Init();
 if (result != SPP_OK) {
     printf("SPI initialization failed: %d\n", result);
     return -1;
@@ -803,7 +803,7 @@ BaseType_t result = xTaskCreate(
 ```c
 // Add debug output to track execution
 printf("Initializing platform-specific implementation\n");
-retval_t result = platform_init();
+SppRetVal_t result = platform_init();
 printf("Platform init result: %d\n", result);
 ```
 

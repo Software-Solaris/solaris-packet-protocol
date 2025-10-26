@@ -15,7 +15,7 @@
 /**
  * @brief Default (weak) SPI initialization
  */
-__attribute__((weak)) retval_t SPP_HAL_SPI_Init(spi_handle_t* handle, const spi_config_t* config)
+__attribute__((weak)) SppRetVal_t SPP_HAL_SPI_Init(spi_handle_t* handle, const spi_config_t* config)
 {   
     return SPP_ERROR;
 }
@@ -23,7 +23,7 @@ __attribute__((weak)) retval_t SPP_HAL_SPI_Init(spi_handle_t* handle, const spi_
 /**
  * @brief Default (weak) SPI deinitialization
  */
-__attribute__((weak)) retval_t SPI_Deinit(spi_handle_t* handle)
+__attribute__((weak)) SppRetVal_t SPI_Deinit(spi_handle_t* handle)
 {
     if (handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -36,7 +36,7 @@ __attribute__((weak)) retval_t SPI_Deinit(spi_handle_t* handle)
 /**
  * @brief Default (weak) SPI transmit function
  */
-__attribute__((weak)) retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length)
+__attribute__((weak)) SppRetVal_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length)
 
 {    
     return SPP_ERROR;
@@ -45,7 +45,7 @@ __attribute__((weak)) retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to
 /**
  * @brief Default (weak) SPI receive function
  */
-__attribute__((weak)) retval_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx_data, 
+__attribute__((weak)) SppRetVal_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx_data, 
                                           uint16_t length, uint32_t timeout_ms)
 {
     if (handle == NULL || rx_data == NULL) {
@@ -66,7 +66,7 @@ __attribute__((weak)) retval_t SPP_SPI_Receive(spi_handle_t* handle, uint8_t* rx
 /**
  * @brief Default (weak) SPI transmit and receive function
  */
-__attribute__((weak)) retval_t SPI_TransmitReceive(spi_handle_t* handle, const uint8_t* tx_data, 
+__attribute__((weak)) SppRetVal_t SPI_TransmitReceive(spi_handle_t* handle, const uint8_t* tx_data, 
                                                   uint8_t* rx_data, uint16_t length, uint32_t timeout_ms)
 {
     if (handle == NULL || tx_data == NULL || rx_data == NULL) {
@@ -100,7 +100,7 @@ __attribute__((weak)) bool SPI_IsBusy(spi_handle_t* handle)
 /**
  * @brief Default (weak) SPI chip select function
  */
-__attribute__((weak)) retval_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t cs_pin, bool active)
+__attribute__((weak)) SppRetVal_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t cs_pin, bool active)
 {
     if (handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -120,7 +120,7 @@ __attribute__((weak)) retval_t SPI_SetChipSelect(spi_handle_t* handle, uint8_t c
 /**
  * @brief Get SPI data (simplified interface)
  */
-__attribute__((weak)) retval_t spi_get_data(uint8_t spi_id, uint8_t* data, uint16_t length)
+__attribute__((weak)) SppRetVal_t spi_get_data(uint8_t spi_id, uint8_t* data, uint16_t length)
 {
     if (data == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -137,7 +137,7 @@ __attribute__((weak)) retval_t spi_get_data(uint8_t spi_id, uint8_t* data, uint1
 /**
  * @brief Write SPI data (simplified interface)
  */
-__attribute__((weak)) retval_t spi_write_data(uint8_t spi_id, const uint8_t* data, uint16_t length)
+__attribute__((weak)) SppRetVal_t spi_write_data(uint8_t spi_id, const uint8_t* data, uint16_t length)
 {
     if (data == NULL) {
         return SPP_ERROR_NULL_POINTER;

@@ -33,16 +33,16 @@ typedef struct {
  * @brief Initialize ESP32-S3 SPI with specific configuration
  * 
  * @param config ESP32 SPI configuration
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t ESP32_SPI_Init(const esp32_spi_config_t* config);
+SppRetVal_t ESP32_SPI_Init(const esp32_spi_config_t* config);
 
 /**
  * @brief Deinitialize ESP32-S3 SPI
  * 
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t ESP32_SPI_Deinit(void);
+SppRetVal_t ESP32_SPI_Deinit(void);
 
 /**
  * @brief Get default ESP32-S3 SPI configuration

@@ -22,16 +22,16 @@ extern "C" {
  * This function should be called before using any OSAL functions
  * to ensure FreeRTOS-specific initialization is complete.
  * 
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t FreeRTOS_OSAL_Init(void);
+SppRetVal_t FreeRTOS_OSAL_Init(void);
 
 /**
  * @brief Deinitialize FreeRTOS OSAL implementation
  * 
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t FreeRTOS_OSAL_Deinit(void);
+SppRetVal_t FreeRTOS_OSAL_Deinit(void);
 
 /**
  * @brief Check if FreeRTOS is available
@@ -45,9 +45,9 @@ bool FreeRTOS_OSAL_IsAvailable(void);
  * 
  * @param version_string Buffer to store version string
  * @param buffer_size Size of the buffer
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t FreeRTOS_OSAL_GetVersion(char* version_string, size_t buffer_size);
+SppRetVal_t FreeRTOS_OSAL_GetVersion(char* version_string, size_t buffer_size);
 
 #ifdef __cplusplus
 }

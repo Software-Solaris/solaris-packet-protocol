@@ -21,8 +21,8 @@ typedef struct{
 
 
 
-retval_t DataBank_Init(void);
+SppRetVal_t DataBank_Init(void);
 spp_packet_t* DataBank_GetPacket(void);
-retval_t DataBank_ReturnPacket(spp_packet_t* packet);
+SppRetVal_t DataBank_ReturnPacket(spp_packet_t* packet);
 
 #endif

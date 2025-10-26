@@ -1,11 +1,11 @@
 #ifndef SPP_CORE_TYPES_H_
 #define SPP_CORE_TYPES_H_
 
-typedef unsigned char  SPP_uint8_t;
-typedef unsigned short SPP_uint16_t;
-typedef unsigned long  Spp_uint32_t;
+typedef unsigned char  spp_uint8_t;
+typedef unsigned short spp_uint16_t;
+typedef unsigned long  spp_uint32_t;
 
-typedef Spp_uint32_t      SPP_size_t;
+typedef spp_uint32_t      SPP_size_t;
 //---Init types---
 typedef enum{
     SPP_SPI_MODE0 = 0,

@@ -7,7 +7,7 @@ int main() {
     printf("Initializing Solaris Packet Protocol...\n");
     
     // Initialize SPP core
-    retval_t result = Core_Init();
+    SppRetVal_t result = Core_Init();
     if (result != SPP_OK) {
         printf("Error initializing SPP: %d\n", result);
         return -1;

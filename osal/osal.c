@@ -16,7 +16,7 @@
 /**
  * @brief Default (weak) OSAL initialization
  */
-__attribute__((weak)) retval_t OSAL_Init(void)
+__attribute__((weak)) SppRetVal_t OSAL_Init(void)
 {
     // Default implementation - just return OK
     return SPP_OK;
@@ -25,7 +25,7 @@ __attribute__((weak)) retval_t OSAL_Init(void)
 /**
  * @brief Default (weak) OSAL deinitialization
  */
-__attribute__((weak)) retval_t OSAL_Deinit(void)
+__attribute__((weak)) SppRetVal_t OSAL_Deinit(void)
 {
     // Default implementation - just return OK
     return SPP_OK;
@@ -34,7 +34,7 @@ __attribute__((weak)) retval_t OSAL_Deinit(void)
 /**
  * @brief Default (weak) task creation
  */
-__attribute__((weak)) retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
+__attribute__((weak)) SppRetVal_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
                                               uint32_t stack_size, void* parameters, osal_priority_t priority,
                                               osal_task_handle_t* task_handle)
 {
@@ -55,7 +55,7 @@ __attribute__((weak)) retval_t OSAL_TaskCreate(osal_task_function_t task_functio
 /**
  * @brief Default (weak) task deletion
  */
-__attribute__((weak)) retval_t OSAL_TaskDelete(osal_task_handle_t task_handle)
+__attribute__((weak)) SppRetVal_t OSAL_TaskDelete(osal_task_handle_t task_handle)
 {
     // Default implementation - just return OK
     (void)task_handle;
@@ -65,7 +65,7 @@ __attribute__((weak)) retval_t OSAL_TaskDelete(osal_task_handle_t task_handle)
 /**
  * @brief Default (weak) task delay
  */
-__attribute__((weak)) retval_t OSAL_TaskDelay(uint32_t delay_ms)
+__attribute__((weak)) SppRetVal_t OSAL_TaskDelay(uint32_t delay_ms)
 {
     // Default implementation - busy wait (not recommended for real use)
     volatile uint32_t count = delay_ms * 1000;
@@ -78,7 +78,7 @@ __attribute__((weak)) retval_t OSAL_TaskDelay(uint32_t delay_ms)
 /**
  * @brief Default (weak) mutex creation
  */
-__attribute__((weak)) retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -92,7 +92,7 @@ __attribute__((weak)) retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handl
 /**
  * @brief Default (weak) mutex deletion
  */
-__attribute__((weak)) retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle)
 {
     // Default implementation - just return OK
     (void)mutex_handle;
@@ -102,7 +102,7 @@ __attribute__((weak)) retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle
 /**
  * @brief Default (weak) mutex take
  */
-__attribute__((weak)) retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -116,7 +116,7 @@ __attribute__((weak)) retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, 
 /**
  * @brief Default (weak) mutex give
  */
-__attribute__((weak)) retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
+__attribute__((weak)) SppRetVal_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -129,7 +129,7 @@ __attribute__((weak)) retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 /**
  * @brief Default (weak) queue creation
  */
-__attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
+__attribute__((weak)) SppRetVal_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
 {
     if (queue_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -145,7 +145,7 @@ __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handl
 /**
  * @brief Default (weak) queue deletion
  */
-__attribute__((weak)) retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
+__attribute__((weak)) SppRetVal_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
 {
     // Default implementation - just return OK
     (void)queue_handle;
@@ -155,7 +155,7 @@ __attribute__((weak)) retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle
 /**
  * @brief Default (weak) queue send
  */
-__attribute__((weak)) retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -169,7 +169,7 @@ __attribute__((weak)) retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, 
 /**
  * @brief Default (weak) queue receive
  */
-__attribute__((weak)) retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -184,7 +184,7 @@ __attribute__((weak)) retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handl
 /**
  * @brief Default (weak) semaphore creation
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -200,7 +200,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* sem
 /**
  * @brief Default (weak) semaphore deletion
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreDelete(osal_semaphore_handle_t semaphore_handle)
 {
     // Default implementation - just return OK
     (void)semaphore_handle;
@@ -210,7 +210,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreDelete(osal_semaphore_handle_t sema
 /**
  * @brief Default (weak) semaphore take
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -224,7 +224,7 @@ __attribute__((weak)) retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaph
 /**
  * @brief Default (weak) semaphore give
  */
-__attribute__((weak)) retval_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
+__attribute__((weak)) SppRetVal_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -256,7 +256,7 @@ __attribute__((weak)) uint32_t OSAL_MsToTicks(uint32_t ms)
 /**
  * @brief Default (weak) start scheduler
  */
-__attribute__((weak)) retval_t OSAL_StartScheduler(void)
+__attribute__((weak)) SppRetVal_t OSAL_StartScheduler(void)
 {
     // Default implementation - just return OK (no scheduler to start)
     return SPP_OK;

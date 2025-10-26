@@ -36,42 +36,42 @@ typedef enum {
  * 
  * @param mutex_handle Pointer to store mutex handle
  * @param type Mutex type (normal or recursive)
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type);
+SppRetVal_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type);
 
 /**
  * @brief Delete a mutex
  * 
  * @param mutex_handle Mutex handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle);
+SppRetVal_t OSAL_MutexDelete(osal_mutex_handle_t mutex_handle);
 
 /**
  * @brief Take (lock) a mutex
  * 
  * @param mutex_handle Mutex handle
  * @param timeout_ms Timeout in milliseconds (0 = no wait, UINT32_MAX = wait forever)
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms);
+SppRetVal_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms);
 
 /**
  * @brief Give (unlock) a mutex
  * 
  * @param mutex_handle Mutex handle
- * @return retval_t SPP_OK on success, error code otherwise
+ * @return SppRetVal_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle);
+SppRetVal_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle);
 
 /**
  * @brief Try to take a mutex without blocking
  * 
  * @param mutex_handle Mutex handle
- * @return retval_t SPP_OK on success, SPP_ERROR_TIMEOUT if mutex not available
+ * @return SppRetVal_t SPP_OK on success, SPP_ERROR_TIMEOUT if mutex not available
  */
-retval_t OSAL_MutexTryTake(osal_mutex_handle_t mutex_handle);
+SppRetVal_t OSAL_MutexTryTake(osal_mutex_handle_t mutex_handle);
 
 /**
  * @brief Get mutex holder task

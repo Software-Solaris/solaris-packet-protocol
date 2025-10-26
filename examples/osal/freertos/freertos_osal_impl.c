@@ -24,7 +24,7 @@ static bool freertos_initialized = false;
 /**
  * @brief Initialize FreeRTOS OSAL implementation
  */
-retval_t FreeRTOS_OSAL_Init(void)
+SppRetVal_t FreeRTOS_OSAL_Init(void)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     if (freertos_initialized) {
@@ -43,7 +43,7 @@ retval_t FreeRTOS_OSAL_Init(void)
 /**
  * @brief Deinitialize FreeRTOS OSAL implementation
  */
-retval_t FreeRTOS_OSAL_Deinit(void)
+SppRetVal_t FreeRTOS_OSAL_Deinit(void)
 {
     freertos_initialized = false;
     return SPP_OK;
@@ -64,7 +64,7 @@ bool FreeRTOS_OSAL_IsAvailable(void)
 /**
  * @brief Get FreeRTOS version information
  */
-retval_t FreeRTOS_OSAL_GetVersion(char* version_string, size_t buffer_size)
+SppRetVal_t FreeRTOS_OSAL_GetVersion(char* version_string, size_t buffer_size)
 {
     if (version_string == NULL || buffer_size == 0) {
         return SPP_ERROR_NULL_POINTER;
@@ -87,7 +87,7 @@ retval_t FreeRTOS_OSAL_GetVersion(char* version_string, size_t buffer_size)
 /**
  * @brief FreeRTOS Task Creation (OSAL Override)
  */
-retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
+SppRetVal_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
                          uint32_t stack_size, void* parameters, osal_priority_t priority,
                          osal_task_handle_t* task_handle)
 {
@@ -144,7 +144,7 @@ retval_t OSAL_TaskCreate(osal_task_function_t task_function, const char* name,
 /**
  * @brief FreeRTOS Task Deletion (OSAL Override)
  */
-retval_t OSAL_TaskDelete(osal_task_handle_t task_handle)
+SppRetVal_t OSAL_TaskDelete(osal_task_handle_t task_handle)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     vTaskDelete((TaskHandle_t)task_handle);
@@ -158,7 +158,7 @@ retval_t OSAL_TaskDelete(osal_task_handle_t task_handle)
 /**
  * @brief FreeRTOS Task Delay (OSAL Override)
  */
-retval_t OSAL_TaskDelay(uint32_t delay_ms)
+SppRetVal_t OSAL_TaskDelay(uint32_t delay_ms)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     TickType_t delay_ticks = pdMS_TO_TICKS(delay_ms);
@@ -177,7 +177,7 @@ retval_t OSAL_TaskDelay(uint32_t delay_ms)
 /**
  * @brief FreeRTOS Task Suspend (OSAL Override)
  */
-retval_t OSAL_TaskSuspend(osal_task_handle_t task_handle)
+SppRetVal_t OSAL_TaskSuspend(osal_task_handle_t task_handle)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     vTaskSuspend((TaskHandle_t)task_handle);
@@ -191,7 +191,7 @@ retval_t OSAL_TaskSuspend(osal_task_handle_t task_handle)
 /**
  * @brief FreeRTOS Task Resume (OSAL Override)
  */
-retval_t OSAL_TaskResume(osal_task_handle_t task_handle)
+SppRetVal_t OSAL_TaskResume(osal_task_handle_t task_handle)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     vTaskResume((TaskHandle_t)task_handle);
@@ -245,7 +245,7 @@ osal_task_state_t OSAL_TaskGetState(osal_task_handle_t task_handle)
 /**
  * @brief FreeRTOS Task Yield (OSAL Override)
  */
-retval_t OSAL_TaskYield(void)
+SppRetVal_t OSAL_TaskYield(void)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     taskYIELD();
@@ -262,7 +262,7 @@ retval_t OSAL_TaskYield(void)
 /**
  * @brief FreeRTOS Queue Creation (OSAL Override)
  */
-retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
+SppRetVal_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
 {
     if (queue_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -287,7 +287,7 @@ retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_leng
 /**
  * @brief FreeRTOS Queue Deletion (OSAL Override)
  */
-retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
+SppRetVal_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
 {
 #ifdef SPP_FREERTOS_AVAILABLE
     if (queue_handle != NULL) {
@@ -303,7 +303,7 @@ retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
 /**
  * @brief FreeRTOS Queue Send (OSAL Override)
  */
-retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
+SppRetVal_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -322,7 +322,7 @@ retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint
 /**
  * @brief FreeRTOS Queue Send from ISR (OSAL Override)
  */
-retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken)
+SppRetVal_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -348,7 +348,7 @@ retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* ite
 /**
  * @brief FreeRTOS Queue Receive (OSAL Override)
  */
-retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
+SppRetVal_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -372,7 +372,7 @@ retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_
 /**
  * @brief FreeRTOS Mutex Creation (OSAL Override)
  */
-retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type)
+SppRetVal_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t type)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -403,7 +403,7 @@ retval_t OSAL_MutexCreate(osal_mutex_handle_t* mutex_handle, osal_mutex_type_t t
 /**
  * @brief FreeRTOS Mutex Take (OSAL Override)
  */
-retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
+SppRetVal_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -422,7 +422,7 @@ retval_t OSAL_MutexTake(osal_mutex_handle_t mutex_handle, uint32_t timeout_ms)
 /**
  * @brief FreeRTOS Mutex Give (OSAL Override)
  */
-retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
+SppRetVal_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 {
     if (mutex_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -443,7 +443,7 @@ retval_t OSAL_MutexGive(osal_mutex_handle_t mutex_handle)
 /**
  * @brief FreeRTOS Counting Semaphore Creation (OSAL Override)
  */
-retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
+SppRetVal_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_t max_count, uint32_t initial_count)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -472,7 +472,7 @@ retval_t OSAL_SemaphoreCreate(osal_semaphore_handle_t* semaphore_handle, uint32_
 /**
  * @brief FreeRTOS Binary Semaphore Creation (OSAL Override)
  */
-retval_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_t* semaphore_handle)
+SppRetVal_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_t* semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -495,7 +495,7 @@ retval_t OSAL_SemaphoreCreateBinary(osal_semaphore_handle_t* semaphore_handle)
 /**
  * @brief FreeRTOS Semaphore Take (OSAL Override)
  */
-retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
+SppRetVal_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t timeout_ms)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -514,7 +514,7 @@ retval_t OSAL_SemaphoreTake(osal_semaphore_handle_t semaphore_handle, uint32_t t
 /**
  * @brief FreeRTOS Semaphore Give (OSAL Override)
  */
-retval_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
+SppRetVal_t OSAL_SemaphoreGive(osal_semaphore_handle_t semaphore_handle)
 {
     if (semaphore_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;

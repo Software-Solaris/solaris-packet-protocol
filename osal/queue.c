@@ -15,7 +15,7 @@
 /**
  * @brief Default (weak) queue creation
  */
-__attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
+__attribute__((weak)) SppRetVal_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
 {
     if (queue_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -31,7 +31,7 @@ __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handl
 /**
  * @brief Default (weak) queue deletion
  */
-__attribute__((weak)) retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
+__attribute__((weak)) SppRetVal_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
 {
     // Default implementation - just return OK
     (void)queue_handle;
@@ -41,7 +41,7 @@ __attribute__((weak)) retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle
 /**
  * @brief Default (weak) queue send
  */
-__attribute__((weak)) retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -55,7 +55,7 @@ __attribute__((weak)) retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, 
 /**
  * @brief Default (weak) queue send from ISR
  */
-__attribute__((weak)) retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken)
+__attribute__((weak)) SppRetVal_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* item, bool* higher_priority_task_woken)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -71,7 +71,7 @@ __attribute__((weak)) retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_h
 /**
  * @brief Default (weak) queue receive
  */
-__attribute__((weak)) retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -86,7 +86,7 @@ __attribute__((weak)) retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handl
 /**
  * @brief Default (weak) queue receive from ISR
  */
-__attribute__((weak)) retval_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queue_handle, void* item, bool* higher_priority_task_woken)
+__attribute__((weak)) SppRetVal_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queue_handle, void* item, bool* higher_priority_task_woken)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -103,7 +103,7 @@ __attribute__((weak)) retval_t OSAL_QueueReceiveFromISR(osal_queue_handle_t queu
 /**
  * @brief Default (weak) queue peek
  */
-__attribute__((weak)) retval_t OSAL_QueuePeek(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
+__attribute__((weak)) SppRetVal_t OSAL_QueuePeek(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms)
 {
     if (queue_handle == NULL || item == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -158,7 +158,7 @@ __attribute__((weak)) bool OSAL_QueueIsEmpty(osal_queue_handle_t queue_handle)
 /**
  * @brief Default (weak) reset queue
  */
-__attribute__((weak)) retval_t OSAL_QueueReset(osal_queue_handle_t queue_handle)
+__attribute__((weak)) SppRetVal_t OSAL_QueueReset(osal_queue_handle_t queue_handle)
 {
     // Default implementation - just return OK
     (void)queue_handle;

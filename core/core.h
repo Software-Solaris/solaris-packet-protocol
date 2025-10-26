@@ -4,6 +4,6 @@
 #include "macros.h"
 #include "returntypes.h"
 
-retval_t Core_Init(void);
+SppRetVal_t Core_Init(void);
 
 #endif
