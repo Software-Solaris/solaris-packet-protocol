@@ -17,9 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @brief Default (weak) queue creation
- */
+/* 
 __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
 {
     if (queue_handle == NULL) {
@@ -31,6 +29,17 @@ __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handl
     (void)queue_length;
     (void)item_size;
     return SPP_OK;
+} */
+
+
+/**
+ * @brief Default (weak) queue creation
+ */
+__attribute__((weak)) void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t item_size)
+{
+    (void)queue_length;
+    (void)item_size;
+    return NULL; // Esto da error???
 }
 
 /**

@@ -27,15 +27,19 @@ extern "C" {
  */
 typedef void* osal_queue_handle_t;
 
+
 /**
- * @brief Create a queue
+ * @brief Crea una nueva cola OSAL
  * 
- * @param queue_handle Pointer to store queue handle
- * @param queue_length Maximum number of items in queue
- * @param item_size Size of each item in bytes
- * @return retval_t SPP_OK on success, error code otherwise
+ * @param queue_length Número máximo de elementos en la cola
+ * @param item_size Tamaño en bytes de cada elemento
+ * 
+ * @return Puntero void a handle de la cola creada
+ * @retval NULL si hubo error al crear la cola
+ * 
+ * @note El handle debe ser usado con las demás funciones OSAL
  */
-retval_t SPP_OSAL_QueueCreate(void* p_queue_handle, uint32_t queue_length, uint32_t item_size);
+void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t item_size);
 
 /**
  * @brief Delete a queue
