@@ -24,19 +24,19 @@ extern "C" {
 #endif
 
 SppRetVal_t SPP_OSAL_TaskCreate(void* task_function, const char* name,
-                    spp_uint32_t stack_size, void* p_parameters, SppPriority_t priority,
-                    SppTaskHandle_t* task_handle);
+                    spp_uint32_t stack_size, void* p_parameters, spp_uint32_t priority,
+                    void** task_handle);
 
-SppRetVal_t  SPP_OSAL_TaskDelete(SppTaskHandle_t task_handle);
+SppRetVal_t  SPP_OSAL_TaskDelete(void* task_handle);
 SppRetVal_t  SPP_OSAL_TaskDelay(spp_uint32_t delay_ms);
-SppRetVal_t  SPP_OSAL_TaskSuspend(SppTaskHandle_t task_handle);
-SppRetVal_t  SPP_OSAL_TaskResume(SppTaskHandle_t task_handle);
+SppRetVal_t  SPP_OSAL_TaskSuspend(void* task_handle);
+SppRetVal_t  SPP_OSAL_TaskResume(void* task_handle);
 void*        SPP_OSAL_TaskGetCurrent(void);
-SppTaskState SPP_OSAL_TaskGetState(SppTaskHandle_t task_handle);
+SppTaskState SPP_OSAL_TaskGetState(void* task_handle);
 SppRetVal_t  SPP_OSAL_TaskYield(void);
 SppRetVal_t  SPP_OSAL_TaskDelayUntil(spp_uint32_t period_ms);
-SppRetVal_t  SPP_OSAL_TaskPrioritySet(SppTaskHandle_t task_handle, SppPriority_t priority);
-SppPriority_t SPP_OSAL_TaskPriorityGet(SppTaskHandle_t task_handle);
+SppRetVal_t  SPP_OSAL_TaskPrioritySet(void* task_handle, spp_uint32_t priority);
+spp_uint32_t SPP_OSAL_TaskPriorityGet(void* task_handle);
 SppRetVal_t  SPP_OSAL_SuspendAll(void);
 SppRetVal_t  SPP_OSAL_ResumeAll(void);
 SppRetVal_t  SPP_OSAL_IdleHookRegister(bool (*idle_function)(void));

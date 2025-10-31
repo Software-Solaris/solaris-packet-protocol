@@ -18,8 +18,8 @@
  * @brief Default (weak) task creation
  */
 __attribute__((weak)) SppRetVal_t SPP_OSAL_TaskCreate(void* task_function, const char* name,
-                    spp_uint32_t stack_size, void* p_parameters, SppPriority_t priority,
-                    SppTaskHandle_t* task_handle)
+                    spp_uint32_t stack_size, void* p_parameters, spp_uint32_t priority,
+                    void** task_handle)
 {
     if (task_function == NULL || task_handle == NULL) {
         return SPP_ERROR_NULL_POINTER;
@@ -33,7 +33,7 @@ __attribute__((weak)) SppRetVal_t SPP_OSAL_TaskCreate(void* task_function, const
  * @brief Default (weak) task deletion
  */
 __attribute__((weak)) SppRetVal_t
-SPP_OSAL_TaskDelete(SppTaskHandle_t task_handle)
+SPP_OSAL_TaskDelete(void* task_handle)
 {
     (void)task_handle;
     return SPP_OK;
@@ -56,7 +56,7 @@ SPP_OSAL_TaskDelay(spp_uint32_t delay_ms)
  * @brief Default (weak) task suspend
  */
 __attribute__((weak)) SppRetVal_t
-SPP_OSAL_TaskSuspend(SppTaskHandle_t task_handle)
+SPP_OSAL_TaskSuspend(void* task_handle)
 {
     (void)task_handle;
     return SPP_OK;
@@ -82,7 +82,7 @@ __attribute__((weak)) SppRetVal_t SPP_OSAL_ResumeAll(void)
  * @brief Default (weak) task resume
  */
 __attribute__((weak)) SppRetVal_t
-SPP_OSAL_TaskResume(SppTaskHandle_t task_handle)
+SPP_OSAL_TaskResume(void* task_handle)
 {
     (void)task_handle;
     return SPP_OK;
@@ -101,7 +101,7 @@ SPP_OSAL_TaskGetCurrent(void)
  * @brief Default (weak) get task state
  */
 __attribute__((weak)) SppTaskState
-SPP_OSAL_TaskGetState(SppTaskHandle_t task_handle)
+SPP_OSAL_TaskGetState(void* task_handle)
 {
     (void)task_handle;
     return SPP_OSAL_TASK_RUNNING;
@@ -130,7 +130,7 @@ SPP_OSAL_TaskDelayUntil(spp_uint32_t period_ms)
  * @brief Default (weak) set task priority
  */
 __attribute__((weak)) SppRetVal_t
-SPP_OSAL_TaskPrioritySet(SppTaskHandle_t task_handle, SppPriority_t priority)
+SPP_OSAL_TaskPrioritySet(void* task_handle, spp_uint32_t priority)
 {
     if (task_handle == NULL) return SPP_ERROR_NULL_POINTER;
     (void)priority;
@@ -140,8 +140,8 @@ SPP_OSAL_TaskPrioritySet(SppTaskHandle_t task_handle, SppPriority_t priority)
 /**
  * @brief Default (weak) get task priority
  */
-__attribute__((weak)) SppPriority_t
-SPP_OSAL_TaskPriorityGet(SppTaskHandle_t task_handle)
+__attribute__((weak)) spp_uint32_t
+SPP_OSAL_TaskPriorityGet(void* task_handle)
 {
     (void)task_handle;
     return SPP_OSAL_PRIORITY_NORMAL;

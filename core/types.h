@@ -35,7 +35,7 @@ typedef struct{
 
 
 /*--------------------------------------------OSAL-------------------------------------------------------------------*/
-typedef void* SppTaskHandle_t;
+typedef void* void*;
 /** @brief Idle hook callback type */
 typedef void (*SPP_OSAL_IdleHook)(void);
 /**
