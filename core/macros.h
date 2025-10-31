@@ -3,4 +3,7 @@
 
 #define DATA_BANK_SIZE 100
 
+//Implement the static behaviour of functions
+#define STATIC
+
 #endif
