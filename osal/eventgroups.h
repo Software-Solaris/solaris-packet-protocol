@@ -17,10 +17,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief OSAL Event Group handle type
- */
-typedef void* osal_eventgroup_handle_t;
 
 /**
  * @brief Event bits type
