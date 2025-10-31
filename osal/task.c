@@ -7,10 +7,12 @@
  * This file provides the default (weak) implementation of task management functions.
  */
 
-#include "task.h"
+#include "osal/task.h"
 #include "core/returntypes.h"
 #include "core/types.h"  
 #include <stddef.h>   // define NULL
+#include <stdbool.h>
+
 
 /**
  * @brief Default (weak) task creation
@@ -56,7 +58,6 @@ SPP_OSAL_TaskDelay(spp_uint32_t delay_ms)
 __attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskSuspend(SppTaskHandle_t task_handle)
 {
-    // Default implementation - just return OK
     (void)task_handle;
     return SPP_OK;
 }
@@ -83,7 +84,6 @@ __attribute__((weak)) SppRetVal_t SPP_OSAL_ResumeAll(void)
 __attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskResume(SppTaskHandle_t task_handle)
 {
-    // Default implementation - just return OK
     (void)task_handle;
     return SPP_OK;
 }
@@ -94,7 +94,6 @@ SPP_OSAL_TaskResume(SppTaskHandle_t task_handle)
 __attribute__((weak)) void*
 SPP_OSAL_TaskGetCurrent(void)
 {
-    // Default implementation - return dummy handle
     return (void*)0x11111111;
 }
 
@@ -103,7 +102,7 @@ SPP_OSAL_TaskGetCurrent(void)
  */
 __attribute__((weak)) SppTaskState
 SPP_OSAL_TaskGetState(SppTaskHandle_t task_handle)
-{   // Default implementation - always return running
+{
     (void)task_handle;
     return SPP_OSAL_TASK_RUNNING;
 }
@@ -114,7 +113,6 @@ SPP_OSAL_TaskGetState(SppTaskHandle_t task_handle)
 __attribute__((weak)) SppRetVal_t
 SPP_OSAL_TaskYield(void)
 {
-    // Default implementation - just return OK
     return SPP_OK;
 }
 
@@ -153,8 +151,8 @@ SPP_OSAL_TaskPriorityGet(SppTaskHandle_t task_handle)
  * @brief Default (weak) idle hook register
  */
 __attribute__((weak)) SppRetVal_t
-SPP_OSAL_IdleHookRegister(SPP_OSAL_IdleHook hook)
+SPP_OSAL_IdleHookRegister(bool (*idle_function)(void))
 {
-    (void)hook; 
+    (void)idle_function;
     return SPP_OK;
 }
