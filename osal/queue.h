@@ -42,6 +42,29 @@ typedef void* osal_queue_handle_t;
 void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t item_size);
 
 /**
+ * @brief Crea una nueva cola OSAL con memoria estática
+ * 
+ * @param queue_length Número máximo de elementos en la cola
+ * @param item_size Tamaño en bytes de cada elemento
+ * @param queue_storage
+ * @param queue_buffer
+ * 
+ * @return Puntero void a handle de la cola creada
+ * @retval NULL si hubo error al crear la cola
+ * 
+ * @note El handle debe ser usado con las demás funciones OSAL
+ */
+void* SPP_OSAL_QueueCreateStatic(uint32_t queue_length, uint32_t item_size, uint8_t* queue_storage, void* queue_buffer);
+
+/**
+ * @brief Obtiene el número de elementos en cola
+ * 
+ * @param queue_handle Handle de la cola
+ * @return uint32_t Número de elementos en cola
+ */
+uint32_t SPP_OSAL_QueueMessagesWaiting(void* queue_handle);
+
+/**
  * @brief Delete a queue
  * 
  * @param queue_handle Queue handle

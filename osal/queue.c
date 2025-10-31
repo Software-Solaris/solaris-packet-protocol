@@ -43,6 +43,27 @@ __attribute__((weak)) void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t
 }
 
 /**
+ * @brief Default (weak) queue creation
+ */
+__attribute__((weak)) SPP_OSAL_QueueCreateStatic(uint32_t queue_length, uint32_t item_size, uint8_t* queue_storage, void* queue_buffer)
+{
+    (void)queue_length;
+    (void)item_size;
+    (void)queue_storage;
+    (void)queue_buffer;
+    return NULL; // Esto da error???
+}
+
+/**
+ * @brief Default (weak) messages waiting
+ */
+__attribute__((weak)) uint32_t SPP_OSAL_QueueMessagesWaiting(void* queue_handle)
+{
+    (void)queue_handle;
+    return NULL; // Esto da error???
+}
+
+/**
  * @brief Default (weak) queue deletion
  */
 __attribute__((weak)) retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle)
