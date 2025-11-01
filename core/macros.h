@@ -5,5 +5,6 @@
 
 //Implement the static behaviour of functions
 #define STATIC
+#define STACK_SIZE 2048
 
 #endif
