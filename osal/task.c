@@ -25,3 +25,7 @@ __attribute__((weak)) void* SPP_OSAL_TaskCreate(void *p_function, const char *co
     // If no implementation is defined, then error is returned
     return NULL;
 }
+
+__attribute__((weak)) retval_t SPP_OSAL_TaskDelete(void *p_task){
+    return SPP_ERROR;
+}
