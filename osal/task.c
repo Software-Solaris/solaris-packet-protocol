@@ -12,10 +12,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+__attribute__((weak))  void * SPP_OSAL_GetTaskStorage(){
+    return NULL;
+}
+
 
 __attribute__((weak)) void* SPP_OSAL_TaskCreate(void *p_function, const char *const task_name, 
                             const uint32_t stack_depth,void *const p_custom_data,
-                            spp_uint32_t priority, uint64_t stack_size)
+                            spp_uint32_t priority, void * p_storage)
 
 {
     // If no implementation is defined, then error is returned

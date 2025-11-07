@@ -16,10 +16,12 @@
 #include "core/types.h"
 #include "core/macros.h"
 
+void * SPP_OSAL_GetTaskStorage();
+
 
 void* SPP_OSAL_TaskCreate(void *p_function, const char *const task_name, 
                             const uint32_t stack_depth,void *const p_custom_data,
-                            spp_uint32_t priority, uint64_t stack_size);
+                            spp_uint32_t priority, void * p_storage);
 
 
 
