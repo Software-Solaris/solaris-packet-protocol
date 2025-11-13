@@ -1,0 +1,13 @@
+DOXYFILE_ENCODING      = UTF-8
+
+PROJECT_NAME           = "Solaris Packet Protocol"
+PROJECT_NUMBER         = 0.1
+PROJECT_LOGO           = docs/SPP_logo.jpeg
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = YES
+
+
+GENERATE_HTML = YES
+GENERATE_LATEX = NO
+
+
