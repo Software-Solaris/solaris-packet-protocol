@@ -2,15 +2,18 @@
 #define RETURNTYPES_H
 
 typedef enum{
+    // Basic errors
     SPP_OK,
     SPP_ERROR,
-    SPP_NULL_POINTER,
+    // Packet-related errors
     SPP_NOT_ENOUGH_PACKETS,
     SPP_NULL_PACKET,
+    // Other errors for function returns
+    SPP_ERROR_ALREADY_INITIALIZED,
     SPP_ERROR_NULL_POINTER,
     SPP_ERROR_NOT_INITIALIZED,
-    SPP_ERROR_INVALID_PARAMETER
+    SPP_ERROR_INVALID_PARAMETER,
+    SPP_ERROR_ON_SPI_TRANSACTION
 }retval_t;
-
 
 #endif
