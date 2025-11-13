@@ -1,0 +1,5 @@
+<map id="osal/queue.h" name="osal/queue.h">
+<area shape="rect" id="Node000001" title="OSAL Queue Management Interface." alt="" coords="5,5,111,31"/>
+<area shape="rect" id="Node000002" href="$d2/dbd/queue_8c.html" title="OSAL Queue Management Implementation." alt="" coords="6,79,110,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,44,61,79,55,79,55,44"/>
+</map>

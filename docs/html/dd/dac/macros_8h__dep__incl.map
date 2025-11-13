@@ -1,0 +1,19 @@
+<map id="core/macros.h" name="core/macros.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="256,5,371,31"/>
+<area shape="rect" id="Node000002" href="$d5/dc4/core_8h.html" title=" " alt="" coords="85,79,179,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,38,163,81,161,76,271,33"/>
+<area shape="rect" id="Node000005" href="$db/da4/task_8h.html" title="OSAL Task Management Interface." alt="" coords="508,79,601,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="366,32,516,76,515,81,365,37"/>
+<area shape="rect" id="Node000007" href="$dc/dd9/databank_8h.html" title=" " alt="" coords="204,79,423,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="316,44,316,79,311,79,311,44"/>
+<area shape="rect" id="Node000003" href="$d6/de7/core_8c.html" title=" " alt="" coords="5,152,99,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,115,67,154,63,150,107,111"/>
+<area shape="rect" id="Node000004" href="$d4/d03/basic__usage_8c.html" title=" " alt="" coords="123,152,304,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="157,111,202,150,198,154,154,115"/>
+<area shape="rect" id="Node000006" href="$d3/d3f/task_8c.html" title="OSAL Task Management Implementation." alt="" coords="570,152,662,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="576,113,608,150,604,154,572,116"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="259,110,95,154,94,149,257,105"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="288,114,231,154,228,150,285,110"/>
+<area shape="rect" id="Node000008" href="$d2/d5c/databank_8c.html" title=" " alt="" coords="329,152,546,177"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="346,108,418,149,416,154,344,113"/>
+</map>

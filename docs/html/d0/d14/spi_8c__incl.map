@@ -1,0 +1,16 @@
+<map id="hal/spi/spi.c" name="hal/spi/spi.c">
+<area shape="rect" id="Node000001" title="SPI Hardware Abstraction Layer Implementation." alt="" coords="291,5,390,31"/>
+<area shape="rect" id="Node000002" href="$da/d87/spi_8h.html" title="SPI Hardware Abstraction Layer." alt="" coords="217,79,270,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="327,33,272,72,269,68,323,29"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="303,152,445,177"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="346,31,371,138,366,139,341,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="379,79,449,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="355,29,394,67,390,71,351,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,76,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,105,87,150,85,145,216,100"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,152,183,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="229,106,171,146,168,142,226,102"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="266,102,342,143,340,148,263,106"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="208,152,279,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="246,104,246,138,241,138,241,104"/>
+</map>

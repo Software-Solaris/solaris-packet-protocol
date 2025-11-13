@@ -1,12 +1,14 @@
 var searchData=
 [
-  ['a_20new_20architecture_0',['Example for a new architecture',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md11',1,'']]],
-  ['a_20series_1',['ARM Cortex-A Series',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md27',1,'']]],
-  ['architecture_2',['architecture',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md25',1,'Error: &quot;Wrong architecture&quot;'],['../db/d24/md_CROSS__COMPILATION.html#autotoc_md11',1,'Example for a new architecture'],['../db/d24/md_CROSS__COMPILATION.html#autotoc_md14',1,'Verify library architecture']]],
-  ['architecture_20specific_20optimizations_3',['Architecture-Specific Optimizations',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md26',1,'']]],
-  ['architectures_4',['Supported Architectures',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md1',1,'']]],
-  ['arm_2032_20bit_5',['ARM (32-bit)',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md2',1,'']]],
-  ['arm_20cortex_20a_20series_6',['ARM Cortex-A Series',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md27',1,'']]],
-  ['automated_20script_20recommended_7',['Method 1: Automated Script (Recommended)',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md8',1,'']]],
-  ['automated_20testing_8',['Automated testing',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md31',1,'']]]
+  ['semaphore_2ec_0',['semaphore.c',['../df/d3f/semaphore_8c.html',1,'']]],
+  ['semaphore_2eh_1',['semaphore.h',['../d6/dc6/semaphore_8h.html',1,'']]],
+  ['spi_2ec_2',['spi.c',['../da/d00/spi_8c.html',1,'']]],
+  ['spi_2eh_3',['spi.h',['../da/d87/spi_8h.html',1,'']]],
+  ['spp_5fhal_5fspi_5fbusinit_4',['SPP_HAL_SPI_BusInit',['../da/d87/spi_8h.html#ab993c2afa43942c2a0c0ba23e33a3278',1,'spi.h']]],
+  ['spp_5fhal_5fspi_5fdeviceinit_5',['SPP_HAL_SPI_DeviceInit',['../da/d87/spi_8h.html#a60fd68a8c7b44cf012ee97b36c18f7cf',1,'spi.h']]],
+  ['spp_5fhal_5fspi_5fgethandler_6',['SPP_HAL_SPI_GetHandler',['../da/d87/spi_8h.html#aab4c81d1a896924e1261dd96f3229591',1,'spi.h']]],
+  ['spp_5fhal_5fspi_5ftransmit_7',['SPP_HAL_SPI_Transmit',['../da/d87/spi_8h.html#a9e6e551f438f70bf35e57bcf28b0b0e1',1,'spi.h']]],
+  ['spp_5fosal_5fgettaskstorage_8',['SPP_OSAL_GetTaskStorage',['../db/da4/task_8h.html#a4b5069015003c52b869dc0e234605f58',1,'task.h']]],
+  ['spp_5fosal_5ftaskcreate_9',['SPP_OSAL_TaskCreate',['../db/da4/task_8h.html#ab2fc48a67077b29dc66bbeaa0c5f0c73',1,'task.h']]],
+  ['spp_5fosal_5ftaskdelete_10',['SPP_OSAL_TaskDelete',['../db/da4/task_8h.html#a2675276911fcc6ce275aa4a906a0bef4',1,'task.h']]]
 ];

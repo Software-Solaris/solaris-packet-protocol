@@ -1,0 +1,16 @@
+<map id="osal/mutex.c" name="osal/mutex.c">
+<area shape="rect" id="Node000001" title="OSAL Mutex Management Implementation." alt="" coords="245,5,351,31"/>
+<area shape="rect" id="Node000002" href="$d0/df8/mutex_8h.html" title="OSAL Mutex Management Interface." alt="" coords="133,79,209,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="279,33,205,74,203,69,276,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="207,152,349,177"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="299,31,291,79,284,139,278,138,286,78,293,30"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="300,79,371,104"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="307,30,325,65,321,68,302,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="395,79,465,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="320,28,398,70,395,74,318,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,76,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,106,75,148,73,143,149,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,152,183,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="169,105,154,140,150,138,164,103"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="190,102,251,142,248,147,187,106"/>
+</map>

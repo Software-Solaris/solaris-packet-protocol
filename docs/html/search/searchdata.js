@@ -1,18 +1,30 @@
 var indexSectionsWithContent =
 {
-  0: "1236abcdefgilmnopqrstuvw",
-  1: "cgs"
+  0: "_moqst",
+  1: "moqst",
+  2: "_os",
+  3: "o",
+  4: "o",
+  5: "o"
 };
 
 var indexSectionNames =
 {
   0: "all",
-  1: "pages"
+  1: "files",
+  2: "functions",
+  3: "typedefs",
+  4: "enums",
+  5: "enumvalues"
 };
 
 var indexSectionLabels =
 {
   0: "All",
-  1: "Pages"
+  1: "Files",
+  2: "Functions",
+  3: "Typedefs",
+  4: "Enumerations",
+  5: "Enumerator"
 };
 

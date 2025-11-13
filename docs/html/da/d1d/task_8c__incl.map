@@ -1,0 +1,19 @@
+<map id="osal/task.c" name="osal/task.c">
+<area shape="rect" id="Node000001" title="OSAL Task Management Implementation." alt="" coords="137,5,229,31"/>
+<area shape="rect" id="Node000002" href="$db/da4/task_8h.html" title="OSAL Task Management Interface." alt="" coords="179,79,273,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,30,214,66,210,68,188,32"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,76,177"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="174,33,64,144,60,140,170,29"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,152,183,177"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="183,32,152,139,146,138,177,30"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="297,79,371,104"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="209,28,298,70,296,75,206,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="197,107,84,149,83,145,195,102"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="214,106,168,145,165,141,211,102"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="207,152,349,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="237,103,264,139,259,142,232,106"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="373,152,476,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="259,102,380,145,378,150,257,107"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="501,152,615,177"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="273,100,491,146,490,152,272,105"/>
+</map>

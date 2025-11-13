@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['libraries_0',['libraries',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md24',1,'Error: &quot;Cannot find libraries&quot;'],['../db/d24/md_CROSS__COMPILATION.html#autotoc_md29',1,'Testing Cross-Compiled Libraries']]],
-  ['library_20architecture_1',['Verify library architecture',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md14',1,'']]],
-  ['local_20installation_2',['Local installation',['../db/d24/md_CROSS__COMPILATION.html#autotoc_md17',1,'']]]
+  ['ret_0',['ret',['../d6/de7/core_8c.html#a2fcf1716ccf22f9b890cc3802a441a68',1,'core.c']]],
+  ['returntypes_2eh_1',['returntypes.h',['../da/dc0/returntypes_8h.html',1,'']]],
+  ['retval_5ft_2',['retval_t',['../da/dc0/returntypes_8h.html#a7a53c0a65d763442224ca36299adee75',1,'returntypes.h']]]
 ];

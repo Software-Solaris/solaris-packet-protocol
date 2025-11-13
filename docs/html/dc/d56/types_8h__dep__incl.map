@@ -1,0 +1,15 @@
+<map id="core/types.h" name="core/types.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="259,5,361,31"/>
+<area shape="rect" id="Node000002" href="$da/d87/spi_8h.html" title="SPI Hardware Abstraction Layer." alt="" coords="200,79,300,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="293,43,262,80,258,77,289,40"/>
+<area shape="rect" id="Node000006" href="$db/da4/task_8h.html" title="OSAL Task Management Interface." alt="" coords="325,79,418,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="331,40,363,77,359,80,327,43"/>
+<area shape="rect" id="Node000003" href="$d4/d0a/esp32__spi_8h.html" title="ESP32&#45;S3 SPI Implementation for SPP HAL." alt="" coords="5,152,177,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,112,131,154,129,149,213,108"/>
+<area shape="rect" id="Node000005" href="$da/d00/spi_8c.html" title="SPI Hardware Abstraction Layer Implementation." alt="" coords="202,159,301,185"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="253,118,254,159,248,159,248,118"/>
+<area shape="rect" id="Node000004" href="$d8/d81/esp32__spi_8c.html" title="ESP32&#45;S3 SPI Implementation for SPP HAL." alt="" coords="5,240,177,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,206,94,240,89,240,89,206"/>
+<area shape="rect" id="Node000007" href="$d3/d3f/task_8c.html" title="OSAL Task Management Implementation." alt="" coords="325,159,417,185"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="374,118,374,159,369,159,369,118"/>
+</map>

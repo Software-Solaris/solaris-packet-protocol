@@ -1,0 +1,16 @@
+<map id="osal/semaphore.c" name="osal/semaphore.c">
+<area shape="rect" id="Node000001" title="OSAL Semaphore Management Implementation." alt="" coords="233,5,371,31"/>
+<area shape="rect" id="Node000002" href="$d6/dc6/semaphore_8h.html" title="OSAL Semaphore Management Interface." alt="" coords="111,79,218,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="281,33,200,75,198,70,279,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="207,152,349,177"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="303,32,285,139,280,138,297,31"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="304,79,375,104"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="311,30,329,65,325,68,306,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="399,79,469,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="324,28,402,70,399,74,322,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,76,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="146,106,74,147,71,143,143,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,152,183,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="163,105,152,140,147,138,158,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="184,102,250,142,247,147,181,106"/>
+</map>

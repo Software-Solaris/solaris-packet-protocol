@@ -6,8 +6,16 @@ PROJECT_LOGO           = docs/SPP_logo.jpeg
 OUTPUT_DIRECTORY       = docs
 CREATE_SUBDIRS         = YES
 
+INPUT                  = hal osal
+RECURSIVE              = YES
 
-GENERATE_HTML = YES
-GENERATE_LATEX = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+FILE_PATTERNS          = *.h *.c
+
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
 
 
