@@ -1,7 +1,0 @@
-var searchData=
-[
-  ['freertos_5fosal_5fdeinit_0',['freertos_osal_deinit',['../d5/d05/freertos__osal__impl_8c.html#ade849dc6c06c49d88d5c7c74ab92f8df',1,'FreeRTOS_OSAL_Deinit(void):&#160;freertos_osal_impl.c'],['../d8/d8b/freertos__osal__impl_8h.html#ade849dc6c06c49d88d5c7c74ab92f8df',1,'FreeRTOS_OSAL_Deinit(void):&#160;freertos_osal_impl.c']]],
-  ['freertos_5fosal_5fgetversion_1',['freertos_osal_getversion',['../d5/d05/freertos__osal__impl_8c.html#ad2320bf9c19eee1b7c522c9ccd8ccaad',1,'FreeRTOS_OSAL_GetVersion(char *version_string, size_t buffer_size):&#160;freertos_osal_impl.c'],['../d8/d8b/freertos__osal__impl_8h.html#ad2320bf9c19eee1b7c522c9ccd8ccaad',1,'FreeRTOS_OSAL_GetVersion(char *version_string, size_t buffer_size):&#160;freertos_osal_impl.c']]],
-  ['freertos_5fosal_5finit_2',['freertos_osal_init',['../d5/d05/freertos__osal__impl_8c.html#a59d01f0eaf5726c5074a73ba02eb7ff3',1,'FreeRTOS_OSAL_Init(void):&#160;freertos_osal_impl.c'],['../d8/d8b/freertos__osal__impl_8h.html#a59d01f0eaf5726c5074a73ba02eb7ff3',1,'FreeRTOS_OSAL_Init(void):&#160;freertos_osal_impl.c']]],
-  ['freertos_5fosal_5fisavailable_3',['freertos_osal_isavailable',['../d5/d05/freertos__osal__impl_8c.html#abeae4307eb378103dfa52ae1cd183ad7',1,'FreeRTOS_OSAL_IsAvailable(void):&#160;freertos_osal_impl.c'],['../d8/d8b/freertos__osal__impl_8h.html#abeae4307eb378103dfa52ae1cd183ad7',1,'FreeRTOS_OSAL_IsAvailable(void):&#160;freertos_osal_impl.c']]]
-];

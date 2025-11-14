@@ -1,0 +1,9 @@
+#projectlogo img {
+    max-width: 90px;
+    height: auto;
+}
+
+#projectlogo {
+    float: left;
+    margin-right: 20px;
+}

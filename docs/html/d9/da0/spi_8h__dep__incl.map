@@ -1,5 +1,0 @@
-<map id="hal/spi/spi.h" name="hal/spi/spi.h">
-<area shape="rect" id="Node000001" title="SPI Hardware Abstraction Layer." alt="" coords="5,5,105,31"/>
-<area shape="rect" id="Node000002" href="$da/d00/spi_8c.html" title="SPI Hardware Abstraction Layer Implementation." alt="" coords="6,79,105,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,44,58,79,53,79,53,44"/>
-</map>
