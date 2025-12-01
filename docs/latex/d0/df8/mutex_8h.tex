@@ -1,0 +1,253 @@
+\doxysection{osal/mutex.h File Reference}
+\hypertarget{mutex_8h}{}\label{mutex_8h}\index{osal/mutex.h@{osal/mutex.h}}
+
+
+OSAL Mutex Management Interface.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+Include dependency graph for mutex.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{de/d34/mutex_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{d1/d2b/mutex_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Mutex handle type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\+\_\+mutex\+\_\+type\+\_\+t}} \{ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c}{OSAL\+\_\+\+MUTEX\+\_\+\+NORMAL}} = 0
+, \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b}{OSAL\+\_\+\+MUTEX\+\_\+\+RECURSIVE}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em Mutex type enumeration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+retval\+\_\+t \mbox{\hyperlink{mutex_8h_a8c6ec70660dcb97f62b60242e610da13}{OSAL\+\_\+\+Mutex\+Create}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}mutex\+\_\+handle, \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\+\_\+mutex\+\_\+type\+\_\+t}} type)
+\begin{DoxyCompactList}\small\item\em Create a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{mutex_8h_ae17499b77a92d6edd587c790c082e6c5}{OSAL\+\_\+\+Mutex\+Delete}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{mutex_8h_ac167bed1aedd605478e21e31e232c0ec}{OSAL\+\_\+\+Mutex\+Take}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Take (lock) a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{mutex_8h_afab450b2e5ab117ca15b7306298e6c92}{OSAL\+\_\+\+Mutex\+Give}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Give (unlock) a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{mutex_8h_afea749440ad0cc0dd6d6e3db2aac2664}{OSAL\+\_\+\+Mutex\+Try\+Take}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Try to take a mutex without blocking. \end{DoxyCompactList}\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{mutex_8h_ae21cf1051203f4a59ecc46afd58f8e46}{OSAL\+\_\+\+Mutex\+Get\+Holder}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Get mutex holder task. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{mutex_8h_a5900611f66e7a970f8b487968811dd19}{OSAL\+\_\+\+Mutex\+Is\+Held\+By\+Current\+Task}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Check if mutex is held by current task. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Mutex Management Interface. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the mutex management interface for the OSAL layer. 
+
+Definition in file \mbox{\hyperlink{mutex_8h_source}{mutex.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}\label{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4} 
+\index{mutex.h@{mutex.h}!osal\_mutex\_handle\_t@{osal\_mutex\_handle\_t}}
+\index{osal\_mutex\_handle\_t@{osal\_mutex\_handle\_t}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{osal\_mutex\_handle\_t}{osal\_mutex\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Mutex handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{mutex_8h_source_l00024}{24}} of file \mbox{\hyperlink{mutex_8h_source}{mutex.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}\label{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded} 
+\index{mutex.h@{mutex.h}!osal\_mutex\_type\_t@{osal\_mutex\_type\_t}}
+\index{osal\_mutex\_type\_t@{osal\_mutex\_type\_t}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{osal\_mutex\_type\_t}{osal\_mutex\_type\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\+\_\+mutex\+\_\+type\+\_\+t}}}
+
+
+
+Mutex type enumeration. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_MUTEX\_NORMAL@{OSAL\_MUTEX\_NORMAL}!mutex.h@{mutex.h}}\index{mutex.h@{mutex.h}!OSAL\_MUTEX\_NORMAL@{OSAL\_MUTEX\_NORMAL}}}\Hypertarget{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c}\label{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c} 
+OSAL\+\_\+\+MUTEX\+\_\+\+NORMAL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_MUTEX\_RECURSIVE@{OSAL\_MUTEX\_RECURSIVE}!mutex.h@{mutex.h}}\index{mutex.h@{mutex.h}!OSAL\_MUTEX\_RECURSIVE@{OSAL\_MUTEX\_RECURSIVE}}}\Hypertarget{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b}\label{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b} 
+OSAL\+\_\+\+MUTEX\+\_\+\+RECURSIVE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{mutex_8h_source_l00029}{29}} of file \mbox{\hyperlink{mutex_8h_source}{mutex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c}{OSAL\_MUTEX\_NORMAL}}\ =\ 0,}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b}{OSAL\_MUTEX\_RECURSIVE}}\ =\ 1}
+\DoxyCodeLine{00032\ \}\ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\_mutex\_type\_t}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{mutex_8h_a8c6ec70660dcb97f62b60242e610da13}\label{mutex_8h_a8c6ec70660dcb97f62b60242e610da13} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexCreate@{OSAL\_MutexCreate}}
+\index{OSAL\_MutexCreate@{OSAL\_MutexCreate}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexCreate()}{OSAL\_MutexCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{mutex\+\_\+handle,  }\item[{\mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\+\_\+mutex\+\_\+type\+\_\+t}}}]{type }\end{DoxyParamCaption})}
+
+
+
+Create a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Pointer to store mutex handle \\
+\hline
+{\em type} & Mutex type (normal or recursive) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_ae17499b77a92d6edd587c790c082e6c5}\label{mutex_8h_ae17499b77a92d6edd587c790c082e6c5} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexDelete@{OSAL\_MutexDelete}}
+\index{OSAL\_MutexDelete@{OSAL\_MutexDelete}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexDelete()}{OSAL\_MutexDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_ae21cf1051203f4a59ecc46afd58f8e46}\label{mutex_8h_ae21cf1051203f4a59ecc46afd58f8e46} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexGetHolder@{OSAL\_MutexGetHolder}}
+\index{OSAL\_MutexGetHolder@{OSAL\_MutexGetHolder}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexGetHolder()}{OSAL\_MutexGetHolder()}}
+{\footnotesize\ttfamily void \texorpdfstring{$\ast$}{*} OSAL\+\_\+\+Mutex\+Get\+Holder (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Get mutex holder task. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void\texorpdfstring{$\ast$}{*} Task handle that currently holds the mutex (NULL if not held) 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_afab450b2e5ab117ca15b7306298e6c92}\label{mutex_8h_afab450b2e5ab117ca15b7306298e6c92} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexGive@{OSAL\_MutexGive}}
+\index{OSAL\_MutexGive@{OSAL\_MutexGive}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexGive()}{OSAL\_MutexGive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Give (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Give (unlock) a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_a5900611f66e7a970f8b487968811dd19}\label{mutex_8h_a5900611f66e7a970f8b487968811dd19} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexIsHeldByCurrentTask@{OSAL\_MutexIsHeldByCurrentTask}}
+\index{OSAL\_MutexIsHeldByCurrentTask@{OSAL\_MutexIsHeldByCurrentTask}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexIsHeldByCurrentTask()}{OSAL\_MutexIsHeldByCurrentTask()}}
+{\footnotesize\ttfamily bool OSAL\+\_\+\+Mutex\+Is\+Held\+By\+Current\+Task (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Check if mutex is held by current task. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool true if mutex is held by current task, false otherwise 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_ac167bed1aedd605478e21e31e232c0ec}\label{mutex_8h_ac167bed1aedd605478e21e31e232c0ec} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexTake@{OSAL\_MutexTake}}
+\index{OSAL\_MutexTake@{OSAL\_MutexTake}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexTake()}{OSAL\_MutexTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Take (lock) a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds (0 = no wait, UINT32\+\_\+\+MAX = wait forever) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{mutex_8h_afea749440ad0cc0dd6d6e3db2aac2664}\label{mutex_8h_afea749440ad0cc0dd6d6e3db2aac2664} 
+\index{mutex.h@{mutex.h}!OSAL\_MutexTryTake@{OSAL\_MutexTryTake}}
+\index{OSAL\_MutexTryTake@{OSAL\_MutexTryTake}!mutex.h@{mutex.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexTryTake()}{OSAL\_MutexTryTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Try\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Try to take a mutex without blocking. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, SPP\+\_\+\+ERROR\+\_\+\+TIMEOUT if mutex not available 
+\end{DoxyReturn}

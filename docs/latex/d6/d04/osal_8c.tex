@@ -1,0 +1,99 @@
+\doxysection{osal/osal.c File Reference}
+\hypertarget{osal_8c}{}\label{osal_8c}\index{osal/osal.c@{osal/osal.c}}
+
+
+Operating System Abstraction Layer Implementation.  
+
+
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include "{}osal.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for osal.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d13/osal_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((weak))
+\begin{DoxyCompactList}\small\item\em Default (weak) OSAL initialization. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Operating System Abstraction Layer Implementation. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the default (weak) implementation of OSAL functions that can be overridden by OS-\/specific implementations. 
+
+Definition in file \mbox{\hyperlink{osal_8c_source}{osal.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{osal_8c_af9aace1b44b73111e15aa39f06f43456}\label{osal_8c_af9aace1b44b73111e15aa39f06f43456} 
+\index{osal.c@{osal.c}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!osal.c@{osal.c}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(weak)}]{ }\end{DoxyParamCaption})}
+
+
+
+Default (weak) OSAL initialization. 
+
+Default (weak) start scheduler.
+
+Default (weak) convert milliseconds to ticks.
+
+Default (weak) get tick count.
+
+Default (weak) semaphore give.
+
+Default (weak) semaphore take.
+
+Default (weak) semaphore deletion.
+
+Default (weak) semaphore creation.
+
+Default (weak) queue receive.
+
+Default (weak) queue send.
+
+Default (weak) queue deletion.
+
+Default (weak) queue creation.
+
+Default (weak) mutex give.
+
+Default (weak) mutex take.
+
+Default (weak) mutex deletion.
+
+Default (weak) mutex creation.
+
+Default (weak) task delay.
+
+Default (weak) task deletion.
+
+Default (weak) task creation.
+
+Default (weak) OSAL deinitialization. 
+
+Definition at line \mbox{\hyperlink{osal_8c_source_l00019}{19}} of file \mbox{\hyperlink{osal_8c_source}{osal.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}

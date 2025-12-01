@@ -1,0 +1,71 @@
+\doxysection{osal/task.h File Reference}
+\hypertarget{task_8h}{}\label{task_8h}\index{osal/task.h@{osal/task.h}}
+
+
+OSAL Task Management Interface.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include "{}core/types.\+h"{}}\newline
+{\ttfamily \#include "{}core/macros.\+h"{}}\newline
+Include dependency graph for task.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/d08/task_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=150pt]{d8/d25/task_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{task_8h_a4b5069015003c52b869dc0e234605f58}{SPP\+\_\+\+OSAL\+\_\+\+Get\+Task\+Storage}} ()
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{task_8h_ab2fc48a67077b29dc66bbeaa0c5f0c73}{SPP\+\_\+\+OSAL\+\_\+\+Task\+Create}} (void \texorpdfstring{$\ast$}{*}p\+\_\+function, const char \texorpdfstring{$\ast$}{*}const task\+\_\+name, const uint32\+\_\+t stack\+\_\+depth, void \texorpdfstring{$\ast$}{*}const p\+\_\+custom\+\_\+data, spp\+\_\+uint32\+\_\+t priority, void \texorpdfstring{$\ast$}{*}p\+\_\+storage)
+\item 
+retval\+\_\+t \mbox{\hyperlink{task_8h_a2675276911fcc6ce275aa4a906a0bef4}{SPP\+\_\+\+OSAL\+\_\+\+Task\+Delete}} (void \texorpdfstring{$\ast$}{*}p\+\_\+task)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Task Management Interface. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the task management interface for the OSAL layer. 
+
+Definition in file \mbox{\hyperlink{task_8h_source}{task.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{task_8h_a4b5069015003c52b869dc0e234605f58}\label{task_8h_a4b5069015003c52b869dc0e234605f58} 
+\index{task.h@{task.h}!SPP\_OSAL\_GetTaskStorage@{SPP\_OSAL\_GetTaskStorage}}
+\index{SPP\_OSAL\_GetTaskStorage@{SPP\_OSAL\_GetTaskStorage}!task.h@{task.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_OSAL\_GetTaskStorage()}{SPP\_OSAL\_GetTaskStorage()}}
+{\footnotesize\ttfamily void \texorpdfstring{$\ast$}{*} SPP\+\_\+\+OSAL\+\_\+\+Get\+Task\+Storage (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{task_8h_ab2fc48a67077b29dc66bbeaa0c5f0c73}\label{task_8h_ab2fc48a67077b29dc66bbeaa0c5f0c73} 
+\index{task.h@{task.h}!SPP\_OSAL\_TaskCreate@{SPP\_OSAL\_TaskCreate}}
+\index{SPP\_OSAL\_TaskCreate@{SPP\_OSAL\_TaskCreate}!task.h@{task.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_OSAL\_TaskCreate()}{SPP\_OSAL\_TaskCreate()}}
+{\footnotesize\ttfamily void \texorpdfstring{$\ast$}{*} SPP\+\_\+\+OSAL\+\_\+\+Task\+Create (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p\+\_\+function,  }\item[{const char \texorpdfstring{$\ast$}{*}const}]{task\+\_\+name,  }\item[{const uint32\+\_\+t}]{stack\+\_\+depth,  }\item[{void \texorpdfstring{$\ast$}{*}const}]{p\+\_\+custom\+\_\+data,  }\item[{spp\+\_\+uint32\+\_\+t}]{priority,  }\item[{void \texorpdfstring{$\ast$}{*}}]{p\+\_\+storage }\end{DoxyParamCaption})}
+
+\Hypertarget{task_8h_a2675276911fcc6ce275aa4a906a0bef4}\label{task_8h_a2675276911fcc6ce275aa4a906a0bef4} 
+\index{task.h@{task.h}!SPP\_OSAL\_TaskDelete@{SPP\_OSAL\_TaskDelete}}
+\index{SPP\_OSAL\_TaskDelete@{SPP\_OSAL\_TaskDelete}!task.h@{task.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_OSAL\_TaskDelete()}{SPP\_OSAL\_TaskDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t SPP\+\_\+\+OSAL\+\_\+\+Task\+Delete (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p\+\_\+task }\end{DoxyParamCaption})}
+

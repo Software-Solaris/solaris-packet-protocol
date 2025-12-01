@@ -1,0 +1,44 @@
+\doxysection{mutex.\+h}
+\hypertarget{mutex_8h_source}{}\label{mutex_8h_source}\index{osal/mutex.h@{osal/mutex.h}}
+\mbox{\hyperlink{mutex_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00010}00010\ \textcolor{preprocessor}{\#ifndef\ SPP\_OSAL\_MUTEX\_H}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00011}00011\ \textcolor{preprocessor}{\#define\ SPP\_OSAL\_MUTEX\_H}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}core/returntypes.h"{}}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00018}00018\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00024}\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{00024}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00029}\mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{00029}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00030}\mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c}{00030}}\ \ \ \ \ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23deda1b9d4044440f2967a735e4bbdde6858c}{OSAL\_MUTEX\_NORMAL}}\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b}{OSAL\_MUTEX\_RECURSIVE}}\ =\ 1}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00032}\mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23dedad512aa05e1709dfba63653df8737284b}{00032}}\ \}\ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\_mutex\_type\_t}};}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00041}\mbox{\hyperlink{mutex_8h_a8c6ec70660dcb97f62b60242e610da13}{00041}}\ retval\_t\ \mbox{\hyperlink{mutex_8h_a8c6ec70660dcb97f62b60242e610da13}{OSAL\_MutexCreate}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}*\ mutex\_handle,\ \mbox{\hyperlink{mutex_8h_a0c31449f5b07878185c8ca0b1ad23ded}{osal\_mutex\_type\_t}}\ type);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00049}\mbox{\hyperlink{mutex_8h_ae17499b77a92d6edd587c790c082e6c5}{00049}}\ retval\_t\ \mbox{\hyperlink{mutex_8h_ae17499b77a92d6edd587c790c082e6c5}{OSAL\_MutexDelete}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00058}\mbox{\hyperlink{mutex_8h_ac167bed1aedd605478e21e31e232c0ec}{00058}}\ retval\_t\ \mbox{\hyperlink{mutex_8h_ac167bed1aedd605478e21e31e232c0ec}{OSAL\_MutexTake}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00066}\mbox{\hyperlink{mutex_8h_afab450b2e5ab117ca15b7306298e6c92}{00066}}\ retval\_t\ \mbox{\hyperlink{mutex_8h_afab450b2e5ab117ca15b7306298e6c92}{OSAL\_MutexGive}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00074}\mbox{\hyperlink{mutex_8h_afea749440ad0cc0dd6d6e3db2aac2664}{00074}}\ retval\_t\ \mbox{\hyperlink{mutex_8h_afea749440ad0cc0dd6d6e3db2aac2664}{OSAL\_MutexTryTake}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00082}\mbox{\hyperlink{mutex_8h_ae21cf1051203f4a59ecc46afd58f8e46}{00082}}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{mutex_8h_ae21cf1051203f4a59ecc46afd58f8e46}{OSAL\_MutexGetHolder}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00090}\mbox{\hyperlink{mutex_8h_a5900611f66e7a970f8b487968811dd19}{00090}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{mutex_8h_a5900611f66e7a970f8b487968811dd19}{OSAL\_MutexIsHeldByCurrentTask}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00092}00092\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00093}00093\ \}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00094}00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{mutex_8h_source_l00096}00096\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SPP\_OSAL\_MUTEX\_H\ */}\textcolor{preprocessor}{\ }}
+
+\end{DoxyCode}

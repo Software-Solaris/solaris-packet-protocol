@@ -1,0 +1,200 @@
+\doxysection{osal.\+c}
+\hypertarget{osal_8c_source}{}\label{osal_8c_source}\index{osal/osal.c@{osal/osal.c}}
+\mbox{\hyperlink{osal_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}core/returntypes.h"{}}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{osal_8h}{osal.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00019}\mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{00019}}\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_adfe7189c4618409c5adbe08f0b22ec54}{OSAL\_Init}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00021}00021\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00023}00023\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00028}00028\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483}{OSAL\_Deinit}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00030}00030\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00037}00037\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e}{OSAL\_TaskCreate}}(\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\_task\_function\_t}}\ task\_function,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name,}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ stack\_size,\ \textcolor{keywordtype}{void}*\ parameters,\ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\_priority\_t}}\ priority,}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\_task\_handle\_t}}*\ task\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00040}00040\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{if}\ (task\_function\ ==\ NULL\ ||\ task\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00044}00044\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00045}00045\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ task\ creation}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00046}00046\ \ \ \ \ *task\_handle\ =\ (\textcolor{keywordtype}{void}*)0x12345678;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00047}00047\ \ \ \ \ (void)name;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00048}00048\ \ \ \ \ (void)stack\_size;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00049}00049\ \ \ \ \ (void)parameters;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00050}00050\ \ \ \ \ (void)priority;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00051}00051\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00053}00053\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00058}00058\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a610ded1828db8ae33e98a25a3b4dd307}{OSAL\_TaskDelete}}(\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\_task\_handle\_t}}\ task\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00059}00059\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00060}00060\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00061}00061\ \ \ \ \ (void)task\_handle;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00063}00063\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00068}00068\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a9acf7d14f9df480df1a95a712d128cbd}{OSAL\_TaskDelay}}(uint32\_t\ delay\_ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00069}00069\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00070}00070\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ busy\ wait\ (not\ recommended\ for\ real\ use)}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{volatile}\ uint32\_t\ count\ =\ delay\_ms\ *\ 1000;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00072}00072\ \ \ \ \ \textcolor{keywordflow}{while}\ (count-\/-\/)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Busy\ wait}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00081}00081\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{mutex_8h_a8c6ec70660dcb97f62b60242e610da13}{OSAL\_MutexCreate}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}*\ mutex\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00082}00082\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00083}00083\ \ \ \ \ \textcolor{keywordflow}{if}\ (mutex\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00086}00086\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00087}00087\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ mutex\ creation}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00088}00088\ \ \ \ \ *mutex\_handle\ =\ (\textcolor{keywordtype}{void}*)0x87654321;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00090}00090\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00095}00095\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{mutex_8h_ae17499b77a92d6edd587c790c082e6c5}{OSAL\_MutexDelete}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00096}00096\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00097}00097\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00098}00098\ \ \ \ \ (void)mutex\_handle;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00105}00105\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{mutex_8h_ac167bed1aedd605478e21e31e232c0ec}{OSAL\_MutexTake}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle,\ uint32\_t\ timeout\_ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00106}00106\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00107}00107\ \ \ \ \ \textcolor{keywordflow}{if}\ (mutex\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00110}00110\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00111}00111\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds\ immediately}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00112}00112\ \ \ \ \ (void)timeout\_ms;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00113}00113\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00119}00119\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{mutex_8h_afab450b2e5ab117ca15b7306298e6c92}{OSAL\_MutexGive}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00120}00120\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00121}00121\ \ \ \ \ \textcolor{keywordflow}{if}\ (mutex\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00124}00124\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00125}00125\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00126}00126\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00127}00127\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00132}00132\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{OSAL\_QueueCreate}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}*\ queue\_handle,\ uint32\_t\ queue\_length,\ uint32\_t\ item\_size)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00133}00133\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00134}00134\ \ \ \ \ \textcolor{keywordflow}{if}\ (queue\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00137}00137\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00138}00138\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ queue\ creation}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00139}00139\ \ \ \ \ *queue\_handle\ =\ (\textcolor{keywordtype}{void}*)0xABCDEF00;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00140}00140\ \ \ \ \ (void)queue\_length;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00141}00141\ \ \ \ \ (void)item\_size;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00142}00142\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00143}00143\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00148}00148\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{OSAL\_QueueDelete}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00149}00149\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00150}00150\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00151}00151\ \ \ \ \ (void)queue\_handle;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00152}00152\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00153}00153\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00158}00158\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a4804bae2478f671d4a05c572f2264f5d}{OSAL\_QueueSend}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00159}00159\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00160}00160\ \ \ \ \ \textcolor{keywordflow}{if}\ (queue\_handle\ ==\ NULL\ ||\ item\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00163}00163\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00164}00164\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00165}00165\ \ \ \ \ (void)timeout\_ms;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00167}00167\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00172}00172\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{OSAL\_QueueReceive}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00173}00173\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00174}00174\ \ \ \ \ \textcolor{keywordflow}{if}\ (queue\_handle\ ==\ NULL\ ||\ item\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00177}00177\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00178}00178\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ return\ dummy\ data}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00179}00179\ \ \ \ \ memset(item,\ 0xAA,\ \textcolor{keyword}{sizeof}(uint32\_t));\ \textcolor{comment}{//\ Assume\ 4-\/byte\ items}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00180}00180\ \ \ \ \ (void)timeout\_ms;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00181}00181\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00182}00182\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00187}00187\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_adf4a6452d009948c7968a01c0de357e5}{OSAL\_SemaphoreCreate}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}*\ semaphore\_handle,\ uint32\_t\ max\_count,\ uint32\_t\ initial\_count)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00188}00188\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00189}00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00192}00192\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00193}00193\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ semaphore\ creation}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00194}00194\ \ \ \ \ *semaphore\_handle\ =\ (\textcolor{keywordtype}{void}*)0xFEDCBA00;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00195}00195\ \ \ \ \ (void)max\_count;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00196}00196\ \ \ \ \ (void)initial\_count;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00197}00197\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00198}00198\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00203}00203\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a659120f46540d0475b7bfcac1824efd5}{OSAL\_SemaphoreDelete}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00204}00204\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00205}00205\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00206}00206\ \ \ \ \ (void)semaphore\_handle;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00208}00208\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00213}00213\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{OSAL\_SemaphoreTake}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle,\ uint32\_t\ timeout\_ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00214}00214\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00215}00215\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00217}00217\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00218}00218\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00219}00219\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00220}00220\ \ \ \ \ (void)timeout\_ms;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00221}00221\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00222}00222\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00227}00227\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_ab753d30f1446fce21163c23397a72ac0}{OSAL\_SemaphoreGive}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00228}00228\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00229}00229\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00231}00231\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00232}00232\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00233}00233\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00234}00234\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00235}00235\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00240}00240\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ uint32\_t\ \mbox{\hyperlink{osal_8h_a3888798712d0218df99aed8fb81854b1}{OSAL\_GetTickCount}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00241}00241\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00242}00242\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ return\ a\ dummy\ value}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00243}00243\ \ \ \ \ \textcolor{keyword}{static}\ uint32\_t\ tick\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{return}\ ++tick\_count;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00245}00245\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00250}00250\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ uint32\_t\ \mbox{\hyperlink{osal_8h_a972e960de7b6fefeea43543430344ea9}{OSAL\_MsToTicks}}(uint32\_t\ ms)}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00251}00251\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00252}00252\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ assume\ 1ms\ =\ 1\ tick}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00253}00253\ \ \ \ \ \textcolor{keywordflow}{return}\ ms;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00254}00254\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00259}00259\ \mbox{\hyperlink{osal_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a776df63f043fe921af469d0101cf8972}{OSAL\_StartScheduler}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00260}00260\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00261}00261\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK\ (no\ scheduler\ to\ start)}}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00262}00262\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{osal_8c_source_l00263}00263\ \}\ }
+
+\end{DoxyCode}

@@ -1,0 +1,49 @@
+\doxysection{queue.\+h}
+\hypertarget{queue_8h_source}{}\label{queue_8h_source}\index{osal/queue.h@{osal/queue.h}}
+\mbox{\hyperlink{queue_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00010}00010\ \textcolor{preprocessor}{\#ifndef\ SPP\_OSAL\_QUEUE\_H}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00011}00011\ \textcolor{preprocessor}{\#define\ SPP\_OSAL\_QUEUE\_H}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}core/returntypes.h"{}}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00018}00018\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00024}\mbox{\hyperlink{queue_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{00024}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{queue_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00034}\mbox{\hyperlink{queue_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{00034}}\ retval\_t\ \mbox{\hyperlink{queue_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{OSAL\_QueueCreate}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}*\ queue\_handle,\ uint32\_t\ queue\_length,\ uint32\_t\ item\_size);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00042}\mbox{\hyperlink{queue_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{00042}}\ retval\_t\ \mbox{\hyperlink{queue_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{OSAL\_QueueDelete}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00052}\mbox{\hyperlink{queue_8h_a4804bae2478f671d4a05c572f2264f5d}{00052}}\ retval\_t\ \mbox{\hyperlink{queue_8h_a4804bae2478f671d4a05c572f2264f5d}{OSAL\_QueueSend}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00062}\mbox{\hyperlink{queue_8h_aeb5855637c566cc053620ca298298e03}{00062}}\ retval\_t\ \mbox{\hyperlink{queue_8h_aeb5855637c566cc053620ca298298e03}{OSAL\_QueueSendFromISR}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ item,\ \textcolor{keywordtype}{bool}*\ higher\_priority\_task\_woken);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00072}\mbox{\hyperlink{queue_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{00072}}\ retval\_t\ \mbox{\hyperlink{queue_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{OSAL\_QueueReceive}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00082}\mbox{\hyperlink{queue_8h_abc3932b37825ba25153a65aeb7b35393}{00082}}\ retval\_t\ \mbox{\hyperlink{queue_8h_abc3932b37825ba25153a65aeb7b35393}{OSAL\_QueueReceiveFromISR}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keywordtype}{void}*\ item,\ \textcolor{keywordtype}{bool}*\ higher\_priority\_task\_woken);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00092}\mbox{\hyperlink{queue_8h_a843eebb4315dc14cdadc0d03e928cf67}{00092}}\ retval\_t\ \mbox{\hyperlink{queue_8h_a843eebb4315dc14cdadc0d03e928cf67}{OSAL\_QueuePeek}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00100}\mbox{\hyperlink{queue_8h_a87b504d6b53a4c96986dfe598bd1b102}{00100}}\ uint32\_t\ \mbox{\hyperlink{queue_8h_a87b504d6b53a4c96986dfe598bd1b102}{OSAL\_QueueGetCount}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00108}\mbox{\hyperlink{queue_8h_aff1d515bc49db11c3915284ebe9bbbce}{00108}}\ uint32\_t\ \mbox{\hyperlink{queue_8h_aff1d515bc49db11c3915284ebe9bbbce}{OSAL\_QueueGetSpace}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00116}\mbox{\hyperlink{queue_8h_a5d965ff8a33f2b8d65d39eac3ea35dbe}{00116}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{queue_8h_a5d965ff8a33f2b8d65d39eac3ea35dbe}{OSAL\_QueueIsFull}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00124}\mbox{\hyperlink{queue_8h_a612ac3829191fede5b8261e154678ebe}{00124}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{queue_8h_a612ac3829191fede5b8261e154678ebe}{OSAL\_QueueIsEmpty}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00132}\mbox{\hyperlink{queue_8h_a54fb339cb500fc2bdf10cf24b8ffa0a0}{00132}}\ retval\_t\ \mbox{\hyperlink{queue_8h_a54fb339cb500fc2bdf10cf24b8ffa0a0}{OSAL\_QueueReset}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00134}00134\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00136}00136\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{queue_8h_source_l00138}00138\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SPP\_OSAL\_QUEUE\_H\ */}\textcolor{preprocessor}{\ }}
+
+\end{DoxyCode}

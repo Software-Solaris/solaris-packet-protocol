@@ -1,0 +1,235 @@
+\doxysection{osal/semaphore.h File Reference}
+\hypertarget{semaphore_8h}{}\label{semaphore_8h}\index{osal/semaphore.h@{osal/semaphore.h}}
+
+
+OSAL Semaphore Management Interface.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+Include dependency graph for semaphore.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{de/dc6/semaphore_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{d5/d82/semaphore_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{semaphore_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Semaphore handle type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_adf4a6452d009948c7968a01c0de357e5}{OSAL\+\_\+\+Semaphore\+Create}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}semaphore\+\_\+handle, uint32\+\_\+t max\+\_\+count, uint32\+\_\+t initial\+\_\+count)
+\begin{DoxyCompactList}\small\item\em Create a counting semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_af81d2c9cac286c80308d5d3e0922e4b3}{OSAL\+\_\+\+Semaphore\+Create\+Binary}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Create a binary semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_a659120f46540d0475b7bfcac1824efd5}{OSAL\+\_\+\+Semaphore\+Delete}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{OSAL\+\_\+\+Semaphore\+Take}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Take a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_ab753d30f1446fce21163c23397a72ac0}{OSAL\+\_\+\+Semaphore\+Give}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Give a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_a031db08d4c73563460206cc79be4da79}{OSAL\+\_\+\+Semaphore\+Give\+From\+ISR}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle, bool \texorpdfstring{$\ast$}{*}higher\+\_\+priority\+\_\+task\+\_\+woken)
+\begin{DoxyCompactList}\small\item\em Give a semaphore from ISR. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{semaphore_8h_ae18822dba1243e20a990d70da9bd0669}{OSAL\+\_\+\+Semaphore\+Try\+Take}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Try to take a semaphore without blocking. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{semaphore_8h_ae2108c943b02299d7532a84356bc9c4f}{OSAL\+\_\+\+Semaphore\+Get\+Count}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Get current semaphore count. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Semaphore Management Interface. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the semaphore management interface for the OSAL layer. 
+
+Definition in file \mbox{\hyperlink{semaphore_8h_source}{semaphore.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{semaphore_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}\label{semaphore_8h_a62c22e6027f21a9fb47ec569dcb4b1ca} 
+\index{semaphore.h@{semaphore.h}!osal\_semaphore\_handle\_t@{osal\_semaphore\_handle\_t}}
+\index{osal\_semaphore\_handle\_t@{osal\_semaphore\_handle\_t}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{osal\_semaphore\_handle\_t}{osal\_semaphore\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Semaphore handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{semaphore_8h_source_l00024}{24}} of file \mbox{\hyperlink{semaphore_8h_source}{semaphore.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{semaphore_8h_adf4a6452d009948c7968a01c0de357e5}\label{semaphore_8h_adf4a6452d009948c7968a01c0de357e5} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreCreate@{OSAL\_SemaphoreCreate}}
+\index{OSAL\_SemaphoreCreate@{OSAL\_SemaphoreCreate}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreCreate()}{OSAL\_SemaphoreCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{semaphore\+\_\+handle,  }\item[{uint32\+\_\+t}]{max\+\_\+count,  }\item[{uint32\+\_\+t}]{initial\+\_\+count }\end{DoxyParamCaption})}
+
+
+
+Create a counting semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Pointer to store semaphore handle \\
+\hline
+{\em max\+\_\+count} & Maximum count value \\
+\hline
+{\em initial\+\_\+count} & Initial count value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_af81d2c9cac286c80308d5d3e0922e4b3}\label{semaphore_8h_af81d2c9cac286c80308d5d3e0922e4b3} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreCreateBinary@{OSAL\_SemaphoreCreateBinary}}
+\index{OSAL\_SemaphoreCreateBinary@{OSAL\_SemaphoreCreateBinary}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreCreateBinary()}{OSAL\_SemaphoreCreateBinary()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Create\+Binary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Create a binary semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Pointer to store semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_a659120f46540d0475b7bfcac1824efd5}\label{semaphore_8h_a659120f46540d0475b7bfcac1824efd5} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreDelete@{OSAL\_SemaphoreDelete}}
+\index{OSAL\_SemaphoreDelete@{OSAL\_SemaphoreDelete}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreDelete()}{OSAL\_SemaphoreDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_ae2108c943b02299d7532a84356bc9c4f}\label{semaphore_8h_ae2108c943b02299d7532a84356bc9c4f} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreGetCount@{OSAL\_SemaphoreGetCount}}
+\index{OSAL\_SemaphoreGetCount@{OSAL\_SemaphoreGetCount}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreGetCount()}{OSAL\_SemaphoreGetCount()}}
+{\footnotesize\ttfamily uint32\+\_\+t OSAL\+\_\+\+Semaphore\+Get\+Count (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Get current semaphore count. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t Current semaphore count 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_ab753d30f1446fce21163c23397a72ac0}\label{semaphore_8h_ab753d30f1446fce21163c23397a72ac0} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreGive@{OSAL\_SemaphoreGive}}
+\index{OSAL\_SemaphoreGive@{OSAL\_SemaphoreGive}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreGive()}{OSAL\_SemaphoreGive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Give (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Give a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_a031db08d4c73563460206cc79be4da79}\label{semaphore_8h_a031db08d4c73563460206cc79be4da79} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreGiveFromISR@{OSAL\_SemaphoreGiveFromISR}}
+\index{OSAL\_SemaphoreGiveFromISR@{OSAL\_SemaphoreGiveFromISR}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreGiveFromISR()}{OSAL\_SemaphoreGiveFromISR()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Give\+From\+ISR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle,  }\item[{bool \texorpdfstring{$\ast$}{*}}]{higher\+\_\+priority\+\_\+task\+\_\+woken }\end{DoxyParamCaption})}
+
+
+
+Give a semaphore from ISR. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+{\em higher\+\_\+priority\+\_\+task\+\_\+woken} & Pointer to flag indicating if higher priority task was woken \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}\label{semaphore_8h_a718b3c1a3b3be91e6d9c3e9db56a4007} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreTake@{OSAL\_SemaphoreTake}}
+\index{OSAL\_SemaphoreTake@{OSAL\_SemaphoreTake}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreTake()}{OSAL\_SemaphoreTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Take a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{semaphore_8h_ae18822dba1243e20a990d70da9bd0669}\label{semaphore_8h_ae18822dba1243e20a990d70da9bd0669} 
+\index{semaphore.h@{semaphore.h}!OSAL\_SemaphoreTryTake@{OSAL\_SemaphoreTryTake}}
+\index{OSAL\_SemaphoreTryTake@{OSAL\_SemaphoreTryTake}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreTryTake()}{OSAL\_SemaphoreTryTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Try\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Try to take a semaphore without blocking. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, SPP\+\_\+\+ERROR\+\_\+\+TIMEOUT if semaphore not available 
+\end{DoxyReturn}

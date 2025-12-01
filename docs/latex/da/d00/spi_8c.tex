@@ -1,0 +1,133 @@
+\doxysection{hal/spi/spi.c File Reference}
+\hypertarget{spi_8c}{}\label{spi_8c}\index{hal/spi/spi.c@{hal/spi/spi.c}}
+
+
+SPI Hardware Abstraction Layer Implementation.  
+
+
+{\ttfamily \#include "{}spi.\+h"{}}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for spi.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d14/spi_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{spi_8c_af9aace1b44b73111e15aa39f06f43456}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((weak))
+\begin{DoxyCompactList}\small\item\em Default (weak) SPI bus configuration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+SPI Hardware Abstraction Layer Implementation. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the default (weak) implementation of SPI HAL functions that can be overridden by platform-\/specific implementations. 
+
+Definition in file \mbox{\hyperlink{spi_8c_source}{spi.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{spi_8c_af9aace1b44b73111e15aa39f06f43456}\label{spi_8c_af9aace1b44b73111e15aa39f06f43456} 
+\index{spi.c@{spi.c}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!spi.c@{spi.c}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(weak)}]{ }\end{DoxyParamCaption})}
+
+
+
+Default (weak) SPI bus configuration. 
+
+Default (weak) get semaphore count.
+
+Default (weak) semaphore try take.
+
+Default (weak) semaphore give from ISR.
+
+Default (weak) binary semaphore creation.
+
+Default (weak) reset queue.
+
+Default (weak) check if queue is empty.
+
+Default (weak) check if queue is full.
+
+Default (weak) get queue space.
+
+Default (weak) get queue count.
+
+Default (weak) queue peek.
+
+Default (weak) queue receive from ISR.
+
+Default (weak) queue send from ISR.
+
+Default (weak) start scheduler.
+
+Default (weak) convert milliseconds to ticks.
+
+Default (weak) get tick count.
+
+Default (weak) semaphore give.
+
+Default (weak) semaphore take.
+
+Default (weak) semaphore deletion.
+
+Default (weak) semaphore creation.
+
+Default (weak) queue receive.
+
+Default (weak) queue send.
+
+Default (weak) queue deletion.
+
+Default (weak) queue creation.
+
+Default (weak) mutex creation.
+
+Default (weak) task delay.
+
+Default (weak) task deletion.
+
+Default (weak) task creation.
+
+Default (weak) OSAL deinitialization.
+
+Default (weak) check if mutex is held by current task.
+
+Default (weak) get mutex holder.
+
+Default (weak) mutex try take.
+
+Default (weak) mutex give.
+
+Default (weak) mutex take.
+
+Default (weak) mutex deletion.
+
+Default (weak) SPI transmit function.
+
+Default (weak) SPI device initialization.
+
+Default (weak) SPI handler asssigner (void pointers) 
+
+Definition at line \mbox{\hyperlink{spi_8c_source_l00019}{19}} of file \mbox{\hyperlink{spi_8c_source}{spi.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR;}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}

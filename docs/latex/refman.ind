@@ -1,0 +1,257 @@
+\begin{theindex}
+
+  \item {\_\_attribute\_\_}
+    \subitem {mutex.c}, \hyperpage{10}
+    \subitem {osal.c}, \hyperpage{17}
+    \subitem {queue.c}, \hyperpage{32}
+    \subitem {semaphore.c}, \hyperpage{43}
+    \subitem {spi.c}, \hyperpage{4}
+    \subitem {task.c}, \hyperpage{50}
+
+  \indexspace
+
+  \item {hal/spi/spi.c}, \hyperpage{3}, \hyperpage{5}
+  \item {hal/spi/spi.h}, \hyperpage{6}, \hyperpage{8}
+
+  \indexspace
+
+  \item {mutex.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{10}
+  \item {mutex.h}
+    \subitem {osal\_mutex\_handle\_t}, \hyperpage{13}
+    \subitem {OSAL\_MUTEX\_NORMAL}, \hyperpage{13}
+    \subitem {OSAL\_MUTEX\_RECURSIVE}, \hyperpage{13}
+    \subitem {osal\_mutex\_type\_t}, \hyperpage{13}
+    \subitem {OSAL\_MutexCreate}, \hyperpage{13}
+    \subitem {OSAL\_MutexDelete}, \hyperpage{13}
+    \subitem {OSAL\_MutexGetHolder}, \hyperpage{14}
+    \subitem {OSAL\_MutexGive}, \hyperpage{14}
+    \subitem {OSAL\_MutexIsHeldByCurrentTask}, \hyperpage{14}
+    \subitem {OSAL\_MutexTake}, \hyperpage{15}
+    \subitem {OSAL\_MutexTryTake}, \hyperpage{15}
+
+  \indexspace
+
+  \item {osal.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{17}
+  \item {osal.h}
+    \subitem {OSAL\_Deinit}, \hyperpage{24}
+    \subitem {OSAL\_GetTickCount}, \hyperpage{24}
+    \subitem {OSAL\_Init}, \hyperpage{24}
+    \subitem {OSAL\_MsToTicks}, \hyperpage{24}
+    \subitem {osal\_mutex\_handle\_t}, \hyperpage{23}
+    \subitem {OSAL\_MutexCreate}, \hyperpage{25}
+    \subitem {OSAL\_MutexDelete}, \hyperpage{25}
+    \subitem {OSAL\_MutexGive}, \hyperpage{25}
+    \subitem {OSAL\_MutexTake}, \hyperpage{26}
+    \subitem {OSAL\_PRIORITY\_CRITICAL}, \hyperpage{24}
+    \subitem {OSAL\_PRIORITY\_HIGH}, \hyperpage{24}
+    \subitem {OSAL\_PRIORITY\_IDLE}, \hyperpage{24}
+    \subitem {OSAL\_PRIORITY\_LOW}, \hyperpage{24}
+    \subitem {OSAL\_PRIORITY\_NORMAL}, \hyperpage{24}
+    \subitem {osal\_priority\_t}, \hyperpage{23}
+    \subitem {osal\_queue\_handle\_t}, \hyperpage{23}
+    \subitem {OSAL\_QueueCreate}, \hyperpage{26}
+    \subitem {OSAL\_QueueDelete}, \hyperpage{26}
+    \subitem {OSAL\_QueueReceive}, \hyperpage{27}
+    \subitem {OSAL\_QueueSend}, \hyperpage{27}
+    \subitem {osal\_semaphore\_handle\_t}, \hyperpage{23}
+    \subitem {OSAL\_SemaphoreCreate}, \hyperpage{27}
+    \subitem {OSAL\_SemaphoreDelete}, \hyperpage{28}
+    \subitem {OSAL\_SemaphoreGive}, \hyperpage{28}
+    \subitem {OSAL\_SemaphoreTake}, \hyperpage{28}
+    \subitem {OSAL\_StartScheduler}, \hyperpage{29}
+    \subitem {osal\_task\_function\_t}, \hyperpage{23}
+    \subitem {osal\_task\_handle\_t}, \hyperpage{23}
+    \subitem {OSAL\_TaskCreate}, \hyperpage{29}
+    \subitem {OSAL\_TaskDelay}, \hyperpage{30}
+    \subitem {OSAL\_TaskDelete}, \hyperpage{30}
+  \item {osal/mutex.c}, \hyperpage{9, 10}
+  \item {osal/mutex.h}, \hyperpage{11}, \hyperpage{15}
+  \item {osal/osal.c}, \hyperpage{16}, \hyperpage{18}
+  \item {osal/osal.h}, \hyperpage{20}, \hyperpage{30}
+  \item {osal/queue.c}, \hyperpage{31}, \hyperpage{33}
+  \item {osal/queue.h}, \hyperpage{35}, \hyperpage{41}
+  \item {osal/semaphore.c}, \hyperpage{42}, \hyperpage{44}
+  \item {osal/semaphore.h}, \hyperpage{45}, \hyperpage{49}
+  \item {osal/task.c}, \hyperpage{50, 51}
+  \item {osal/task.h}, \hyperpage{51}, \hyperpage{53}
+  \item {OSAL\_Deinit}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_GetTickCount}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_Init}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_MsToTicks}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {osal\_mutex\_handle\_t}
+    \subitem {mutex.h}, \hyperpage{13}
+    \subitem {osal.h}, \hyperpage{23}
+  \item {OSAL\_MUTEX\_NORMAL}
+    \subitem {mutex.h}, \hyperpage{13}
+  \item {OSAL\_MUTEX\_RECURSIVE}
+    \subitem {mutex.h}, \hyperpage{13}
+  \item {osal\_mutex\_type\_t}
+    \subitem {mutex.h}, \hyperpage{13}
+  \item {OSAL\_MutexCreate}
+    \subitem {mutex.h}, \hyperpage{13}
+    \subitem {osal.h}, \hyperpage{25}
+  \item {OSAL\_MutexDelete}
+    \subitem {mutex.h}, \hyperpage{13}
+    \subitem {osal.h}, \hyperpage{25}
+  \item {OSAL\_MutexGetHolder}
+    \subitem {mutex.h}, \hyperpage{14}
+  \item {OSAL\_MutexGive}
+    \subitem {mutex.h}, \hyperpage{14}
+    \subitem {osal.h}, \hyperpage{25}
+  \item {OSAL\_MutexIsHeldByCurrentTask}
+    \subitem {mutex.h}, \hyperpage{14}
+  \item {OSAL\_MutexTake}
+    \subitem {mutex.h}, \hyperpage{15}
+    \subitem {osal.h}, \hyperpage{26}
+  \item {OSAL\_MutexTryTake}
+    \subitem {mutex.h}, \hyperpage{15}
+  \item {OSAL\_PRIORITY\_CRITICAL}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_PRIORITY\_HIGH}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_PRIORITY\_IDLE}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_PRIORITY\_LOW}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {OSAL\_PRIORITY\_NORMAL}
+    \subitem {osal.h}, \hyperpage{24}
+  \item {osal\_priority\_t}
+    \subitem {osal.h}, \hyperpage{23}
+  \item {osal\_queue\_handle\_t}
+    \subitem {osal.h}, \hyperpage{23}
+    \subitem {queue.h}, \hyperpage{37}
+  \item {OSAL\_QueueCreate}
+    \subitem {osal.h}, \hyperpage{26}
+    \subitem {queue.h}, \hyperpage{37}
+  \item {OSAL\_QueueDelete}
+    \subitem {osal.h}, \hyperpage{26}
+    \subitem {queue.h}, \hyperpage{37}
+  \item {OSAL\_QueueGetCount}
+    \subitem {queue.h}, \hyperpage{37}
+  \item {OSAL\_QueueGetSpace}
+    \subitem {queue.h}, \hyperpage{38}
+  \item {OSAL\_QueueIsEmpty}
+    \subitem {queue.h}, \hyperpage{38}
+  \item {OSAL\_QueueIsFull}
+    \subitem {queue.h}, \hyperpage{38}
+  \item {OSAL\_QueuePeek}
+    \subitem {queue.h}, \hyperpage{39}
+  \item {OSAL\_QueueReceive}
+    \subitem {osal.h}, \hyperpage{27}
+    \subitem {queue.h}, \hyperpage{39}
+  \item {OSAL\_QueueReceiveFromISR}
+    \subitem {queue.h}, \hyperpage{40}
+  \item {OSAL\_QueueReset}
+    \subitem {queue.h}, \hyperpage{40}
+  \item {OSAL\_QueueSend}
+    \subitem {osal.h}, \hyperpage{27}
+    \subitem {queue.h}, \hyperpage{40}
+  \item {OSAL\_QueueSendFromISR}
+    \subitem {queue.h}, \hyperpage{41}
+  \item {osal\_semaphore\_handle\_t}
+    \subitem {osal.h}, \hyperpage{23}
+    \subitem {semaphore.h}, \hyperpage{46}
+  \item {OSAL\_SemaphoreCreate}
+    \subitem {osal.h}, \hyperpage{27}
+    \subitem {semaphore.h}, \hyperpage{46}
+  \item {OSAL\_SemaphoreCreateBinary}
+    \subitem {semaphore.h}, \hyperpage{47}
+  \item {OSAL\_SemaphoreDelete}
+    \subitem {osal.h}, \hyperpage{28}
+    \subitem {semaphore.h}, \hyperpage{47}
+  \item {OSAL\_SemaphoreGetCount}
+    \subitem {semaphore.h}, \hyperpage{47}
+  \item {OSAL\_SemaphoreGive}
+    \subitem {osal.h}, \hyperpage{28}
+    \subitem {semaphore.h}, \hyperpage{48}
+  \item {OSAL\_SemaphoreGiveFromISR}
+    \subitem {semaphore.h}, \hyperpage{48}
+  \item {OSAL\_SemaphoreTake}
+    \subitem {osal.h}, \hyperpage{28}
+    \subitem {semaphore.h}, \hyperpage{48}
+  \item {OSAL\_SemaphoreTryTake}
+    \subitem {semaphore.h}, \hyperpage{49}
+  \item {OSAL\_StartScheduler}
+    \subitem {osal.h}, \hyperpage{29}
+  \item {osal\_task\_function\_t}
+    \subitem {osal.h}, \hyperpage{23}
+  \item {osal\_task\_handle\_t}
+    \subitem {osal.h}, \hyperpage{23}
+  \item {OSAL\_TaskCreate}
+    \subitem {osal.h}, \hyperpage{29}
+  \item {OSAL\_TaskDelay}
+    \subitem {osal.h}, \hyperpage{30}
+  \item {OSAL\_TaskDelete}
+    \subitem {osal.h}, \hyperpage{30}
+
+  \indexspace
+
+  \item {queue.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{32}
+  \item {queue.h}
+    \subitem {osal\_queue\_handle\_t}, \hyperpage{37}
+    \subitem {OSAL\_QueueCreate}, \hyperpage{37}
+    \subitem {OSAL\_QueueDelete}, \hyperpage{37}
+    \subitem {OSAL\_QueueGetCount}, \hyperpage{37}
+    \subitem {OSAL\_QueueGetSpace}, \hyperpage{38}
+    \subitem {OSAL\_QueueIsEmpty}, \hyperpage{38}
+    \subitem {OSAL\_QueueIsFull}, \hyperpage{38}
+    \subitem {OSAL\_QueuePeek}, \hyperpage{39}
+    \subitem {OSAL\_QueueReceive}, \hyperpage{39}
+    \subitem {OSAL\_QueueReceiveFromISR}, \hyperpage{40}
+    \subitem {OSAL\_QueueReset}, \hyperpage{40}
+    \subitem {OSAL\_QueueSend}, \hyperpage{40}
+    \subitem {OSAL\_QueueSendFromISR}, \hyperpage{41}
+
+  \indexspace
+
+  \item {semaphore.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{43}
+  \item {semaphore.h}
+    \subitem {osal\_semaphore\_handle\_t}, \hyperpage{46}
+    \subitem {OSAL\_SemaphoreCreate}, \hyperpage{46}
+    \subitem {OSAL\_SemaphoreCreateBinary}, \hyperpage{47}
+    \subitem {OSAL\_SemaphoreDelete}, \hyperpage{47}
+    \subitem {OSAL\_SemaphoreGetCount}, \hyperpage{47}
+    \subitem {OSAL\_SemaphoreGive}, \hyperpage{48}
+    \subitem {OSAL\_SemaphoreGiveFromISR}, \hyperpage{48}
+    \subitem {OSAL\_SemaphoreTake}, \hyperpage{48}
+    \subitem {OSAL\_SemaphoreTryTake}, \hyperpage{49}
+  \item {spi.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{4}
+  \item {spi.h}
+    \subitem {SPP\_HAL\_SPI\_BusInit}, \hyperpage{7}
+    \subitem {SPP\_HAL\_SPI\_DeviceInit}, \hyperpage{7}
+    \subitem {SPP\_HAL\_SPI\_GetHandler}, \hyperpage{7}
+    \subitem {SPP\_HAL\_SPI\_Transmit}, \hyperpage{8}
+  \item {SPP\_HAL\_SPI\_BusInit}
+    \subitem {spi.h}, \hyperpage{7}
+  \item {SPP\_HAL\_SPI\_DeviceInit}
+    \subitem {spi.h}, \hyperpage{7}
+  \item {SPP\_HAL\_SPI\_GetHandler}
+    \subitem {spi.h}, \hyperpage{7}
+  \item {SPP\_HAL\_SPI\_Transmit}
+    \subitem {spi.h}, \hyperpage{8}
+  \item {SPP\_OSAL\_GetTaskStorage}
+    \subitem {task.h}, \hyperpage{52}
+  \item {SPP\_OSAL\_TaskCreate}
+    \subitem {task.h}, \hyperpage{52}
+  \item {SPP\_OSAL\_TaskDelete}
+    \subitem {task.h}, \hyperpage{52}
+
+  \indexspace
+
+  \item {task.c}
+    \subitem {\_\_attribute\_\_}, \hyperpage{50}
+  \item {task.h}
+    \subitem {SPP\_OSAL\_GetTaskStorage}, \hyperpage{52}
+    \subitem {SPP\_OSAL\_TaskCreate}, \hyperpage{52}
+    \subitem {SPP\_OSAL\_TaskDelete}, \hyperpage{52}
+
+\end{theindex}

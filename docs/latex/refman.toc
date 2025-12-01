@@ -1,0 +1,129 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{\numberline {1}File Index}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}File List}{1}{section.1.1}%
+\contentsline {chapter}{\numberline {2}File Documentation}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}hal/spi/spi.c File Reference}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Detailed Description}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Function Documentation}{4}{subsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.2.1}\_\_attribute\_\_()}{4}{subsubsection.2.1.2.1}%
+\contentsline {section}{\numberline {2.2}spi.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{5}{section.2.2}%
+\contentsline {section}{\numberline {2.3}hal/spi/spi.h File Reference}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Detailed Description}{7}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Function Documentation}{7}{subsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.2.1}SPP\_HAL\_SPI\_BusInit()}{7}{subsubsection.2.3.2.1}%
+\contentsline {subsubsection}{\numberline {2.3.2.2}SPP\_HAL\_SPI\_DeviceInit()}{7}{subsubsection.2.3.2.2}%
+\contentsline {subsubsection}{\numberline {2.3.2.3}SPP\_HAL\_SPI\_GetHandler()}{7}{subsubsection.2.3.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.2.4}SPP\_HAL\_SPI\_Transmit()}{8}{subsubsection.2.3.2.4}%
+\contentsline {section}{\numberline {2.4}spi.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{8}{section.2.4}%
+\contentsline {section}{\numberline {2.5}osal/mutex.c File Reference}{9}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Detailed Description}{9}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Function Documentation}{10}{subsection.2.5.2}%
+\contentsline {subsubsection}{\numberline {2.5.2.1}\_\_attribute\_\_()}{10}{subsubsection.2.5.2.1}%
+\contentsline {section}{\numberline {2.6}mutex.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{10}{section.2.6}%
+\contentsline {section}{\numberline {2.7}osal/mutex.h File Reference}{11}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Detailed Description}{12}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Typedef Documentation}{13}{subsection.2.7.2}%
+\contentsline {subsubsection}{\numberline {2.7.2.1}osal\_mutex\_handle\_t}{13}{subsubsection.2.7.2.1}%
+\contentsline {subsection}{\numberline {2.7.3}Enumeration Type Documentation}{13}{subsection.2.7.3}%
+\contentsline {subsubsection}{\numberline {2.7.3.1}osal\_mutex\_type\_t}{13}{subsubsection.2.7.3.1}%
+\contentsline {subsection}{\numberline {2.7.4}Function Documentation}{13}{subsection.2.7.4}%
+\contentsline {subsubsection}{\numberline {2.7.4.1}OSAL\_MutexCreate()}{13}{subsubsection.2.7.4.1}%
+\contentsline {subsubsection}{\numberline {2.7.4.2}OSAL\_MutexDelete()}{14}{subsubsection.2.7.4.2}%
+\contentsline {subsubsection}{\numberline {2.7.4.3}OSAL\_MutexGetHolder()}{14}{subsubsection.2.7.4.3}%
+\contentsline {subsubsection}{\numberline {2.7.4.4}OSAL\_MutexGive()}{14}{subsubsection.2.7.4.4}%
+\contentsline {subsubsection}{\numberline {2.7.4.5}OSAL\_MutexIsHeldByCurrentTask()}{14}{subsubsection.2.7.4.5}%
+\contentsline {subsubsection}{\numberline {2.7.4.6}OSAL\_MutexTake()}{15}{subsubsection.2.7.4.6}%
+\contentsline {subsubsection}{\numberline {2.7.4.7}OSAL\_MutexTryTake()}{15}{subsubsection.2.7.4.7}%
+\contentsline {section}{\numberline {2.8}mutex.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{15}{section.2.8}%
+\contentsline {section}{\numberline {2.9}osal/osal.c File Reference}{16}{section.2.9}%
+\contentsline {subsection}{\numberline {2.9.1}Detailed Description}{17}{subsection.2.9.1}%
+\contentsline {subsection}{\numberline {2.9.2}Function Documentation}{17}{subsection.2.9.2}%
+\contentsline {subsubsection}{\numberline {2.9.2.1}\_\_attribute\_\_()}{17}{subsubsection.2.9.2.1}%
+\contentsline {section}{\numberline {2.10}osal.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{18}{section.2.10}%
+\contentsline {section}{\numberline {2.11}osal/osal.h File Reference}{20}{section.2.11}%
+\contentsline {subsection}{\numberline {2.11.1}Detailed Description}{22}{subsection.2.11.1}%
+\contentsline {subsection}{\numberline {2.11.2}Typedef Documentation}{23}{subsection.2.11.2}%
+\contentsline {subsubsection}{\numberline {2.11.2.1}osal\_mutex\_handle\_t}{23}{subsubsection.2.11.2.1}%
+\contentsline {subsubsection}{\numberline {2.11.2.2}osal\_queue\_handle\_t}{23}{subsubsection.2.11.2.2}%
+\contentsline {subsubsection}{\numberline {2.11.2.3}osal\_semaphore\_handle\_t}{23}{subsubsection.2.11.2.3}%
+\contentsline {subsubsection}{\numberline {2.11.2.4}osal\_task\_function\_t}{23}{subsubsection.2.11.2.4}%
+\contentsline {subsubsection}{\numberline {2.11.2.5}osal\_task\_handle\_t}{23}{subsubsection.2.11.2.5}%
+\contentsline {subsection}{\numberline {2.11.3}Enumeration Type Documentation}{23}{subsection.2.11.3}%
+\contentsline {subsubsection}{\numberline {2.11.3.1}osal\_priority\_t}{23}{subsubsection.2.11.3.1}%
+\contentsline {subsection}{\numberline {2.11.4}Function Documentation}{24}{subsection.2.11.4}%
+\contentsline {subsubsection}{\numberline {2.11.4.1}OSAL\_Deinit()}{24}{subsubsection.2.11.4.1}%
+\contentsline {subsubsection}{\numberline {2.11.4.2}OSAL\_GetTickCount()}{24}{subsubsection.2.11.4.2}%
+\contentsline {subsubsection}{\numberline {2.11.4.3}OSAL\_Init()}{24}{subsubsection.2.11.4.3}%
+\contentsline {subsubsection}{\numberline {2.11.4.4}OSAL\_MsToTicks()}{24}{subsubsection.2.11.4.4}%
+\contentsline {subsubsection}{\numberline {2.11.4.5}OSAL\_MutexCreate()}{25}{subsubsection.2.11.4.5}%
+\contentsline {subsubsection}{\numberline {2.11.4.6}OSAL\_MutexDelete()}{25}{subsubsection.2.11.4.6}%
+\contentsline {subsubsection}{\numberline {2.11.4.7}OSAL\_MutexGive()}{25}{subsubsection.2.11.4.7}%
+\contentsline {subsubsection}{\numberline {2.11.4.8}OSAL\_MutexTake()}{26}{subsubsection.2.11.4.8}%
+\contentsline {subsubsection}{\numberline {2.11.4.9}OSAL\_QueueCreate()}{26}{subsubsection.2.11.4.9}%
+\contentsline {subsubsection}{\numberline {2.11.4.10}OSAL\_QueueDelete()}{26}{subsubsection.2.11.4.10}%
+\contentsline {subsubsection}{\numberline {2.11.4.11}OSAL\_QueueReceive()}{27}{subsubsection.2.11.4.11}%
+\contentsline {subsubsection}{\numberline {2.11.4.12}OSAL\_QueueSend()}{27}{subsubsection.2.11.4.12}%
+\contentsline {subsubsection}{\numberline {2.11.4.13}OSAL\_SemaphoreCreate()}{28}{subsubsection.2.11.4.13}%
+\contentsline {subsubsection}{\numberline {2.11.4.14}OSAL\_SemaphoreDelete()}{28}{subsubsection.2.11.4.14}%
+\contentsline {subsubsection}{\numberline {2.11.4.15}OSAL\_SemaphoreGive()}{28}{subsubsection.2.11.4.15}%
+\contentsline {subsubsection}{\numberline {2.11.4.16}OSAL\_SemaphoreTake()}{29}{subsubsection.2.11.4.16}%
+\contentsline {subsubsection}{\numberline {2.11.4.17}OSAL\_StartScheduler()}{29}{subsubsection.2.11.4.17}%
+\contentsline {subsubsection}{\numberline {2.11.4.18}OSAL\_TaskCreate()}{29}{subsubsection.2.11.4.18}%
+\contentsline {subsubsection}{\numberline {2.11.4.19}OSAL\_TaskDelay()}{30}{subsubsection.2.11.4.19}%
+\contentsline {subsubsection}{\numberline {2.11.4.20}OSAL\_TaskDelete()}{30}{subsubsection.2.11.4.20}%
+\contentsline {section}{\numberline {2.12}osal.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{30}{section.2.12}%
+\contentsline {section}{\numberline {2.13}osal/queue.c File Reference}{31}{section.2.13}%
+\contentsline {subsection}{\numberline {2.13.1}Detailed Description}{32}{subsection.2.13.1}%
+\contentsline {subsection}{\numberline {2.13.2}Function Documentation}{32}{subsection.2.13.2}%
+\contentsline {subsubsection}{\numberline {2.13.2.1}\_\_attribute\_\_()}{32}{subsubsection.2.13.2.1}%
+\contentsline {section}{\numberline {2.14}queue.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{33}{section.2.14}%
+\contentsline {section}{\numberline {2.15}osal/queue.h File Reference}{35}{section.2.15}%
+\contentsline {subsection}{\numberline {2.15.1}Detailed Description}{36}{subsection.2.15.1}%
+\contentsline {subsection}{\numberline {2.15.2}Typedef Documentation}{37}{subsection.2.15.2}%
+\contentsline {subsubsection}{\numberline {2.15.2.1}osal\_queue\_handle\_t}{37}{subsubsection.2.15.2.1}%
+\contentsline {subsection}{\numberline {2.15.3}Function Documentation}{37}{subsection.2.15.3}%
+\contentsline {subsubsection}{\numberline {2.15.3.1}OSAL\_QueueCreate()}{37}{subsubsection.2.15.3.1}%
+\contentsline {subsubsection}{\numberline {2.15.3.2}OSAL\_QueueDelete()}{37}{subsubsection.2.15.3.2}%
+\contentsline {subsubsection}{\numberline {2.15.3.3}OSAL\_QueueGetCount()}{38}{subsubsection.2.15.3.3}%
+\contentsline {subsubsection}{\numberline {2.15.3.4}OSAL\_QueueGetSpace()}{38}{subsubsection.2.15.3.4}%
+\contentsline {subsubsection}{\numberline {2.15.3.5}OSAL\_QueueIsEmpty()}{38}{subsubsection.2.15.3.5}%
+\contentsline {subsubsection}{\numberline {2.15.3.6}OSAL\_QueueIsFull()}{38}{subsubsection.2.15.3.6}%
+\contentsline {subsubsection}{\numberline {2.15.3.7}OSAL\_QueuePeek()}{39}{subsubsection.2.15.3.7}%
+\contentsline {subsubsection}{\numberline {2.15.3.8}OSAL\_QueueReceive()}{39}{subsubsection.2.15.3.8}%
+\contentsline {subsubsection}{\numberline {2.15.3.9}OSAL\_QueueReceiveFromISR()}{40}{subsubsection.2.15.3.9}%
+\contentsline {subsubsection}{\numberline {2.15.3.10}OSAL\_QueueReset()}{40}{subsubsection.2.15.3.10}%
+\contentsline {subsubsection}{\numberline {2.15.3.11}OSAL\_QueueSend()}{40}{subsubsection.2.15.3.11}%
+\contentsline {subsubsection}{\numberline {2.15.3.12}OSAL\_QueueSendFromISR()}{41}{subsubsection.2.15.3.12}%
+\contentsline {section}{\numberline {2.16}queue.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{41}{section.2.16}%
+\contentsline {section}{\numberline {2.17}osal/semaphore.c File Reference}{42}{section.2.17}%
+\contentsline {subsection}{\numberline {2.17.1}Detailed Description}{42}{subsection.2.17.1}%
+\contentsline {subsection}{\numberline {2.17.2}Function Documentation}{43}{subsection.2.17.2}%
+\contentsline {subsubsection}{\numberline {2.17.2.1}\_\_attribute\_\_()}{43}{subsubsection.2.17.2.1}%
+\contentsline {section}{\numberline {2.18}semaphore.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{44}{section.2.18}%
+\contentsline {section}{\numberline {2.19}osal/semaphore.h File Reference}{45}{section.2.19}%
+\contentsline {subsection}{\numberline {2.19.1}Detailed Description}{46}{subsection.2.19.1}%
+\contentsline {subsection}{\numberline {2.19.2}Typedef Documentation}{46}{subsection.2.19.2}%
+\contentsline {subsubsection}{\numberline {2.19.2.1}osal\_semaphore\_handle\_t}{46}{subsubsection.2.19.2.1}%
+\contentsline {subsection}{\numberline {2.19.3}Function Documentation}{46}{subsection.2.19.3}%
+\contentsline {subsubsection}{\numberline {2.19.3.1}OSAL\_SemaphoreCreate()}{46}{subsubsection.2.19.3.1}%
+\contentsline {subsubsection}{\numberline {2.19.3.2}OSAL\_SemaphoreCreateBinary()}{47}{subsubsection.2.19.3.2}%
+\contentsline {subsubsection}{\numberline {2.19.3.3}OSAL\_SemaphoreDelete()}{47}{subsubsection.2.19.3.3}%
+\contentsline {subsubsection}{\numberline {2.19.3.4}OSAL\_SemaphoreGetCount()}{47}{subsubsection.2.19.3.4}%
+\contentsline {subsubsection}{\numberline {2.19.3.5}OSAL\_SemaphoreGive()}{48}{subsubsection.2.19.3.5}%
+\contentsline {subsubsection}{\numberline {2.19.3.6}OSAL\_SemaphoreGiveFromISR()}{48}{subsubsection.2.19.3.6}%
+\contentsline {subsubsection}{\numberline {2.19.3.7}OSAL\_SemaphoreTake()}{48}{subsubsection.2.19.3.7}%
+\contentsline {subsubsection}{\numberline {2.19.3.8}OSAL\_SemaphoreTryTake()}{49}{subsubsection.2.19.3.8}%
+\contentsline {section}{\numberline {2.20}semaphore.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{49}{section.2.20}%
+\contentsline {section}{\numberline {2.21}osal/task.c File Reference}{50}{section.2.21}%
+\contentsline {subsection}{\numberline {2.21.1}Detailed Description}{50}{subsection.2.21.1}%
+\contentsline {subsection}{\numberline {2.21.2}Function Documentation}{50}{subsection.2.21.2}%
+\contentsline {subsubsection}{\numberline {2.21.2.1}\_\_attribute\_\_()}{50}{subsubsection.2.21.2.1}%
+\contentsline {section}{\numberline {2.22}task.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}c}{51}{section.2.22}%
+\contentsline {section}{\numberline {2.23}osal/task.h File Reference}{51}{section.2.23}%
+\contentsline {subsection}{\numberline {2.23.1}Detailed Description}{52}{subsection.2.23.1}%
+\contentsline {subsection}{\numberline {2.23.2}Function Documentation}{52}{subsection.2.23.2}%
+\contentsline {subsubsection}{\numberline {2.23.2.1}SPP\_OSAL\_GetTaskStorage()}{52}{subsubsection.2.23.2.1}%
+\contentsline {subsubsection}{\numberline {2.23.2.2}SPP\_OSAL\_TaskCreate()}{52}{subsubsection.2.23.2.2}%
+\contentsline {subsubsection}{\numberline {2.23.2.3}SPP\_OSAL\_TaskDelete()}{52}{subsubsection.2.23.2.3}%
+\contentsline {section}{\numberline {2.24}task.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{53}{section.2.24}%
+\contentsline {chapter}{Index}{55}{section*.37}%

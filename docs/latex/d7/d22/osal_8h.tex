@@ -1,0 +1,603 @@
+\doxysection{osal/osal.h File Reference}
+\hypertarget{osal_8h}{}\label{osal_8h}\index{osal/osal.h@{osal/osal.h}}
+
+
+Operating System Abstraction Layer.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+Include dependency graph for osal.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{d3/d3d/osal_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=149pt]{dc/d93/osal_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Task handle type. \end{DoxyCompactList}\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Mutex handle type. \end{DoxyCompactList}\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Queue handle type. \end{DoxyCompactList}\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Semaphore handle type. \end{DoxyCompactList}\item 
+typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\+\_\+task\+\_\+function\+\_\+t}}) (void \texorpdfstring{$\ast$}{*}parameters)
+\begin{DoxyCompactList}\small\item\em Task function pointer type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\+\_\+priority\+\_\+t}} \{ \newline
+\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190}{OSAL\+\_\+\+PRIORITY\+\_\+\+IDLE}} = 0
+, \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611}{OSAL\+\_\+\+PRIORITY\+\_\+\+LOW}} = 1
+, \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410}{OSAL\+\_\+\+PRIORITY\+\_\+\+NORMAL}} = 2
+, \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2}{OSAL\+\_\+\+PRIORITY\+\_\+\+HIGH}} = 3
+, \newline
+\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795}{OSAL\+\_\+\+PRIORITY\+\_\+\+CRITICAL}} = 4
+ \}
+\begin{DoxyCompactList}\small\item\em Task priority levels. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_adfe7189c4618409c5adbe08f0b22ec54}{OSAL\+\_\+\+Init}} (void)
+\begin{DoxyCompactList}\small\item\em Initialize OSAL. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483}{OSAL\+\_\+\+Deinit}} (void)
+\begin{DoxyCompactList}\small\item\em Deinitialize OSAL. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e}{OSAL\+\_\+\+Task\+Create}} (\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\+\_\+task\+\_\+function\+\_\+t}} task\+\_\+function, const char \texorpdfstring{$\ast$}{*}name, uint32\+\_\+t stack\+\_\+size, void \texorpdfstring{$\ast$}{*}parameters, \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\+\_\+priority\+\_\+t}} priority, \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}task\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Create a task. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a610ded1828db8ae33e98a25a3b4dd307}{OSAL\+\_\+\+Task\+Delete}} (\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}} task\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a task. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a9acf7d14f9df480df1a95a712d128cbd}{OSAL\+\_\+\+Task\+Delay}} (uint32\+\_\+t delay\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Delay task execution. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ac18a863fb915ae473f084726fffa9e4e}{OSAL\+\_\+\+Mutex\+Create}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Create a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ae17499b77a92d6edd587c790c082e6c5}{OSAL\+\_\+\+Mutex\+Delete}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ac167bed1aedd605478e21e31e232c0ec}{OSAL\+\_\+\+Mutex\+Take}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Take (lock) a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_afab450b2e5ab117ca15b7306298e6c92}{OSAL\+\_\+\+Mutex\+Give}} (\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} mutex\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Give (unlock) a mutex. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{OSAL\+\_\+\+Queue\+Create}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}queue\+\_\+handle, uint32\+\_\+t queue\+\_\+length, uint32\+\_\+t item\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Create a queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{OSAL\+\_\+\+Queue\+Delete}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a4804bae2478f671d4a05c572f2264f5d}{OSAL\+\_\+\+Queue\+Send}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, const void \texorpdfstring{$\ast$}{*}item, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Send item to queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{OSAL\+\_\+\+Queue\+Receive}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, void \texorpdfstring{$\ast$}{*}item, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Receive item from queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_adf4a6452d009948c7968a01c0de357e5}{OSAL\+\_\+\+Semaphore\+Create}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}semaphore\+\_\+handle, uint32\+\_\+t max\+\_\+count, uint32\+\_\+t initial\+\_\+count)
+\begin{DoxyCompactList}\small\item\em Create a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a659120f46540d0475b7bfcac1824efd5}{OSAL\+\_\+\+Semaphore\+Delete}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{OSAL\+\_\+\+Semaphore\+Take}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Take a semaphore. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_ab753d30f1446fce21163c23397a72ac0}{OSAL\+\_\+\+Semaphore\+Give}} (\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} semaphore\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Give a semaphore. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{osal_8h_a3888798712d0218df99aed8fb81854b1}{OSAL\+\_\+\+Get\+Tick\+Count}} (void)
+\begin{DoxyCompactList}\small\item\em Get system tick count. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{osal_8h_a972e960de7b6fefeea43543430344ea9}{OSAL\+\_\+\+Ms\+To\+Ticks}} (uint32\+\_\+t ms)
+\begin{DoxyCompactList}\small\item\em Convert milliseconds to ticks. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{osal_8h_a776df63f043fe921af469d0101cf8972}{OSAL\+\_\+\+Start\+Scheduler}} (void)
+\begin{DoxyCompactList}\small\item\em Start the RTOS scheduler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Operating System Abstraction Layer. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the main Operating System Abstraction Layer (OSAL) interface for the Solaris Packet Protocol library. 
+
+Definition in file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{osal_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}\label{osal_8h_a498f5ee57fa4a73cfff0b5529c7c23d4} 
+\index{osal.h@{osal.h}!osal\_mutex\_handle\_t@{osal\_mutex\_handle\_t}}
+\index{osal\_mutex\_handle\_t@{osal\_mutex\_handle\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_mutex\_handle\_t}{osal\_mutex\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Mutex handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00030}{30}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+\Hypertarget{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}\label{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0} 
+\index{osal.h@{osal.h}!osal\_queue\_handle\_t@{osal\_queue\_handle\_t}}
+\index{osal\_queue\_handle\_t@{osal\_queue\_handle\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_queue\_handle\_t}{osal\_queue\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Queue handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00035}{35}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+\Hypertarget{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}\label{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca} 
+\index{osal.h@{osal.h}!osal\_semaphore\_handle\_t@{osal\_semaphore\_handle\_t}}
+\index{osal\_semaphore\_handle\_t@{osal\_semaphore\_handle\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_semaphore\_handle\_t}{osal\_semaphore\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Semaphore handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00040}{40}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+\Hypertarget{osal_8h_af14155c735fa5bf380b4bd66903db660}\label{osal_8h_af14155c735fa5bf380b4bd66903db660} 
+\index{osal.h@{osal.h}!osal\_task\_function\_t@{osal\_task\_function\_t}}
+\index{osal\_task\_function\_t@{osal\_task\_function\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_task\_function\_t}{osal\_task\_function\_t}}
+{\footnotesize\ttfamily typedef void(\texorpdfstring{$\ast$}{*} osal\+\_\+task\+\_\+function\+\_\+t) (void \texorpdfstring{$\ast$}{*}parameters)}
+
+
+
+Task function pointer type. 
+
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00045}{45}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+\Hypertarget{osal_8h_a416b8bb099ff532b169e16b9a072488a}\label{osal_8h_a416b8bb099ff532b169e16b9a072488a} 
+\index{osal.h@{osal.h}!osal\_task\_handle\_t@{osal\_task\_handle\_t}}
+\index{osal\_task\_handle\_t@{osal\_task\_handle\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_task\_handle\_t}{osal\_task\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Task handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00025}{25}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8} 
+\index{osal.h@{osal.h}!osal\_priority\_t@{osal\_priority\_t}}
+\index{osal\_priority\_t@{osal\_priority\_t}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{osal\_priority\_t}{osal\_priority\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\+\_\+priority\+\_\+t}}}
+
+
+
+Task priority levels. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_PRIORITY\_IDLE@{OSAL\_PRIORITY\_IDLE}!osal.h@{osal.h}}\index{osal.h@{osal.h}!OSAL\_PRIORITY\_IDLE@{OSAL\_PRIORITY\_IDLE}}}\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190} 
+OSAL\+\_\+\+PRIORITY\+\_\+\+IDLE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_PRIORITY\_LOW@{OSAL\_PRIORITY\_LOW}!osal.h@{osal.h}}\index{osal.h@{osal.h}!OSAL\_PRIORITY\_LOW@{OSAL\_PRIORITY\_LOW}}}\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611} 
+OSAL\+\_\+\+PRIORITY\+\_\+\+LOW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_PRIORITY\_NORMAL@{OSAL\_PRIORITY\_NORMAL}!osal.h@{osal.h}}\index{osal.h@{osal.h}!OSAL\_PRIORITY\_NORMAL@{OSAL\_PRIORITY\_NORMAL}}}\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410} 
+OSAL\+\_\+\+PRIORITY\+\_\+\+NORMAL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_PRIORITY\_HIGH@{OSAL\_PRIORITY\_HIGH}!osal.h@{osal.h}}\index{osal.h@{osal.h}!OSAL\_PRIORITY\_HIGH@{OSAL\_PRIORITY\_HIGH}}}\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2} 
+OSAL\+\_\+\+PRIORITY\+\_\+\+HIGH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OSAL\_PRIORITY\_CRITICAL@{OSAL\_PRIORITY\_CRITICAL}!osal.h@{osal.h}}\index{osal.h@{osal.h}!OSAL\_PRIORITY\_CRITICAL@{OSAL\_PRIORITY\_CRITICAL}}}\Hypertarget{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795}\label{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795} 
+OSAL\+\_\+\+PRIORITY\+\_\+\+CRITICAL&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{osal_8h_source_l00050}{50}} of file \mbox{\hyperlink{osal_8h_source}{osal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190}{OSAL\_PRIORITY\_IDLE}}\ =\ 0,}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611}{OSAL\_PRIORITY\_LOW}}\ =\ 1,}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410}{OSAL\_PRIORITY\_NORMAL}}\ =\ 2,}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2}{OSAL\_PRIORITY\_HIGH}}\ =\ 3,}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795}{OSAL\_PRIORITY\_CRITICAL}}\ =\ 4}
+\DoxyCodeLine{00056\ \}\ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\_priority\_t}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483}\label{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483} 
+\index{osal.h@{osal.h}!OSAL\_Deinit@{OSAL\_Deinit}}
+\index{OSAL\_Deinit@{OSAL\_Deinit}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_Deinit()}{OSAL\_Deinit()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Deinit (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Deinitialize OSAL. 
+
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a3888798712d0218df99aed8fb81854b1}\label{osal_8h_a3888798712d0218df99aed8fb81854b1} 
+\index{osal.h@{osal.h}!OSAL\_GetTickCount@{OSAL\_GetTickCount}}
+\index{OSAL\_GetTickCount@{OSAL\_GetTickCount}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_GetTickCount()}{OSAL\_GetTickCount()}}
+{\footnotesize\ttfamily uint32\+\_\+t OSAL\+\_\+\+Get\+Tick\+Count (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Get system tick count. 
+
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t Current tick count 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_adfe7189c4618409c5adbe08f0b22ec54}\label{osal_8h_adfe7189c4618409c5adbe08f0b22ec54} 
+\index{osal.h@{osal.h}!OSAL\_Init@{OSAL\_Init}}
+\index{OSAL\_Init@{OSAL\_Init}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_Init()}{OSAL\_Init()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initialize OSAL. 
+
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a972e960de7b6fefeea43543430344ea9}\label{osal_8h_a972e960de7b6fefeea43543430344ea9} 
+\index{osal.h@{osal.h}!OSAL\_MsToTicks@{OSAL\_MsToTicks}}
+\index{OSAL\_MsToTicks@{OSAL\_MsToTicks}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MsToTicks()}{OSAL\_MsToTicks()}}
+{\footnotesize\ttfamily uint32\+\_\+t OSAL\+\_\+\+Ms\+To\+Ticks (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{ms }\end{DoxyParamCaption})}
+
+
+
+Convert milliseconds to ticks. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ms} & Milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t Equivalent ticks 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_ac18a863fb915ae473f084726fffa9e4e}\label{osal_8h_ac18a863fb915ae473f084726fffa9e4e} 
+\index{osal.h@{osal.h}!OSAL\_MutexCreate@{OSAL\_MutexCreate}}
+\index{OSAL\_MutexCreate@{OSAL\_MutexCreate}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexCreate()}{OSAL\_MutexCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Create a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Pointer to store mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_ae17499b77a92d6edd587c790c082e6c5}\label{osal_8h_ae17499b77a92d6edd587c790c082e6c5} 
+\index{osal.h@{osal.h}!OSAL\_MutexDelete@{OSAL\_MutexDelete}}
+\index{OSAL\_MutexDelete@{OSAL\_MutexDelete}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexDelete()}{OSAL\_MutexDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_afab450b2e5ab117ca15b7306298e6c92}\label{osal_8h_afab450b2e5ab117ca15b7306298e6c92} 
+\index{osal.h@{osal.h}!OSAL\_MutexGive@{OSAL\_MutexGive}}
+\index{OSAL\_MutexGive@{OSAL\_MutexGive}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexGive()}{OSAL\_MutexGive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Give (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Give (unlock) a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_ac167bed1aedd605478e21e31e232c0ec}\label{osal_8h_ac167bed1aedd605478e21e31e232c0ec} 
+\index{osal.h@{osal.h}!OSAL\_MutexTake@{OSAL\_MutexTake}}
+\index{OSAL\_MutexTake@{OSAL\_MutexTake}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_MutexTake()}{OSAL\_MutexTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Mutex\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\+\_\+mutex\+\_\+handle\+\_\+t}}}]{mutex\+\_\+handle,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Take (lock) a mutex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mutex\+\_\+handle} & Mutex handle \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds (0 = no wait, UINT32\+\_\+\+MAX = wait forever) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea}\label{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea} 
+\index{osal.h@{osal.h}!OSAL\_QueueCreate@{OSAL\_QueueCreate}}
+\index{OSAL\_QueueCreate@{OSAL\_QueueCreate}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueCreate()}{OSAL\_QueueCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{queue\+\_\+handle,  }\item[{uint32\+\_\+t}]{queue\+\_\+length,  }\item[{uint32\+\_\+t}]{item\+\_\+size }\end{DoxyParamCaption})}
+
+
+
+Create a queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Pointer to store queue handle \\
+\hline
+{\em queue\+\_\+length} & Maximum number of items in queue \\
+\hline
+{\em item\+\_\+size} & Size of each item in bytes \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1}\label{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1} 
+\index{osal.h@{osal.h}!OSAL\_QueueDelete@{OSAL\_QueueDelete}}
+\index{OSAL\_QueueDelete@{OSAL\_QueueDelete}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueDelete()}{OSAL\_QueueDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}\label{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1} 
+\index{osal.h@{osal.h}!OSAL\_QueueReceive@{OSAL\_QueueReceive}}
+\index{OSAL\_QueueReceive@{OSAL\_QueueReceive}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueReceive()}{OSAL\_QueueReceive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Receive (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Receive item from queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to buffer for received item \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a4804bae2478f671d4a05c572f2264f5d}\label{osal_8h_a4804bae2478f671d4a05c572f2264f5d} 
+\index{osal.h@{osal.h}!OSAL\_QueueSend@{OSAL\_QueueSend}}
+\index{OSAL\_QueueSend@{OSAL\_QueueSend}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueSend()}{OSAL\_QueueSend()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{const void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Send item to queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to item to send \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_adf4a6452d009948c7968a01c0de357e5}\label{osal_8h_adf4a6452d009948c7968a01c0de357e5} 
+\index{osal.h@{osal.h}!OSAL\_SemaphoreCreate@{OSAL\_SemaphoreCreate}}
+\index{OSAL\_SemaphoreCreate@{OSAL\_SemaphoreCreate}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreCreate()}{OSAL\_SemaphoreCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{semaphore\+\_\+handle,  }\item[{uint32\+\_\+t}]{max\+\_\+count,  }\item[{uint32\+\_\+t}]{initial\+\_\+count }\end{DoxyParamCaption})}
+
+
+
+Create a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Pointer to store semaphore handle \\
+\hline
+{\em max\+\_\+count} & Maximum count value \\
+\hline
+{\em initial\+\_\+count} & Initial count value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a659120f46540d0475b7bfcac1824efd5}\label{osal_8h_a659120f46540d0475b7bfcac1824efd5} 
+\index{osal.h@{osal.h}!OSAL\_SemaphoreDelete@{OSAL\_SemaphoreDelete}}
+\index{OSAL\_SemaphoreDelete@{OSAL\_SemaphoreDelete}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreDelete()}{OSAL\_SemaphoreDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_ab753d30f1446fce21163c23397a72ac0}\label{osal_8h_ab753d30f1446fce21163c23397a72ac0} 
+\index{osal.h@{osal.h}!OSAL\_SemaphoreGive@{OSAL\_SemaphoreGive}}
+\index{OSAL\_SemaphoreGive@{OSAL\_SemaphoreGive}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreGive()}{OSAL\_SemaphoreGive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Give (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Give a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}\label{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007} 
+\index{osal.h@{osal.h}!OSAL\_SemaphoreTake@{OSAL\_SemaphoreTake}}
+\index{OSAL\_SemaphoreTake@{OSAL\_SemaphoreTake}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_SemaphoreTake()}{OSAL\_SemaphoreTake()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Semaphore\+Take (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\+\_\+semaphore\+\_\+handle\+\_\+t}}}]{semaphore\+\_\+handle,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Take a semaphore. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+handle} & Semaphore handle \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a776df63f043fe921af469d0101cf8972}\label{osal_8h_a776df63f043fe921af469d0101cf8972} 
+\index{osal.h@{osal.h}!OSAL\_StartScheduler@{OSAL\_StartScheduler}}
+\index{OSAL\_StartScheduler@{OSAL\_StartScheduler}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_StartScheduler()}{OSAL\_StartScheduler()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Start\+Scheduler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Start the RTOS scheduler. 
+
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e}\label{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e} 
+\index{osal.h@{osal.h}!OSAL\_TaskCreate@{OSAL\_TaskCreate}}
+\index{OSAL\_TaskCreate@{OSAL\_TaskCreate}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_TaskCreate()}{OSAL\_TaskCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Task\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\+\_\+task\+\_\+function\+\_\+t}}}]{task\+\_\+function,  }\item[{const char \texorpdfstring{$\ast$}{*}}]{name,  }\item[{uint32\+\_\+t}]{stack\+\_\+size,  }\item[{void \texorpdfstring{$\ast$}{*}}]{parameters,  }\item[{\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\+\_\+priority\+\_\+t}}}]{priority,  }\item[{\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{task\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Create a task. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em task\+\_\+function} & Task function pointer \\
+\hline
+{\em name} & Task name \\
+\hline
+{\em stack\+\_\+size} & Stack size in bytes \\
+\hline
+{\em parameters} & Task parameters \\
+\hline
+{\em priority} & Task priority \\
+\hline
+{\em task\+\_\+handle} & Pointer to store task handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a9acf7d14f9df480df1a95a712d128cbd}\label{osal_8h_a9acf7d14f9df480df1a95a712d128cbd} 
+\index{osal.h@{osal.h}!OSAL\_TaskDelay@{OSAL\_TaskDelay}}
+\index{OSAL\_TaskDelay@{OSAL\_TaskDelay}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_TaskDelay()}{OSAL\_TaskDelay()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Task\+Delay (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{delay\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Delay task execution. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delay\+\_\+ms} & Delay in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{osal_8h_a610ded1828db8ae33e98a25a3b4dd307}\label{osal_8h_a610ded1828db8ae33e98a25a3b4dd307} 
+\index{osal.h@{osal.h}!OSAL\_TaskDelete@{OSAL\_TaskDelete}}
+\index{OSAL\_TaskDelete@{OSAL\_TaskDelete}!osal.h@{osal.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_TaskDelete()}{OSAL\_TaskDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Task\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\+\_\+task\+\_\+handle\+\_\+t}}}]{task\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a task. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em task\+\_\+handle} & Task handle (NULL for current task) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}

@@ -1,0 +1,83 @@
+\doxysection{osal.\+h}
+\hypertarget{osal_8h_source}{}\label{osal_8h_source}\index{osal/osal.h@{osal/osal.h}}
+\mbox{\hyperlink{osal_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00011}00011\ \textcolor{preprocessor}{\#ifndef\ SPP\_OSAL\_H}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00012}00012\ \textcolor{preprocessor}{\#define\ SPP\_OSAL\_H}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}core/returntypes.h"{}}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00018}00018\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00019}00019\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00020}00020\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00025}\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{00025}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\_task\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00030}\mbox{\hyperlink{osal_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{00030}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{osal_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00035}\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{00035}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00040}\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{00040}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}};}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00045}\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{00045}}\ \textcolor{keyword}{typedef}\ void\ (*\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\_task\_function\_t}})(\textcolor{keywordtype}{void}*\ parameters);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00050}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{00050}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00051}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190}{00051}}\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8ad860c00e161a8f3c2c6d2766ac9a8190}{OSAL\_PRIORITY\_IDLE}}\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00052}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611}{00052}}\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6913d1f7a049e0ceb52e50ad20e54611}{OSAL\_PRIORITY\_LOW}}\ =\ 1,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00053}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410}{00053}}\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a6feefb1df76bdcf0ea6deb808e410410}{OSAL\_PRIORITY\_NORMAL}}\ =\ 2,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00054}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2}{00054}}\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8a8600a9cd11df04f483dcab9159a2dba2}{OSAL\_PRIORITY\_HIGH}}\ =\ 3,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795}{OSAL\_PRIORITY\_CRITICAL}}\ =\ 4}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00056}\mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8aad38e022a8d22e1a7315c4e57921d795}{00056}}\ \}\ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\_priority\_t}};}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00063}\mbox{\hyperlink{osal_8h_adfe7189c4618409c5adbe08f0b22ec54}{00063}}\ retval\_t\ \mbox{\hyperlink{osal_8h_adfe7189c4618409c5adbe08f0b22ec54}{OSAL\_Init}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00070}\mbox{\hyperlink{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483}{00070}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ad7745d65a1d63f6f3c66c908b64e1483}{OSAL\_Deinit}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00083}\mbox{\hyperlink{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e}{00083}}\ retval\_t\ \mbox{\hyperlink{osal_8h_afcfe3b3d1066d4792f625f614e7ca94e}{OSAL\_TaskCreate}}(\mbox{\hyperlink{osal_8h_af14155c735fa5bf380b4bd66903db660}{osal\_task\_function\_t}}\ task\_function,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ stack\_size,\ \textcolor{keywordtype}{void}*\ parameters,\ \mbox{\hyperlink{osal_8h_a76874f49e00c9033efb3816f1e14edf8}{osal\_priority\_t}}\ priority,}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\_task\_handle\_t}}*\ task\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00093}\mbox{\hyperlink{osal_8h_a610ded1828db8ae33e98a25a3b4dd307}{00093}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a610ded1828db8ae33e98a25a3b4dd307}{OSAL\_TaskDelete}}(\mbox{\hyperlink{osal_8h_a416b8bb099ff532b169e16b9a072488a}{osal\_task\_handle\_t}}\ task\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00101}\mbox{\hyperlink{osal_8h_a9acf7d14f9df480df1a95a712d128cbd}{00101}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a9acf7d14f9df480df1a95a712d128cbd}{OSAL\_TaskDelay}}(uint32\_t\ delay\_ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00109}\mbox{\hyperlink{osal_8h_ac18a863fb915ae473f084726fffa9e4e}{00109}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ac18a863fb915ae473f084726fffa9e4e}{OSAL\_MutexCreate}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}*\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00117}\mbox{\hyperlink{osal_8h_ae17499b77a92d6edd587c790c082e6c5}{00117}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ae17499b77a92d6edd587c790c082e6c5}{OSAL\_MutexDelete}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00126}\mbox{\hyperlink{osal_8h_ac167bed1aedd605478e21e31e232c0ec}{00126}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ac167bed1aedd605478e21e31e232c0ec}{OSAL\_MutexTake}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00134}\mbox{\hyperlink{osal_8h_afab450b2e5ab117ca15b7306298e6c92}{00134}}\ retval\_t\ \mbox{\hyperlink{osal_8h_afab450b2e5ab117ca15b7306298e6c92}{OSAL\_MutexGive}}(\mbox{\hyperlink{mutex_8h_a498f5ee57fa4a73cfff0b5529c7c23d4}{osal\_mutex\_handle\_t}}\ mutex\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00144}\mbox{\hyperlink{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{00144}}\ retval\_t\ \mbox{\hyperlink{osal_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{OSAL\_QueueCreate}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}*\ queue\_handle,\ uint32\_t\ queue\_length,\ uint32\_t\ item\_size);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00152}\mbox{\hyperlink{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{00152}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{OSAL\_QueueDelete}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00162}\mbox{\hyperlink{osal_8h_a4804bae2478f671d4a05c572f2264f5d}{00162}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a4804bae2478f671d4a05c572f2264f5d}{OSAL\_QueueSend}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00172}\mbox{\hyperlink{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{00172}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{OSAL\_QueueReceive}}(\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\_queue\_handle\_t}}\ queue\_handle,\ \textcolor{keywordtype}{void}*\ item,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00182}\mbox{\hyperlink{osal_8h_adf4a6452d009948c7968a01c0de357e5}{00182}}\ retval\_t\ \mbox{\hyperlink{osal_8h_adf4a6452d009948c7968a01c0de357e5}{OSAL\_SemaphoreCreate}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}*\ semaphore\_handle,\ uint32\_t\ max\_count,\ uint32\_t\ initial\_count);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00190}\mbox{\hyperlink{osal_8h_a659120f46540d0475b7bfcac1824efd5}{00190}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a659120f46540d0475b7bfcac1824efd5}{OSAL\_SemaphoreDelete}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00199}\mbox{\hyperlink{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{00199}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{OSAL\_SemaphoreTake}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle,\ uint32\_t\ timeout\_ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00207}\mbox{\hyperlink{osal_8h_ab753d30f1446fce21163c23397a72ac0}{00207}}\ retval\_t\ \mbox{\hyperlink{osal_8h_ab753d30f1446fce21163c23397a72ac0}{OSAL\_SemaphoreGive}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00214}\mbox{\hyperlink{osal_8h_a3888798712d0218df99aed8fb81854b1}{00214}}\ uint32\_t\ \mbox{\hyperlink{osal_8h_a3888798712d0218df99aed8fb81854b1}{OSAL\_GetTickCount}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00222}\mbox{\hyperlink{osal_8h_a972e960de7b6fefeea43543430344ea9}{00222}}\ uint32\_t\ \mbox{\hyperlink{osal_8h_a972e960de7b6fefeea43543430344ea9}{OSAL\_MsToTicks}}(uint32\_t\ ms);}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00229}\mbox{\hyperlink{osal_8h_a776df63f043fe921af469d0101cf8972}{00229}}\ retval\_t\ \mbox{\hyperlink{osal_8h_a776df63f043fe921af469d0101cf8972}{OSAL\_StartScheduler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00231}00231\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00232}00232\ \}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00233}00233\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{osal_8h_source_l00235}00235\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SPP\_OSAL\_H\ */}\textcolor{preprocessor}{\ }}
+
+\end{DoxyCode}

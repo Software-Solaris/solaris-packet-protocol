@@ -1,0 +1,90 @@
+\doxysection{osal/queue.c File Reference}
+\hypertarget{queue_8c}{}\label{queue_8c}\index{osal/queue.c@{osal/queue.c}}
+
+
+OSAL Queue Management Implementation.  
+
+
+{\ttfamily \#include "{}queue.\+h"{}}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for queue.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/d50/queue_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{queue_8c_af9aace1b44b73111e15aa39f06f43456}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((weak))
+\begin{DoxyCompactList}\small\item\em Default (weak) queue creation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Queue Management Implementation. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the default (weak) implementation of queue management functions. 
+
+Definition in file \mbox{\hyperlink{queue_8c_source}{queue.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{queue_8c_af9aace1b44b73111e15aa39f06f43456}\label{queue_8c_af9aace1b44b73111e15aa39f06f43456} 
+\index{queue.c@{queue.c}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!queue.c@{queue.c}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(weak)}]{ }\end{DoxyParamCaption})}
+
+
+
+Default (weak) queue creation. 
+
+Default (weak) reset queue.
+
+Default (weak) check if queue is empty.
+
+Default (weak) check if queue is full.
+
+Default (weak) get queue space.
+
+Default (weak) get queue count.
+
+Default (weak) queue peek.
+
+Default (weak) queue receive from ISR.
+
+Default (weak) queue receive.
+
+Default (weak) queue send from ISR.
+
+Default (weak) queue send.
+
+Default (weak) queue deletion. 
+
+Definition at line \mbox{\hyperlink{queue_8c_source_l00018}{18}} of file \mbox{\hyperlink{queue_8c_source}{queue.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{if}\ (queue\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ queue\ creation}}
+\DoxyCodeLine{00025\ \ \ \ \ *queue\_handle\ =\ (\textcolor{keywordtype}{void}*)0xABCDEF00;}
+\DoxyCodeLine{00026\ \ \ \ \ (void)queue\_length;}
+\DoxyCodeLine{00027\ \ \ \ \ (void)item\_size;}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}

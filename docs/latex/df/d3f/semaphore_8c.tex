@@ -1,0 +1,86 @@
+\doxysection{osal/semaphore.c File Reference}
+\hypertarget{semaphore_8c}{}\label{semaphore_8c}\index{osal/semaphore.c@{osal/semaphore.c}}
+
+
+OSAL Semaphore Management Implementation.  
+
+
+{\ttfamily \#include "{}semaphore.\+h"{}}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for semaphore.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d4/d73/semaphore_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((weak))
+\begin{DoxyCompactList}\small\item\em Default (weak) counting semaphore creation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Semaphore Management Implementation. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the default (weak) implementation of semaphore management functions. 
+
+Definition in file \mbox{\hyperlink{semaphore_8c_source}{semaphore.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}\label{semaphore_8c_af9aace1b44b73111e15aa39f06f43456} 
+\index{semaphore.c@{semaphore.c}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!semaphore.c@{semaphore.c}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(weak)}]{ }\end{DoxyParamCaption})}
+
+
+
+Default (weak) counting semaphore creation. 
+
+Default (weak) get semaphore count.
+
+Default (weak) semaphore try take.
+
+Default (weak) semaphore give from ISR.
+
+Default (weak) semaphore give.
+
+Default (weak) semaphore take.
+
+Default (weak) semaphore deletion.
+
+Default (weak) binary semaphore creation. 
+
+Definition at line \mbox{\hyperlink{semaphore_8c_source_l00018}{18}} of file \mbox{\hyperlink{semaphore_8c_source}{semaphore.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (initial\_count\ >\ max\_count)\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_INVALID\_PARAMETER;}
+\DoxyCodeLine{00026\ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ semaphore\ creation}}
+\DoxyCodeLine{00029\ \ \ \ \ *semaphore\_handle\ =\ (\textcolor{keywordtype}{void}*)0xDEADBEEF;}
+\DoxyCodeLine{00030\ \ \ \ \ (void)max\_count;}
+\DoxyCodeLine{00031\ \ \ \ \ (void)initial\_count;}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{00033\ \}}
+
+\end{DoxyCode}

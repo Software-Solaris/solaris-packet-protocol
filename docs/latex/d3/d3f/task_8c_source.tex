@@ -1,0 +1,29 @@
+\doxysection{task.\+c}
+\hypertarget{task_8c_source}{}\label{task_8c_source}\index{osal/task.c@{osal/task.c}}
+\mbox{\hyperlink{task_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{task_8h}{osal/task.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00015}\mbox{\hyperlink{task_8c_af9aace1b44b73111e15aa39f06f43456}{00015}}\ \mbox{\hyperlink{task_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{task_8h_a4b5069015003c52b869dc0e234605f58}{SPP\_OSAL\_GetTaskStorage}}()\{}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00016}00016\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00017}00017\ \}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00020}00020\ \mbox{\hyperlink{task_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{task_8h_ab2fc48a67077b29dc66bbeaa0c5f0c73}{SPP\_OSAL\_TaskCreate}}(\textcolor{keywordtype}{void}\ *p\_function,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ task\_name,\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint32\_t\ stack\_depth,\textcolor{keywordtype}{void}\ *\textcolor{keyword}{const}\ p\_custom\_data,}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ spp\_uint32\_t\ priority,\ \textcolor{keywordtype}{void}\ *\ p\_storage)}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00025}00025\ \ \ \ \ \textcolor{comment}{//\ If\ no\ implementation\ is\ defined,\ then\ error\ is\ returned}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00029}00029\ \mbox{\hyperlink{task_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{task_8h_a2675276911fcc6ce275aa4a906a0bef4}{SPP\_OSAL\_TaskDelete}}(\textcolor{keywordtype}{void}\ *p\_task)\{}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00030}00030\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR;}
+\DoxyCodeLine{\Hypertarget{task_8c_source_l00031}00031\ \}}
+
+\end{DoxyCode}

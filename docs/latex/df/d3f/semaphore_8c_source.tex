@@ -1,0 +1,97 @@
+\doxysection{semaphore.\+c}
+\hypertarget{semaphore_8c_source}{}\label{semaphore_8c_source}\index{osal/semaphore.c@{osal/semaphore.c}}
+\mbox{\hyperlink{semaphore_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{semaphore_8h}{semaphore.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}core/returntypes.h"{}}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00018}\mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{00018}}\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_adf4a6452d009948c7968a01c0de357e5}{OSAL\_SemaphoreCreate}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}*\ semaphore\_handle,\ uint32\_t\ max\_count,\ uint32\_t\ initial\_count)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00020}00020\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00023}00023\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (initial\_count\ >\ max\_count)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_INVALID\_PARAMETER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00026}00026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00027}00027\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00028}00028\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ semaphore\ creation}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00029}00029\ \ \ \ \ *semaphore\_handle\ =\ (\textcolor{keywordtype}{void}*)0xDEADBEEF;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00030}00030\ \ \ \ \ (void)max\_count;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00031}00031\ \ \ \ \ (void)initial\_count;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00032}00032\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00033}00033\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00038}00038\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{semaphore_8h_af81d2c9cac286c80308d5d3e0922e4b3}{OSAL\_SemaphoreCreateBinary}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}*\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00039}00039\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00043}00043\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00044}00044\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ simulate\ binary\ semaphore\ creation}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00045}00045\ \ \ \ \ *semaphore\_handle\ =\ (\textcolor{keywordtype}{void}*)0xBEEFDEAD;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00052}00052\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a659120f46540d0475b7bfcac1824efd5}{OSAL\_SemaphoreDelete}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00053}00053\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00055}00055\ \ \ \ \ (void)semaphore\_handle;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00056}00056\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00062}00062\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_a718b3c1a3b3be91e6d9c3e9db56a4007}{OSAL\_SemaphoreTake}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle,\ uint32\_t\ timeout\_ms)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00063}00063\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00066}00066\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00067}00067\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00068}00068\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds\ immediately}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00069}00069\ \ \ \ \ (void)timeout\_ms;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00076}00076\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{osal_8h_ab753d30f1446fce21163c23397a72ac0}{OSAL\_SemaphoreGive}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00077}00077\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00081}00081\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00082}00082\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ just\ return\ OK}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00083}00083\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00089}00089\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{semaphore_8h_a031db08d4c73563460206cc79be4da79}{OSAL\_SemaphoreGiveFromISR}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle,\ \textcolor{keywordtype}{bool}*\ higher\_priority\_task\_woken)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00090}00090\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00094}00094\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00095}00095\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{if}\ (higher\_priority\_task\_woken\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ *higher\_priority\_task\_woken\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00105}00105\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ retval\_t\ \mbox{\hyperlink{semaphore_8h_ae18822dba1243e20a990d70da9bd0669}{OSAL\_SemaphoreTryTake}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00106}00106\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00107}00107\ \ \ \ \ \textcolor{keywordflow}{if}\ (semaphore\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_ERROR\_NULL\_POINTER;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00110}00110\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00111}00111\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ always\ succeeds}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00112}00112\ \ \ \ \ \textcolor{keywordflow}{return}\ SPP\_OK;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00118}00118\ \mbox{\hyperlink{semaphore_8c_af9aace1b44b73111e15aa39f06f43456}{\_\_attribute\_\_}}((weak))\ uint32\_t\ \mbox{\hyperlink{semaphore_8h_ae2108c943b02299d7532a84356bc9c4f}{OSAL\_SemaphoreGetCount}}(\mbox{\hyperlink{osal_8h_a62c22e6027f21a9fb47ec569dcb4b1ca}{osal\_semaphore\_handle\_t}}\ semaphore\_handle)}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00119}00119\ \{}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00120}00120\ \ \ \ \ \textcolor{comment}{//\ Default\ implementation\ -\/\ return\ dummy\ count}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00121}00121\ \ \ \ \ (void)semaphore\_handle;}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00122}00122\ \ \ \ \ \textcolor{keywordflow}{return}\ 3;\ \textcolor{comment}{//\ Simulate\ 3\ available\ permits}}
+\DoxyCodeLine{\Hypertarget{semaphore_8c_source_l00123}00123\ \}\ }
+
+\end{DoxyCode}

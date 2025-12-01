@@ -1,0 +1,122 @@
+\doxysection{hal/spi/spi.h File Reference}
+\hypertarget{spi_8h}{}\label{spi_8h}\index{hal/spi/spi.h@{hal/spi/spi.h}}
+
+
+SPI Hardware Abstraction Layer.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+{\ttfamily \#include "{}types.\+h"{}}\newline
+Include dependency graph for spi.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d6b/spi_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=155pt]{d9/da0/spi_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+retval\+\_\+t \mbox{\hyperlink{spi_8h_ab993c2afa43942c2a0c0ba23e33a3278}{SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Bus\+Init}} (void)
+\begin{DoxyCompactList}\small\item\em Initialize SPI bus configuration. \end{DoxyCompactList}\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{spi_8h_aab4c81d1a896924e1261dd96f3229591}{SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Get\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em Sets a handler for every pheripheral (\mbox{[}0\mbox{]} reserved for BMP and \mbox{[}1\mbox{]} reserved for ICM) \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{spi_8h_a60fd68a8c7b44cf012ee97b36c18f7cf}{SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Device\+Init}} (void \texorpdfstring{$\ast$}{*}p\+\_\+handler)
+\begin{DoxyCompactList}\small\item\em Initialize SPI peripheral and defines transaction details. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{spi_8h_a9e6e551f438f70bf35e57bcf28b0b0e1}{SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Transmit}} (void \texorpdfstring{$\ast$}{*}handler, void \texorpdfstring{$\ast$}{*}data\+\_\+to\+\_\+send, void \texorpdfstring{$\ast$}{*}data\+\_\+to\+\_\+recieve, spp\+\_\+uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Transmit data over SPI. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+SPI Hardware Abstraction Layer. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the SPI Hardware Abstraction Layer (HAL) interface for the Solaris Packet Protocol library. 
+
+Definition in file \mbox{\hyperlink{spi_8h_source}{spi.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{spi_8h_ab993c2afa43942c2a0c0ba23e33a3278}\label{spi_8h_ab993c2afa43942c2a0c0ba23e33a3278} 
+\index{spi.h@{spi.h}!SPP\_HAL\_SPI\_BusInit@{SPP\_HAL\_SPI\_BusInit}}
+\index{SPP\_HAL\_SPI\_BusInit@{SPP\_HAL\_SPI\_BusInit}!spi.h@{spi.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_HAL\_SPI\_BusInit()}{SPP\_HAL\_SPI\_BusInit()}}
+{\footnotesize\ttfamily retval\+\_\+t SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Bus\+Init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initialize SPI bus configuration. 
+
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{spi_8h_a60fd68a8c7b44cf012ee97b36c18f7cf}\label{spi_8h_a60fd68a8c7b44cf012ee97b36c18f7cf} 
+\index{spi.h@{spi.h}!SPP\_HAL\_SPI\_DeviceInit@{SPP\_HAL\_SPI\_DeviceInit}}
+\index{SPP\_HAL\_SPI\_DeviceInit@{SPP\_HAL\_SPI\_DeviceInit}!spi.h@{spi.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_HAL\_SPI\_DeviceInit()}{SPP\_HAL\_SPI\_DeviceInit()}}
+{\footnotesize\ttfamily retval\+\_\+t SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Device\+Init (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p\+\_\+handler }\end{DoxyParamCaption})}
+
+
+
+Initialize SPI peripheral and defines transaction details. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+\_\+handler} & Void pointer to pheripheral device (device\+\_\+id\mbox{[}0\mbox{]} on BMP or device\+\_\+id\mbox{[}1\mbox{]} on ICM) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{spi_8h_aab4c81d1a896924e1261dd96f3229591}\label{spi_8h_aab4c81d1a896924e1261dd96f3229591} 
+\index{spi.h@{spi.h}!SPP\_HAL\_SPI\_GetHandler@{SPP\_HAL\_SPI\_GetHandler}}
+\index{SPP\_HAL\_SPI\_GetHandler@{SPP\_HAL\_SPI\_GetHandler}!spi.h@{spi.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_HAL\_SPI\_GetHandler()}{SPP\_HAL\_SPI\_GetHandler()}}
+{\footnotesize\ttfamily void \texorpdfstring{$\ast$}{*} SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Get\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Sets a handler for every pheripheral (\mbox{[}0\mbox{]} reserved for BMP and \mbox{[}1\mbox{]} reserved for ICM) 
+
+\begin{DoxyReturn}{Returns}
+a void pointer to an device\+\_\+id array position, NULL otherwise 
+\end{DoxyReturn}
+\Hypertarget{spi_8h_a9e6e551f438f70bf35e57bcf28b0b0e1}\label{spi_8h_a9e6e551f438f70bf35e57bcf28b0b0e1} 
+\index{spi.h@{spi.h}!SPP\_HAL\_SPI\_Transmit@{SPP\_HAL\_SPI\_Transmit}}
+\index{SPP\_HAL\_SPI\_Transmit@{SPP\_HAL\_SPI\_Transmit}!spi.h@{spi.h}}
+\doxysubsubsection{\texorpdfstring{SPP\_HAL\_SPI\_Transmit()}{SPP\_HAL\_SPI\_Transmit()}}
+{\footnotesize\ttfamily retval\+\_\+t SPP\+\_\+\+HAL\+\_\+\+SPI\+\_\+\+Transmit (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{handler,  }\item[{void \texorpdfstring{$\ast$}{*}}]{data\+\_\+to\+\_\+send,  }\item[{void \texorpdfstring{$\ast$}{*}}]{data\+\_\+to\+\_\+recieve,  }\item[{spp\+\_\+uint8\+\_\+t}]{length }\end{DoxyParamCaption})}
+
+
+
+Transmit data over SPI. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Pointer to SPI handle \\
+\hline
+{\em data\+\_\+to\+\_\+send} & Pointer to the data to transmit \\
+\hline
+{\em data\+\_\+to\+\_\+recieve} & Pointer to where the data recieved will be stored \\
+\hline
+{\em length} & Size of the buffer to transmit data (recieve buffer should be half of the size) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}

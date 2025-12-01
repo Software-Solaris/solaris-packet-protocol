@@ -1,0 +1,331 @@
+\doxysection{osal/queue.h File Reference}
+\hypertarget{queue_8h}{}\label{queue_8h}\index{osal/queue.h@{osal/queue.h}}
+
+
+OSAL Queue Management Interface.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}core/returntypes.\+h"{}}\newline
+Include dependency graph for queue.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{d9/dc8/queue_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{d2/d5f/queue_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{queue_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em OSAL Queue handle type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_adf0a6c175a0462ddd2e0153bd6d641ea}{OSAL\+\_\+\+Queue\+Create}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}queue\+\_\+handle, uint32\+\_\+t queue\+\_\+length, uint32\+\_\+t item\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Create a queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_a445767bc3e7f63e0bba2ccf178f88fe1}{OSAL\+\_\+\+Queue\+Delete}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Delete a queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_a4804bae2478f671d4a05c572f2264f5d}{OSAL\+\_\+\+Queue\+Send}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, const void \texorpdfstring{$\ast$}{*}item, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Send item to queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_aeb5855637c566cc053620ca298298e03}{OSAL\+\_\+\+Queue\+Send\+From\+ISR}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, const void \texorpdfstring{$\ast$}{*}item, bool \texorpdfstring{$\ast$}{*}higher\+\_\+priority\+\_\+task\+\_\+woken)
+\begin{DoxyCompactList}\small\item\em Send item to queue from ISR. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}{OSAL\+\_\+\+Queue\+Receive}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, void \texorpdfstring{$\ast$}{*}item, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Receive item from queue. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_abc3932b37825ba25153a65aeb7b35393}{OSAL\+\_\+\+Queue\+Receive\+From\+ISR}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, void \texorpdfstring{$\ast$}{*}item, bool \texorpdfstring{$\ast$}{*}higher\+\_\+priority\+\_\+task\+\_\+woken)
+\begin{DoxyCompactList}\small\item\em Receive item from queue from ISR. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_a843eebb4315dc14cdadc0d03e928cf67}{OSAL\+\_\+\+Queue\+Peek}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle, void \texorpdfstring{$\ast$}{*}item, uint32\+\_\+t timeout\+\_\+ms)
+\begin{DoxyCompactList}\small\item\em Peek at item in queue without removing it. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{queue_8h_a87b504d6b53a4c96986dfe598bd1b102}{OSAL\+\_\+\+Queue\+Get\+Count}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Get number of items in queue. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{queue_8h_aff1d515bc49db11c3915284ebe9bbbce}{OSAL\+\_\+\+Queue\+Get\+Space}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Get available space in queue. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{queue_8h_a5d965ff8a33f2b8d65d39eac3ea35dbe}{OSAL\+\_\+\+Queue\+Is\+Full}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Check if queue is full. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{queue_8h_a612ac3829191fede5b8261e154678ebe}{OSAL\+\_\+\+Queue\+Is\+Empty}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Check if queue is empty. \end{DoxyCompactList}\item 
+retval\+\_\+t \mbox{\hyperlink{queue_8h_a54fb339cb500fc2bdf10cf24b8ffa0a0}{OSAL\+\_\+\+Queue\+Reset}} (\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} queue\+\_\+handle)
+\begin{DoxyCompactList}\small\item\em Reset queue (remove all items) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OSAL Queue Management Interface. 
+
+\begin{DoxyVersion}{Version}
+1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024
+\end{DoxyDate}
+This file provides the queue management interface for the OSAL layer. 
+
+Definition in file \mbox{\hyperlink{queue_8h_source}{queue.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{queue_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}\label{queue_8h_aeb822d9ce3d94b0f48d06b736ccf11d0} 
+\index{queue.h@{queue.h}!osal\_queue\_handle\_t@{osal\_queue\_handle\_t}}
+\index{osal\_queue\_handle\_t@{osal\_queue\_handle\_t}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{osal\_queue\_handle\_t}{osal\_queue\_handle\_t}}
+{\footnotesize\ttfamily typedef void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}
+
+
+
+OSAL Queue handle type. 
+
+
+
+Definition at line \mbox{\hyperlink{queue_8h_source_l00024}{24}} of file \mbox{\hyperlink{queue_8h_source}{queue.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{queue_8h_adf0a6c175a0462ddd2e0153bd6d641ea}\label{queue_8h_adf0a6c175a0462ddd2e0153bd6d641ea} 
+\index{queue.h@{queue.h}!OSAL\_QueueCreate@{OSAL\_QueueCreate}}
+\index{OSAL\_QueueCreate@{OSAL\_QueueCreate}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueCreate()}{OSAL\_QueueCreate()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{queue\+\_\+handle,  }\item[{uint32\+\_\+t}]{queue\+\_\+length,  }\item[{uint32\+\_\+t}]{item\+\_\+size }\end{DoxyParamCaption})}
+
+
+
+Create a queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Pointer to store queue handle \\
+\hline
+{\em queue\+\_\+length} & Maximum number of items in queue \\
+\hline
+{\em item\+\_\+size} & Size of each item in bytes \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a445767bc3e7f63e0bba2ccf178f88fe1}\label{queue_8h_a445767bc3e7f63e0bba2ccf178f88fe1} 
+\index{queue.h@{queue.h}!OSAL\_QueueDelete@{OSAL\_QueueDelete}}
+\index{OSAL\_QueueDelete@{OSAL\_QueueDelete}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueDelete()}{OSAL\_QueueDelete()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Delete a queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a87b504d6b53a4c96986dfe598bd1b102}\label{queue_8h_a87b504d6b53a4c96986dfe598bd1b102} 
+\index{queue.h@{queue.h}!OSAL\_QueueGetCount@{OSAL\_QueueGetCount}}
+\index{OSAL\_QueueGetCount@{OSAL\_QueueGetCount}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueGetCount()}{OSAL\_QueueGetCount()}}
+{\footnotesize\ttfamily uint32\+\_\+t OSAL\+\_\+\+Queue\+Get\+Count (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Get number of items in queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t Number of items in queue 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_aff1d515bc49db11c3915284ebe9bbbce}\label{queue_8h_aff1d515bc49db11c3915284ebe9bbbce} 
+\index{queue.h@{queue.h}!OSAL\_QueueGetSpace@{OSAL\_QueueGetSpace}}
+\index{OSAL\_QueueGetSpace@{OSAL\_QueueGetSpace}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueGetSpace()}{OSAL\_QueueGetSpace()}}
+{\footnotesize\ttfamily uint32\+\_\+t OSAL\+\_\+\+Queue\+Get\+Space (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Get available space in queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t Available space in queue 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a612ac3829191fede5b8261e154678ebe}\label{queue_8h_a612ac3829191fede5b8261e154678ebe} 
+\index{queue.h@{queue.h}!OSAL\_QueueIsEmpty@{OSAL\_QueueIsEmpty}}
+\index{OSAL\_QueueIsEmpty@{OSAL\_QueueIsEmpty}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueIsEmpty()}{OSAL\_QueueIsEmpty()}}
+{\footnotesize\ttfamily bool OSAL\+\_\+\+Queue\+Is\+Empty (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Check if queue is empty. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool true if queue is empty, false otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a5d965ff8a33f2b8d65d39eac3ea35dbe}\label{queue_8h_a5d965ff8a33f2b8d65d39eac3ea35dbe} 
+\index{queue.h@{queue.h}!OSAL\_QueueIsFull@{OSAL\_QueueIsFull}}
+\index{OSAL\_QueueIsFull@{OSAL\_QueueIsFull}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueIsFull()}{OSAL\_QueueIsFull()}}
+{\footnotesize\ttfamily bool OSAL\+\_\+\+Queue\+Is\+Full (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Check if queue is full. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool true if queue is full, false otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a843eebb4315dc14cdadc0d03e928cf67}\label{queue_8h_a843eebb4315dc14cdadc0d03e928cf67} 
+\index{queue.h@{queue.h}!OSAL\_QueuePeek@{OSAL\_QueuePeek}}
+\index{OSAL\_QueuePeek@{OSAL\_QueuePeek}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueuePeek()}{OSAL\_QueuePeek()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Peek (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Peek at item in queue without removing it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to buffer for peeked item \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_ac2a947f67c4c48dea9c1418ede8a3cd1}\label{queue_8h_ac2a947f67c4c48dea9c1418ede8a3cd1} 
+\index{queue.h@{queue.h}!OSAL\_QueueReceive@{OSAL\_QueueReceive}}
+\index{OSAL\_QueueReceive@{OSAL\_QueueReceive}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueReceive()}{OSAL\_QueueReceive()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Receive (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Receive item from queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to buffer for received item \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_abc3932b37825ba25153a65aeb7b35393}\label{queue_8h_abc3932b37825ba25153a65aeb7b35393} 
+\index{queue.h@{queue.h}!OSAL\_QueueReceiveFromISR@{OSAL\_QueueReceiveFromISR}}
+\index{OSAL\_QueueReceiveFromISR@{OSAL\_QueueReceiveFromISR}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueReceiveFromISR()}{OSAL\_QueueReceiveFromISR()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Receive\+From\+ISR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{bool \texorpdfstring{$\ast$}{*}}]{higher\+\_\+priority\+\_\+task\+\_\+woken }\end{DoxyParamCaption})}
+
+
+
+Receive item from queue from ISR. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to buffer for received item \\
+\hline
+{\em higher\+\_\+priority\+\_\+task\+\_\+woken} & Pointer to flag indicating if higher priority task was woken \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a54fb339cb500fc2bdf10cf24b8ffa0a0}\label{queue_8h_a54fb339cb500fc2bdf10cf24b8ffa0a0} 
+\index{queue.h@{queue.h}!OSAL\_QueueReset@{OSAL\_QueueReset}}
+\index{OSAL\_QueueReset@{OSAL\_QueueReset}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueReset()}{OSAL\_QueueReset()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle }\end{DoxyParamCaption})}
+
+
+
+Reset queue (remove all items) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_a4804bae2478f671d4a05c572f2264f5d}\label{queue_8h_a4804bae2478f671d4a05c572f2264f5d} 
+\index{queue.h@{queue.h}!OSAL\_QueueSend@{OSAL\_QueueSend}}
+\index{OSAL\_QueueSend@{OSAL\_QueueSend}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueSend()}{OSAL\_QueueSend()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Send (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{const void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{uint32\+\_\+t}]{timeout\+\_\+ms }\end{DoxyParamCaption})}
+
+
+
+Send item to queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to item to send \\
+\hline
+{\em timeout\+\_\+ms} & Timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
+\Hypertarget{queue_8h_aeb5855637c566cc053620ca298298e03}\label{queue_8h_aeb5855637c566cc053620ca298298e03} 
+\index{queue.h@{queue.h}!OSAL\_QueueSendFromISR@{OSAL\_QueueSendFromISR}}
+\index{OSAL\_QueueSendFromISR@{OSAL\_QueueSendFromISR}!queue.h@{queue.h}}
+\doxysubsubsection{\texorpdfstring{OSAL\_QueueSendFromISR()}{OSAL\_QueueSendFromISR()}}
+{\footnotesize\ttfamily retval\+\_\+t OSAL\+\_\+\+Queue\+Send\+From\+ISR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{osal_8h_aeb822d9ce3d94b0f48d06b736ccf11d0}{osal\+\_\+queue\+\_\+handle\+\_\+t}}}]{queue\+\_\+handle,  }\item[{const void \texorpdfstring{$\ast$}{*}}]{item,  }\item[{bool \texorpdfstring{$\ast$}{*}}]{higher\+\_\+priority\+\_\+task\+\_\+woken }\end{DoxyParamCaption})}
+
+
+
+Send item to queue from ISR. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+handle} & Queue handle \\
+\hline
+{\em item} & Pointer to item to send \\
+\hline
+{\em higher\+\_\+priority\+\_\+task\+\_\+woken} & Pointer to flag indicating if higher priority task was woken \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+retval\+\_\+t SPP\+\_\+\+OK on success, error code otherwise 
+\end{DoxyReturn}
