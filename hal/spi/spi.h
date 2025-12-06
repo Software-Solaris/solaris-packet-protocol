@@ -53,7 +53,7 @@ retval_t SPP_HAL_SPI_DeviceInit(void* p_handler);
  * @param length Size of the buffer to transmit data (recieve buffer should be half of the size)
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length);
+retval_t SPP_HAL_SPI_Transmit(void* handler, spp_uint8_t* data, spp_uint8_t length);
 
 
 #ifdef __cplusplus

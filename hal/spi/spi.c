@@ -38,7 +38,7 @@ __attribute__((weak)) retval_t SPP_HAL_SPI_DeviceInit(void* handler) {
 /**
  * @brief Default (weak) SPI transmit function
  */
-__attribute__((weak)) retval_t SPP_HAL_SPI_Transmit(void* handler, void* data_to_send, void* data_to_recieve, spp_uint8_t length) {    
+__attribute__((weak)) retval_t SPP_HAL_SPI_Transmit(void* handler, spp_uint8_t* data, spp_uint8_t length) {    
     return SPP_ERROR;
 }
 
