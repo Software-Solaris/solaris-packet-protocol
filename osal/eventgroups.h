@@ -26,14 +26,20 @@ typedef spp_uint32_t osal_eventbits_t;
 
 void* SPP_OSAL_GetEventGroupsBuffer();
 
-/**
- * @brief Create a new event group
- * 
- * @param[out] event_group Pointer to store the created event group handle
- * @return retval_t SPP_OK on success, error code otherwise
- */
-retval_t OSAL_EventGroupCreate(void* p_event_group, void* p_buffer_event_group);
+void* SPP_OSAL_EventGroupCreate(void* event_group_buffer);
 
+retval_t OSAL_EventGroupSetBitsFromISR(void* event_group,
+                                      osal_eventbits_t bits_to_set,
+                                      osal_eventbits_t* previous_bits,
+                                      spp_uint8_t* higher_priority_task_woken);
+
+retval_t OSAL_EventGroupWaitBits(void* event_group,
+                                 osal_eventbits_t bits_to_wait,
+                                 spp_uint8_t clear_on_exit,
+                                 spp_uint8_t wait_for_all_bits,
+                                 spp_uint32_t timeout_ms,
+                                 osal_eventbits_t* actual_bits);
+                                 
 // /**
 //  * @brief Set bits in an event group
 //  * 
