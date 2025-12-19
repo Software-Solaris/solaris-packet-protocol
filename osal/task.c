@@ -29,3 +29,13 @@ __attribute__((weak))  void * SPP_OSAL_GetTaskStorage(){
 __attribute__((weak)) retval_t SPP_OSAL_TaskDelete(void *p_task){
     return SPP_ERROR;
 }
+
+
+/**
+ * @brief Default (weak) task delay
+ */
+__attribute__((weak)) void SPP_OSAL_TaskDelay(spp_uint32_t blocktime_ms)
+{
+    return;
+}
+

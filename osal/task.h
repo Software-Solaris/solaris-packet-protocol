@@ -26,5 +26,14 @@ void* SPP_OSAL_TaskCreate(void *p_function, const char *const task_name,
 retval_t SPP_OSAL_TaskDelete(void *p_task);
 
 
+/**
+ * @brief Create a delay
+ * 
+ * @param blocktime_ms Time of the delay
+ * @return void
+ */
+void SPP_OSAL_TaskDelay(spp_uint32_t blocktime_ms);
 
-#endif /* SPP_OSAL_TASK_H */ 
+
+
+#endif /* SPP_OSAL_TASK_H */
