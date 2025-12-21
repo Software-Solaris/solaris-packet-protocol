@@ -2,6 +2,7 @@
 
 Solaris Packet Protocol (SPP) is a protocol for telemetry/command packet handling between avionic subsystems. This folder hosts the portable implementation of the protocol core, built around **HAL** (Hardware Abstraction Layer) and **OSAL** (Operating System Abstraction Layer). These layers decouple the protocol logic from any concrete microcontroller or RTOS so the same stack can be reused across platforms.
 
+
 ## Directory layout
 - `core/`: core primitives (`core.c`/`core.h`), shared `types.h`, `macros.h`, and error codes (`returntypes.h`). `Core_Init()` lives here and bootstraps every service used by the stack.
 - `services/`: reusable services that extend the core. Currently `databank/` provides a pool of `spp_packet_t`, tracks free packets, and exposes APIs to lease/return them safely.
