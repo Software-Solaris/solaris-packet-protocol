@@ -1,5 +1,6 @@
 #ifndef SPP_CORE_TYPES_H_
 #define SPP_CORE_TYPES_H_
+#include <stdbool.h>
 
 typedef unsigned char  spp_uint8_t;
 typedef unsigned short spp_uint16_t;
