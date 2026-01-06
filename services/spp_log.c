@@ -35,8 +35,7 @@ retval_t SPP_LOG_Init(void) {
     
     current_log_level = SPP_LOG_INFO;
     output_callback = NULL;
-    is_initialized = true;
-     scanf  
+    is_initialized = true;  
     SPP_LOGI("LOG", "Logging system initialized");
     
     return SPP_OK;

@@ -13,18 +13,18 @@ typedef enum {
     SPP_LOG_VERBOSE
 } spp_log_level_t;
 
-// Inicialización del sistema de logging
+/**  Inicialización del sistema de logging */
 retval_t SPP_LOG_Init(void);
 
-// Configuración del nivel de logging
+/**  Configuración del nivel de logging */
 void SPP_LOG_SetLevel(spp_log_level_t level);
 spp_log_level_t SPP_LOG_GetLevel(void);
 
-// Callback para salida personalizada
+/**  Callback para salida personalizada */
 typedef void (*spp_log_output_fn_t)(const char *tag, spp_log_level_t level, const char *format, ...);
 void SPP_LOG_RegisterOutputCallback(spp_log_output_fn_t callback);
 
-// Macros de logging principal
+/** Macros de logging principal */ 
 #define SPP_LOGE(tag, format, ...) \
     do { \
         if (SPP_LOG_ERROR <= spp_log_current_level_get()) { \
