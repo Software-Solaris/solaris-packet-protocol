@@ -2,7 +2,7 @@
 
 # Include service subdirectories
 add_subdirectory(databank)
-
+add_subdirectory(logging)
 # Create services library that groups all services
 add_library(spp_services INTERFACE)
 
@@ -10,6 +10,7 @@ add_library(spp_services INTERFACE)
 target_link_libraries(spp_services
     INTERFACE
         spp_databank
+        spp_logging
 )
 
 # Configure include directories
