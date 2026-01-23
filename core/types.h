@@ -40,5 +40,4 @@ typedef struct{
 }SPP_SPI_InitCfg;
 
 //---End Init Types---
-//hola
 #endif /* SPP_CORE_TYPES_H_ */
