@@ -1,3 +1,5 @@
+#include "returntypes.h"
+#include "types.h"
 typedef struct
 {
     const char*  base_path;          
@@ -8,3 +10,6 @@ typedef struct
     spp_uint32_t allocation_unit_size; 
     spp_bool_t   format_if_mount_failed;
 } SPP_Storage_InitCfg;
+
+retval_t SPP_HAL_Storage_Mount(void* p_cfg);
+retval_t SPP_HAL_Storage_Unmount(void* p_cfg);
