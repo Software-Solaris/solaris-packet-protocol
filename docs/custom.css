@@ -1,9 +1,243 @@
-#projectlogo img {
-    max-width: 90px;
-    height: auto;
+/* ----------------------------------------------------
+ * Solaris Packet Protocol – Doxygen custom theme
+ * Layout: izquierda logo, derecha texto (o arriba según HTML)
+ * -------------------------------------------------- */
+
+:root {
+  --spp-bg: #000000;
+  --spp-bg-elevated: #080808;
+  --spp-border: #2b2b2b;
+  --spp-red: #d7352f;
+  --spp-red-soft: #f04a3a;
+  --spp-text-main: #f7f7f7;
+  --spp-text-muted: #d0d0d0;
+  --spp-link: #ff6455;
 }
 
-#projectlogo {
-    float: left;
-    margin-right: 20px;
+/* Fondo general y tipografía */
+body {
+  background-color: var(--spp-bg);
+  color: var(--spp-text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
 }
+
+/* Cabecera superior */
+#top,
+#titlearea,
+div.header {
+  background: #000000;
+  border: none;
+  box-shadow: none;
+}
+
+/* Logo de cabecera */
+#projectlogo img {
+  max-height: 56px;
+  width: auto;
+}
+
+/* Nombre de proyecto (arriba a la izquierda) */
+#projectname {
+  text-align: left;
+}
+
+/* Franja del título de página centrado y plana */
+div.header div.headertitle {
+  text-align: center;
+  background: #080808;
+  border-bottom: 1px solid var(--spp-border);
+  padding: 0.25rem 0;
+  margin: 0;
+}
+
+div.header .title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* -------- Barra de pestañas (tabs) -------- */
+
+#navrow1,
+#navrow1 ul.tablist {
+  background: #050505 !important;
+  background-image: none !important;
+  border: none;
+  border-bottom: 1px solid var(--spp-border) !important;
+}
+
+#navrow1 ul.tablist li {
+  background: transparent !important;
+  border: none !important;
+}
+
+#navrow1 ul.tablist li a {
+  color: var(--spp-text-main) !important;
+  padding: 4px 10px;
+}
+
+#navrow1 ul.tablist li a:hover {
+  color: var(--spp-red-soft) !important;
+}
+
+/* pestaña activa */
+#navrow1 ul.tablist li.current,
+#navrow1 ul.tablist li.current a {
+  background: #101010 !important;
+  border-bottom: 2px solid var(--spp-red) !important;
+}
+
+/* Breadcrumb */
+.navpath {
+  background: #050505 !important;
+  background-image: none !important;
+  border-top: none;
+  border-bottom: 1px solid var(--spp-border);
+}
+
+.navpath li,
+.navpath li a {
+  color: var(--spp-text-muted);
+}
+
+/* Enlaces generales */
+a {
+  color: var(--spp-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ----------------------- */
+/*   Contenido general     */
+/* ----------------------- */
+
+div.contents,
+div.textblock {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0.1rem 0;
+}
+
+/* Eliminar tarjetas/bordes de Doxygen */
+.contents > div,
+.contents > div > div {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Párrafos estándar */
+.contents p,
+.textblock p {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0.05rem 0;
+  line-height: 1.3;
+}
+
+/* ----------------------- */
+/*  Main page SPP layout   */
+/* ----------------------- */
+
+/* Contenedor principal: FLEX en fila (logo/texto) */
+.spp-mainpage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2.5rem;
+  max-width: 1000px;
+  margin: 0rem auto 0.5rem auto;
+}
+
+/* Logo */
+.spp-main-logo {
+  flex: 0 0 220px;
+  display: block;
+  margin: 0;
+  box-shadow: none !important;
+  width: 220px;
+  max-width: 100%;
+}
+
+/* Columna de texto */
+.spp-main-content {
+  flex: 1;
+}
+
+/* Títulos de sección (main page) */
+.spp-section-title {
+  text-align: center;
+  margin: 0rem 0 0 0;        /* solo margen arriba */
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--spp-red-soft);
+}
+
+/* Primer subtítulo (después del logo) */
+.spp-main-content .spp-section-title:first-of-type {
+  margin-top: 0.3rem;
+}
+
+/* Texto principal (main page) */
+.spp-main-text {
+  color: var(--spp-text-muted);
+  line-height: 1.4;
+  font-size: 0.98rem;
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+}
+
+.spp-main-text strong {
+  color: var(--spp-text-main);
+  font-weight: 600;
+}
+
+/* Relación título/texto en la main page (por si Doxygen no mete nada raro) */
+.spp-section-title + .spp-main-text {
+  margin-top: 0.1rem;
+}
+
+.spp-main-text + .spp-section-title {
+  margin-top: 1.2rem;
+}
+
+/* Bloque "Learn more" */
+.spp-learnmore {
+  margin-top: 0.2rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--spp-border);
+}
+
+.spp-main-link {
+  font-weight: 500;
+}
+
+/* Responsivo: en móvil apilado vertical */
+@media (max-width: 768px) {
+  .spp-mainpage {
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 0.3rem 0.6rem 0.6rem;
+  }
+
+  .spp-main-logo {
+    margin: 0 auto;
+  }
+
+  .spp-section-title {
+    margin-top: 0.5rem;
+  }
+}
+
