@@ -1,5 +1,5 @@
 // Datapool (FIFO)-> Gestionar punteros a los N structs (paquetes) que tienen reservado su espacio en RAM
-
+// Dos FIFO: uno para los punteros libres (FREE) y otro para los punteros listos para ser procesados (READY)
 #include "returntypes.h"
 #include "types.h"
 
