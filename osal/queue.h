@@ -80,7 +80,7 @@ retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueSend(void* queue_handle, const void* p_item, uint32_t timeout_ms);
 
 /**
  * @brief Send item to queue from ISR
@@ -100,7 +100,7 @@ retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* ite
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueReceive(void* queue_handle, void* p_out_item, uint32_t timeout_ms);
 
 /**
  * @brief Receive item from queue from ISR
@@ -161,6 +161,9 @@ bool OSAL_QueueIsEmpty(osal_queue_handle_t queue_handle);
  * @return retval_t SPP_OK on success, error code otherwise
  */
 retval_t OSAL_QueueReset(osal_queue_handle_t queue_handle);
+
+retval_t SPP_OSAL_QueueReset(void* queue_handle);
+
 
 #ifdef __cplusplus
 }
