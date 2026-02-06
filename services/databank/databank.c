@@ -5,15 +5,17 @@
 
 // Static variables for data pool
 static spp_packet_t data_bank[DATA_BANK_SIZE];
-static data_pool_t data_pool;
+static SPP_DataPool_t data_pool;
 static bool is_initialized = false;
 
-retval_t DataBank_Init(void){
+char *TAG = "DATABANK";
+
+retval_t SPP_DATABANK_init(void){
     if (is_initialized) {
         return SPP_OK; // Already initialized
     }
     
-    printf("Initializing Data Bank\n");
+    SPP_LOGI(TAG, "Initializing Data Bank\n");
     
     // Clear data bank
     memset(data_bank, 0, sizeof(data_bank));
@@ -26,11 +28,11 @@ retval_t DataBank_Init(void){
     data_pool.number_of_free_packets = DATA_BANK_SIZE;
     is_initialized = true;
     
-    printf("Data Bank initialized with %d packets\n", DATA_BANK_SIZE);
+    SPP_LOGI(TAG, "Data Bank initialized with %d packets\n", DATA_BANK_SIZE);
     return SPP_OK;
 }
 
-spp_packet_t* DataBank_GetPacket(void){
+spp_packet_t* SPP_DATABANK_getPacket(void){
     if (!is_initialized) {
         printf("Error: Data Bank not initialized\n");
         return NULL;
@@ -44,12 +46,11 @@ spp_packet_t* DataBank_GetPacket(void){
     // Get the last available packet
     data_pool.number_of_free_packets--;
     spp_packet_t* p_packet = data_pool.free_packets[data_pool.number_of_free_packets];
-    data_pool.free_packets[data_pool.number_of_free_packets] = NULL;
     
     return p_packet;
 }
 
-retval_t DataBank_ReturnPacket(spp_packet_t* p_packet){
+retval_t SPP_DATABANK_returnPacket(spp_packet_t* p_packet){
     if (!is_initialized) {
         printf("Error: Data Bank not initialized\n");
         return SPP_ERROR;
@@ -69,7 +70,6 @@ retval_t DataBank_ReturnPacket(spp_packet_t* p_packet){
     memset(p_packet, 0, sizeof(spp_packet_t));
     
     // Return packet to pool
-    data_pool.free_packets[data_pool.number_of_free_packets] = p_packet;
     data_pool.number_of_free_packets++;
     
     return SPP_OK;
