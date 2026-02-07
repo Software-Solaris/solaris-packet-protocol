@@ -1,3 +1,8 @@
+// Aqui van los weaks de las funciones que crees en queues.c
+
+
+
+
 /**
  * @file queue.c
  * @brief OSAL Queue Management Implementation
@@ -12,9 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @brief Default (weak) queue creation
- */
+/* 
 __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size)
 {
     if (queue_handle == NULL) {
@@ -26,6 +29,38 @@ __attribute__((weak)) retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handl
     (void)queue_length;
     (void)item_size;
     return SPP_OK;
+} */
+
+
+/**
+ * @brief Default (weak) queue creation
+ */
+__attribute__((weak)) void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t item_size)
+{
+    (void)queue_length;
+    (void)item_size;
+    return NULL; // Esto da error???
+}
+
+/**
+ * @brief Default (weak) queue creation
+ */
+__attribute__((weak)) SPP_OSAL_QueueCreateStatic(uint32_t queue_length, uint32_t item_size, uint8_t* queue_storage, void* queue_buffer)
+{
+    (void)queue_length;
+    (void)item_size;
+    (void)queue_storage;
+    (void)queue_buffer;
+    return NULL; // Esto da error???
+}
+
+/**
+ * @brief Default (weak) messages waiting
+ */
+__attribute__((weak)) uint32_t SPP_OSAL_QueueMessagesWaiting(void* queue_handle)
+{
+    (void)queue_handle;
+    return NULL; // Esto da error???
 }
 
 /**
