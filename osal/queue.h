@@ -1,3 +1,7 @@
+// Aquí se definen las funciones que quieres en el queue.c
+
+
+
 /**
  * @file queue.h
  * @brief OSAL Queue Management Interface
@@ -14,7 +18,7 @@
 #include <stdbool.h>
 #include "core/returntypes.h"
 
-#ifdef __cplusplus
+#ifdef __cplusplus // Es un wrapper de compatibilidad entre C y C++
 extern "C" {
 #endif
 
@@ -23,15 +27,42 @@ extern "C" {
  */
 typedef void* osal_queue_handle_t;
 
+
 /**
- * @brief Create a queue
+ * @brief Crea una nueva cola OSAL
  * 
- * @param queue_handle Pointer to store queue handle
- * @param queue_length Maximum number of items in queue
- * @param item_size Size of each item in bytes
- * @return retval_t SPP_OK on success, error code otherwise
+ * @param queue_length Número máximo de elementos en la cola
+ * @param item_size Tamaño en bytes de cada elemento
+ * 
+ * @return Puntero void a handle de la cola creada
+ * @retval NULL si hubo error al crear la cola
+ * 
+ * @note El handle debe ser usado con las demás funciones OSAL
  */
-retval_t OSAL_QueueCreate(osal_queue_handle_t* queue_handle, uint32_t queue_length, uint32_t item_size);
+void* SPP_OSAL_QueueCreate(uint32_t queue_length, uint32_t item_size);
+
+/**
+ * @brief Crea una nueva cola OSAL con memoria estática
+ * 
+ * @param queue_length Número máximo de elementos en la cola
+ * @param item_size Tamaño en bytes de cada elemento
+ * @param queue_storage
+ * @param queue_buffer
+ * 
+ * @return Puntero void a handle de la cola creada
+ * @retval NULL si hubo error al crear la cola
+ * 
+ * @note El handle debe ser usado con las demás funciones OSAL
+ */
+void* SPP_OSAL_QueueCreateStatic(uint32_t queue_length, uint32_t item_size, uint8_t* queue_storage, void* queue_buffer);
+
+/**
+ * @brief Obtiene el número de elementos en cola
+ * 
+ * @param queue_handle Handle de la cola
+ * @return uint32_t Número de elementos en cola
+ */
+uint32_t SPP_OSAL_QueueMessagesWaiting(void* queue_handle);
 
 /**
  * @brief Delete a queue
@@ -49,7 +80,7 @@ retval_t OSAL_QueueDelete(osal_queue_handle_t queue_handle);
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueSend(osal_queue_handle_t queue_handle, const void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueSend(void* queue_handle, const void* p_item, uint32_t timeout_ms);
 
 /**
  * @brief Send item to queue from ISR
@@ -69,7 +100,7 @@ retval_t OSAL_QueueSendFromISR(osal_queue_handle_t queue_handle, const void* ite
  * @param timeout_ms Timeout in milliseconds
  * @return retval_t SPP_OK on success, error code otherwise
  */
-retval_t OSAL_QueueReceive(osal_queue_handle_t queue_handle, void* item, uint32_t timeout_ms);
+retval_t SPP_OSAL_QueueReceive(void* queue_handle, void* p_out_item, uint32_t timeout_ms);
 
 /**
  * @brief Receive item from queue from ISR
@@ -130,6 +161,9 @@ bool OSAL_QueueIsEmpty(osal_queue_handle_t queue_handle);
  * @return retval_t SPP_OK on success, error code otherwise
  */
 retval_t OSAL_QueueReset(osal_queue_handle_t queue_handle);
+
+retval_t SPP_OSAL_QueueReset(void* queue_handle);
+
 
 #ifdef __cplusplus
 }
