@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 /**  Variables estáticas del módulo */
 static spp_log_level_t current_log_level = SPP_LOG_INFO;
