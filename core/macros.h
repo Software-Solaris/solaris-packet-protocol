@@ -1,7 +1,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#define DATA_BANK_SIZE 100
+#define DATA_BANK_SIZE 5
 
 //Implement the static behaviour of functions
 #define STATIC
