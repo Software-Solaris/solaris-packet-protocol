@@ -3,6 +3,7 @@
 #include "osal/queue.h"
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 retval_t SPP_Datapool_Init(SPP_DatapoolHandle* p_handle, const SPP_DatapoolCfg* p_cfg)
 {
@@ -165,7 +166,7 @@ retval_t SPP_Datapool_Reset(SPP_DatapoolHandle* p_handle)
         {
             void* p_slot = (void*)(base + ((spp_uint32_t)i * (spp_uint32_t)p_handle->cfg->elem_size));
 
-            ret = SPP_OSAL_QueueSent(p_handle->q_free_handle, &p_slot, 0);
+            ret = SPP_OSAL_QueueSend(p_handle->q_free_handle, &p_slot, 0);
             if (ret != SPP_OK)
             {
                 return ret;
