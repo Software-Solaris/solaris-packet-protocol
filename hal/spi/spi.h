@@ -27,7 +27,6 @@ extern "C" {
  */
 retval_t SPP_HAL_SPI_BusInit(void);
 
-
 /**
  * @brief Sets a handler for every pheripheral ([0] reserved for BMP and [1] reserved for ICM)
  * 
