@@ -7,7 +7,7 @@
 
 // Static variables for data pool
 static spp_packet_t data_bank[DATA_BANK_SIZE];
-static SPP_DataPool_t data_pool;
+static SPP_Databank_t data_pool;
 static spp_packet_t* initial_state[DATA_BANK_SIZE];
 static bool is_initialized = false;
 
@@ -37,12 +37,12 @@ retval_t SPP_DATABANK_init(void){
 
 spp_packet_t* SPP_DATABANK_getPacket(void){
     if (!is_initialized) {
-        printf("Error: Data Bank not initialized\n");
+        SPP_LOGE(TAG, "Error: Data Bank not initialized\n");
         return NULL;
     }
     
     if(data_pool.number_of_free_packets == 0){
-        printf("Error: No free packets available\n");
+        SPP_LOGE(TAG, "Error: No free packets available\n");
         return NULL;
     }
     
@@ -60,17 +60,17 @@ spp_packet_t* SPP_DATABANK_getPacket(void){
 
 retval_t SPP_DATABANK_returnPacket(spp_packet_t* p_packet){
     if (!is_initialized) {
-        printf("Error: Data Bank not initialized\n");
+        SPP_LOGE(TAG, "Error: Data Bank not initialized\n");
         return SPP_ERROR;
     }
     
     if(p_packet == NULL){
-        printf("Error: Packet is NULL\n");
+        SPP_LOGE(TAG, "Error: Packet is NULL\n");
         return SPP_NULL_PACKET;
     }
     
     if(data_pool.number_of_free_packets >= DATA_BANK_SIZE){
-        printf("Error: Data pool is full\n");
+        SPP_LOGE(TAG, "Error: Data pool is full\n");
         return SPP_ERROR;
     }
 
