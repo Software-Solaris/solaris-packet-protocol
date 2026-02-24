@@ -9,6 +9,7 @@ typedef unsigned long  spp_uint32_t;
 typedef signed char     spp_int8_t;
 typedef signed short    spp_int16_t;
 typedef signed long     spp_int32_t;
+typedef signed long long    spp_int64_t;
 
 typedef bool spp_bool_t;
 
