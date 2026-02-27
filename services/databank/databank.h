@@ -5,7 +5,7 @@
 #include "core/returntypes.h"
 #include "core/macros.h"
 #include "core/packet.h"
-#include "logging/spp_log.h"
+#include "spp_log.h"
 
 
 typedef struct{
