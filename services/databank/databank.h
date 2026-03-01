@@ -5,13 +5,13 @@
 #include "core/returntypes.h"
 #include "core/macros.h"
 #include "core/packet.h"
-#include "logging/spp_log.h"
+#include "services/logging/spp_log.h"
 
 
 typedef struct{
     spp_packet_t *free_packets[DATA_BANK_SIZE];
     uint32_t number_of_free_packets;
-}SPP_DataPool_t;
+}SPP_Databank_t;
 
 
 retval_t SPP_DATABANK_init(void);
