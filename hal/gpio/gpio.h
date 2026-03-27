@@ -1,32 +1,68 @@
+/**
+ * @file gpio.h
+ * @brief GPIO Hardware Abstraction Layer
+ * @version 1.0.0
+ * @date 2024
+ *
+ * This file provides the GPIO Hardware Abstraction Layer (HAL) interface
+ * for interrupt configuration and ISR registration.
+ */
+
 #ifndef SPP_HAL_GPIO_H
 #define SPP_HAL_GPIO_H
 
-#include "core/types.h"
-#include "core/returntypes.h"
-#include "osal/eventgroups.h"   // osal_eventbits_t
+/* ---------------------------------------------------------------- */
+/*  Includes                                                        */
+/* ---------------------------------------------------------------- */
+
+#include "spp/core/types.h"
+#include "spp/core/returntypes.h"
+#include "spp/osal/eventgroups.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* Contexto que consume la ISR interna fija del port */
-typedef struct {
-    void*            event_group;
-    osal_eventbits_t bits;
-} spp_gpio_isr_ctx_t;
+    /* ---------------------------------------------------------------- */
+    /*  Types                                                           */
+    /* ---------------------------------------------------------------- */
 
-/*
- * intr_type y pull son enteros “agnósticos”:
- *  - intr_type: se castea dentro del port a gpio_int_type_t (ESP-IDF)
- *  - pull: 0 none, 1 pullup, 2 pulldown
- */
-retval_t SPP_HAL_GPIO_ConfigInterrupt(spp_uint32_t pin, spp_uint32_t intr_type, spp_uint32_t pull);
+    /**
+     * @brief  Context consumed by the fixed internal ISR in the port layer.
+     */
+    typedef struct
+    {
+        void *p_event_group;   /**< Opaque event-group handle. */
+        osal_eventbits_t bits; /**< Bits to set from the ISR.  */
+    } spp_gpio_isr_ctx_t;
 
-/*
- * Registra la ISR interna fija del port para ese pin.
- * isr_context debe apuntar a un spp_gpio_isr_ctx_t persistente.
- */
-retval_t SPP_HAL_GPIO_RegisterISR(spp_uint32_t pin, void* isr_context);
+    /* ---------------------------------------------------------------- */
+    /*  Public function declarations                                    */
+    /* ---------------------------------------------------------------- */
+
+    /**
+     * @brief  Configure a GPIO pin as an interrupt source.
+     *
+     * @param[in] pin        GPIO pin number.
+     * @param[in] intr_type  Platform-agnostic interrupt type
+     *                       (cast to gpio_int_type_t inside the port).
+     * @param[in] pull       Pull mode: 0 = none, 1 = pull-up, 2 = pull-down.
+     *
+     * @return retval_t  SPP_OK on success, error code otherwise.
+     */
+    retval_t SPP_HAL_GPIO_ConfigInterrupt(spp_uint32_t pin, spp_uint32_t intr_type,
+                                          spp_uint32_t pull);
+
+    /**
+     * @brief  Register the fixed internal ISR for a given pin.
+     *
+     * @param[in] pin             GPIO pin number.
+     * @param[in] p_isr_context   Pointer to a persistent spp_gpio_isr_ctx_t.
+     *
+     * @return retval_t  SPP_OK on success, error code otherwise.
+     */
+    retval_t SPP_HAL_GPIO_RegisterISR(spp_uint32_t pin, void *p_isr_context);
 
 #ifdef __cplusplus
 }

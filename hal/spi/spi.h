@@ -3,7 +3,7 @@
  * @brief SPI Hardware Abstraction Layer
  * @version 1.0.0
  * @date 2024
- * 
+ *
  * This file provides the SPI Hardware Abstraction Layer (HAL) interface
  * for the Solaris Packet Protocol library.
  */
@@ -11,52 +11,62 @@
 #ifndef SPP_HAL_SPI_H
 #define SPP_HAL_SPI_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "core/returntypes.h"
-#include "types.h"
+/* ---------------------------------------------------------------- */
+/*  Includes                                                        */
+/* ---------------------------------------------------------------- */
+
+#include "spp/core/returntypes.h"
+#include "spp/core/types.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
- * @brief Initialize SPI bus configuration
- * 
- * @return retval_t SPP_OK on success, error code otherwise
- */
-retval_t SPP_HAL_SPI_BusInit(void);
+    /* ---------------------------------------------------------------- */
+    /*  Public function declarations                                    */
+    /* ---------------------------------------------------------------- */
 
-/**
- * @brief Sets a handler for every pheripheral ([0] reserved for BMP and [1] reserved for ICM)
- * 
- * @return a void pointer to an device_id array position, NULL otherwise
- */
-void* SPP_HAL_SPI_GetHandler(void);
+    /**
+     * @brief  Initialize the SPI bus configuration.
+     *
+     * @return retval_t  SPP_OK on success, error code otherwise.
+     */
+    retval_t SPP_HAL_SPI_BusInit(void);
 
+    /**
+     * @brief  Get a handler for the next available SPI peripheral.
+     *
+     * Returns a void pointer to a device_id array position.
+     * Index 0 is reserved for BMP and index 1 for ICM.
+     *
+     * @return void*  Pointer to the device handle, NULL if none available.
+     */
+    void *SPP_HAL_SPI_GetHandler(void);
 
-/**
- * @brief Initialize SPI peripheral and defines transaction details
- * 
- * @param p_handler Void pointer to pheripheral device (device_id[0] on BMP or device_id[1] on ICM)
- * @return retval_t SPP_OK on success, error code otherwise
- */
-retval_t SPP_HAL_SPI_DeviceInit(void* p_handler);
+    /**
+     * @brief  Initialize an SPI peripheral and define transaction details.
+     *
+     * @param[in] p_handler  Void pointer to the peripheral device
+     *                       (device_id[0] for BMP or device_id[1] for ICM).
+     *
+     * @return retval_t  SPP_OK on success, error code otherwise.
+     */
+    retval_t SPP_HAL_SPI_DeviceInit(void *p_handler);
 
-/**
- * @brief Transmit data over SPI
- * 
- * @param handle Pointer to SPI handle
- * @param data_to_send Pointer to the data to transmit
- * @param data_to_recieve Pointer to where the data recieved will be stored
- * @param length Size of the buffer to transmit data (recieve buffer should be half of the size)
- * @return retval_t SPP_OK on success, error code otherwise
- */
-retval_t SPP_HAL_SPI_Transmit(void* handler, spp_uint8_t* data, spp_uint8_t length);
-
+    /**
+     * @brief  Transmit data over SPI (full-duplex).
+     *
+     * @param[in]     p_handler  Pointer to the SPI device handle.
+     * @param[in,out] p_data     Pointer to the TX/RX buffer.
+     * @param[in]     length     Number of bytes to transmit.
+     *
+     * @return retval_t  SPP_OK on success, error code otherwise.
+     */
+    retval_t SPP_HAL_SPI_Transmit(void *p_handler, spp_uint8_t *p_data, spp_uint8_t length);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SPP_HAL_SPI_H */ 
+#endif /* SPP_HAL_SPI_H */
