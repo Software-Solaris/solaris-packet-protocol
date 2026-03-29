@@ -15,8 +15,8 @@ extern "C"
     /*  Includes                                                        */
     /* ---------------------------------------------------------------- */
 
-#include "spp/core/macros.h"
-#include "spp/core/returntypes.h"
+#include "macros.h"
+#include "returntypes.h"
 
     /* ---------------------------------------------------------------- */
     /*  Public Functions                                                */
