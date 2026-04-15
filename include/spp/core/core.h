@@ -33,9 +33,9 @@
  *
  * @param[in] p_port  Pointer to the populated @ref SPP_OsalPort_t.
  *
- * @return SPP_OK on success, SPP_ERROR_NULL_POINTER if @p p_port is NULL.
+ * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if @p p_port is NULL.
  */
-retval_t SPP_Core_setOsalPort(const SPP_OsalPort_t *p_port);
+SPP_RetVal_t SPP_Core_setOsalPort(const SPP_OsalPort_t *p_port);
 
 /**
  * @brief Register the HAL port for the current hardware.
@@ -45,9 +45,9 @@ retval_t SPP_Core_setOsalPort(const SPP_OsalPort_t *p_port);
  *
  * @param[in] p_port  Pointer to the populated @ref SPP_HalPort_t.
  *
- * @return SPP_OK on success, SPP_ERROR_NULL_POINTER if @p p_port is NULL.
+ * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if @p p_port is NULL.
  */
-retval_t SPP_Core_setHalPort(const SPP_HalPort_t *p_port);
+SPP_RetVal_t SPP_Core_setHalPort(const SPP_HalPort_t *p_port);
 
 /* ----------------------------------------------------------------
  * Core initialisation
@@ -59,10 +59,10 @@ retval_t SPP_Core_setHalPort(const SPP_HalPort_t *p_port);
  * Initialises the logging service and the packet databank.  Both ports must
  * be registered before calling this function.
  *
- * @return SPP_OK on success.
- * @return SPP_ERROR_NOT_INITIALIZED if a required port has not been registered.
+ * @return K_SPP_OK on success.
+ * @return K_SPP_ERROR_NOT_INITIALIZED if a required port has not been registered.
  */
-retval_t SPP_Core_init(void);
+SPP_RetVal_t SPP_Core_init(void);
 
 /**
  * @brief Return a pointer to the currently registered OSAL port.

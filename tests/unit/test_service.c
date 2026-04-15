@@ -21,12 +21,12 @@
 
 typedef struct { int initCalled; int startCalled; int stopCalled; } StubCtx_t;
 
-static retval_t stubInit  (void *p_ctx, const void *p_cfg) { (void)p_cfg; ((StubCtx_t*)p_ctx)->initCalled++;  return SPP_OK; }
-static retval_t stubStart (void *p_ctx)                    { ((StubCtx_t*)p_ctx)->startCalled++; return SPP_OK; }
-static retval_t stubStop  (void *p_ctx)                    { ((StubCtx_t*)p_ctx)->stopCalled++;  return SPP_OK; }
-static retval_t stubDeinit(void *p_ctx)                    { (void)p_ctx; return SPP_OK; }
+static SPP_RetVal_t stubInit  (void *p_ctx, const void *p_cfg) { (void)p_cfg; ((StubCtx_t*)p_ctx)->initCalled++;  return K_SPP_OK; }
+static SPP_RetVal_t stubStart (void *p_ctx)                    { ((StubCtx_t*)p_ctx)->startCalled++; return K_SPP_OK; }
+static SPP_RetVal_t stubStop  (void *p_ctx)                    { ((StubCtx_t*)p_ctx)->stopCalled++;  return K_SPP_OK; }
+static SPP_RetVal_t stubDeinit(void *p_ctx)                    { (void)p_ctx; return K_SPP_OK; }
 
-static retval_t failingInit(void *p_ctx, const void *p_cfg) { (void)p_ctx; (void)p_cfg; return SPP_ERROR; }
+static SPP_RetVal_t failingInit(void *p_ctx, const void *p_cfg) { (void)p_ctx; (void)p_cfg; return K_SPP_ERROR; }
 
 static const SPP_ServiceDesc_t k_stubDesc = {
     .p_name  = "stub",
@@ -59,18 +59,18 @@ AfterEach(SPP_Service_register)  {}
 Ensure(SPP_Service_register, rejects_null_descriptor)
 {
     StubCtx_t ctx = {0};
-    assert_that(SPP_Service_register(NULL, &ctx, NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_Service_register(NULL, &ctx, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_Service_register, rejects_null_context)
 {
-    assert_that(SPP_Service_register(&k_stubDesc, NULL, NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_Service_register(&k_stubDesc, NULL, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_Service_register, succeeds_with_valid_args)
 {
     StubCtx_t ctx = {0};
-    assert_that(SPP_Service_register(&k_stubDesc, &ctx, NULL), is_equal_to(SPP_OK));
+    assert_that(SPP_Service_register(&k_stubDesc, &ctx, NULL), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Service_register, count_increments)
@@ -117,8 +117,8 @@ Ensure(SPP_Service_lifecycle, initAll_propagates_error)
 {
     StubCtx_t ctx = {0};
     SPP_Service_register(&k_failDesc, &ctx, NULL);
-    retval_t ret = SPP_Service_initAll();
-    assert_that(ret, is_equal_to(SPP_ERROR));
+    SPP_RetVal_t ret = SPP_Service_initAll();
+    assert_that(ret, is_equal_to(K_SPP_ERROR));
 }
 
 /* ----------------------------------------------------------------

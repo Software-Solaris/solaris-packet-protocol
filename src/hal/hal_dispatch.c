@@ -8,6 +8,7 @@
 #include "spp/hal/storage.h"
 #include "spp/core/core.h"
 #include "spp/core/returntypes.h"
+#include "spp/core/error.h"
 
 /* ----------------------------------------------------------------
  * Internal helper
@@ -22,17 +23,17 @@ static inline const SPP_HalPort_t *getPort(void)
  * SPI dispatch
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Hal_spiBusInit(void)
+SPP_RetVal_t SPP_HAL_spiBusInit(void)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->spiBusInit == NULL))
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     return p_port->spiBusInit();
 }
 
-void *SPP_Hal_spiGetHandle(spp_uint8_t deviceIdx)
+void *SPP_HAL_spiGetHandle(spp_uint8_t deviceIdx)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->spiGetHandle == NULL))
@@ -42,23 +43,23 @@ void *SPP_Hal_spiGetHandle(spp_uint8_t deviceIdx)
     return p_port->spiGetHandle(deviceIdx);
 }
 
-retval_t SPP_Hal_spiDeviceInit(void *p_handle)
+SPP_RetVal_t SPP_HAL_spiDeviceInit(void *p_handle)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->spiDeviceInit == NULL))
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     return p_port->spiDeviceInit(p_handle);
 }
 
-retval_t SPP_Hal_spiTransmit(void *p_handle, spp_uint8_t *p_data,
+SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data,
                                spp_uint8_t length)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->spiTransmit == NULL))
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     return p_port->spiTransmit(p_handle, p_data, length);
 }
@@ -67,23 +68,23 @@ retval_t SPP_Hal_spiTransmit(void *p_handle, spp_uint8_t *p_data,
  * GPIO dispatch
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Hal_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
+SPP_RetVal_t SPP_HAL_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
                                       spp_uint32_t pull)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->gpioConfigInterrupt == NULL))
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     return p_port->gpioConfigInterrupt(pin, intrType, pull);
 }
 
-retval_t SPP_Hal_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
+SPP_RetVal_t SPP_HAL_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->gpioRegisterIsr == NULL))
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     return p_port->gpioRegisterIsr(pin, p_isrCtx);
 }
@@ -92,30 +93,30 @@ retval_t SPP_Hal_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
  * Storage dispatch
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Hal_storageMount(void *p_cfg)
+SPP_RetVal_t SPP_HAL_storageMount(void *p_cfg)
 {
     const SPP_HalPort_t *p_port = getPort();
     if (p_port == NULL)
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     if (p_port->storageMount == NULL)
     {
-        return SPP_OK; /* Optional — treat as no-op. */
+        return K_SPP_OK; /* Optional — treat as no-op. */
     }
     return p_port->storageMount(p_cfg);
 }
 
-retval_t SPP_Hal_storageUnmount(void *p_cfg)
+SPP_RetVal_t SPP_HAL_storageUnmount(void *p_cfg)
 {
     const SPP_HalPort_t *p_port = getPort();
     if (p_port == NULL)
     {
-        return SPP_ERROR_NO_PORT;
+        SPP_ERR_RETURN(K_SPP_ERROR_NO_PORT);
     }
     if (p_port->storageUnmount == NULL)
     {
-        return SPP_OK;
+        return K_SPP_OK;
     }
     return p_port->storageUnmount(p_cfg);
 }

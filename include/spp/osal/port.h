@@ -88,9 +88,9 @@ typedef struct
      * @param[in] p_item     Pointer to the item to copy in.
      * @param[in] timeoutMs  Max wait time; 0 = non-blocking.
      *
-     * @return SPP_OK on success, SPP_ERROR on timeout or full queue.
+     * @return K_SPP_OK on success, K_SPP_ERROR on timeout or full queue.
      */
-    retval_t (*queueSend)(void *p_q, const void *p_item,
+    SPP_RetVal_t (*queueSend)(void *p_q, const void *p_item,
                           spp_uint32_t timeoutMs);
 
     /**
@@ -100,9 +100,9 @@ typedef struct
      * @param[out] p_item     Buffer to copy the item into.
      * @param[in]  timeoutMs  Max wait time; 0 = non-blocking.
      *
-     * @return SPP_OK on success, SPP_ERROR on timeout or empty queue.
+     * @return K_SPP_OK on success, K_SPP_ERROR on timeout or empty queue.
      */
-    retval_t (*queueRecv)(void *p_q, void *p_item, spp_uint32_t timeoutMs);
+    SPP_RetVal_t (*queueRecv)(void *p_q, void *p_item, spp_uint32_t timeoutMs);
 
     /**
      * @brief Return the number of items currently waiting in the queue.
@@ -128,18 +128,18 @@ typedef struct
      * @param[in] p_m        Mutex handle.
      * @param[in] timeoutMs  Max wait time; 0 = non-blocking.
      *
-     * @return SPP_OK on success, SPP_ERROR on timeout.
+     * @return K_SPP_OK on success, K_SPP_ERROR on timeout.
      */
-    retval_t (*mutexLock)(void *p_m, spp_uint32_t timeoutMs);
+    SPP_RetVal_t (*mutexLock)(void *p_m, spp_uint32_t timeoutMs);
 
     /**
      * @brief Release a mutex.
      *
      * @param[in] p_m  Mutex handle.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*mutexUnlock)(void *p_m);
+    SPP_RetVal_t (*mutexUnlock)(void *p_m);
 
     /* ---- Event groups ------------------------------------------ */
 
@@ -160,9 +160,9 @@ typedef struct
      * @param[in]  timeoutMs    Max wait time; 0 = non-blocking.
      * @param[out] p_actualBits Bits set at the time of return (may be NULL).
      *
-     * @return SPP_OK when the condition is satisfied, SPP_ERROR_TIMEOUT otherwise.
+     * @return K_SPP_OK when the condition is satisfied, K_SPP_ERROR_TIMEOUT otherwise.
      */
-    retval_t (*eventWait)(void *p_e, spp_uint32_t bits,
+    SPP_RetVal_t (*eventWait)(void *p_e, spp_uint32_t bits,
                           spp_bool_t clearOnExit, spp_bool_t waitAll,
                           spp_uint32_t timeoutMs,
                           spp_uint32_t *p_actualBits);
@@ -175,9 +175,9 @@ typedef struct
      * @param[out] p_prev   Previous bit value (may be NULL).
      * @param[out] p_yield  Set to true if a higher-priority task was unblocked.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*eventSetFromIsr)(void *p_e, spp_uint32_t bits,
+    SPP_RetVal_t (*eventSetFromIsr)(void *p_e, spp_uint32_t bits,
                                 spp_uint32_t *p_prev,
                                 spp_bool_t   *p_yield);
 

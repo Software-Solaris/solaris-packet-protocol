@@ -48,11 +48,11 @@ typedef struct
  *
  * Zeroes all packets and rebuilds the free stack.  Safe to call multiple
  * times; subsequent calls are no-ops and return
- * @c SPP_ERROR_ALREADY_INITIALIZED.
+ * @c K_SPP_ERROR_ALREADY_INITIALIZED.
  *
- * @return SPP_OK on success, SPP_ERROR_ALREADY_INITIALIZED if already done.
+ * @return K_SPP_OK on success, K_SPP_ERROR_ALREADY_INITIALIZED if already done.
  */
-retval_t SPP_Databank_init(void);
+SPP_RetVal_t SPP_Databank_init(void);
 
 /**
  * @brief Acquire a free packet from the pool.
@@ -69,12 +69,12 @@ SPP_Packet_t *SPP_Databank_getPacket(void);
  *
  * @param[in] p_packet  Pointer previously returned by @ref SPP_Databank_getPacket().
  *
- * @return SPP_OK on success.
- * @return SPP_ERROR_NULL_POINTER if @p p_packet is NULL.
- * @return SPP_ERROR if @p p_packet is not a valid pool address (double-return guard).
- * @return SPP_ERROR_ALREADY_INITIALIZED if the packet is already in the free list.
+ * @return K_SPP_OK on success.
+ * @return K_SPP_ERROR_NULL_POINTER if @p p_packet is NULL.
+ * @return K_SPP_ERROR if @p p_packet is not a valid pool address (double-return guard).
+ * @return K_SPP_ERROR_ALREADY_INITIALIZED if the packet is already in the free list.
  */
-retval_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet);
+SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet);
 
 /**
  * @brief Return the number of free packets currently available.

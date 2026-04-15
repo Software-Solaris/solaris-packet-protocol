@@ -37,9 +37,9 @@ typedef struct
      *
      * May be called multiple times; subsequent calls must be no-ops.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*spiBusInit)(void);
+    SPP_RetVal_t (*spiBusInit)(void);
 
     /**
      * @brief Obtain the handle for the next SPI device slot.
@@ -58,9 +58,9 @@ typedef struct
      *
      * @param[in] p_handle  Handle returned by @c spiGetHandle.
      *
-     * @return SPP_OK on success, SPP_ERROR_NULL_POINTER if handle is NULL.
+     * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if handle is NULL.
      */
-    retval_t (*spiDeviceInit)(void *p_handle);
+    SPP_RetVal_t (*spiDeviceInit)(void *p_handle);
 
     /**
      * @brief Perform a full-duplex SPI transaction.
@@ -72,9 +72,9 @@ typedef struct
      * @param[in,out] p_data    TX data in, RX data out.
      * @param[in]     length    Number of bytes in the transaction.
      *
-     * @return SPP_OK on success, SPP_ERROR_ON_SPI_TRANSACTION on failure.
+     * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
      */
-    retval_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data,
+    SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data,
                              spp_uint8_t length);
 
     /* ---- GPIO / interrupts ------------------------------------- */
@@ -86,9 +86,9 @@ typedef struct
      * @param[in] intrType  Platform-specific interrupt trigger type.
      * @param[in] pull      Pull resistor: 0 = none, 1 = pull-up, 2 = pull-down.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType,
+    SPP_RetVal_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType,
                                     spp_uint32_t pull);
 
     /**
@@ -97,9 +97,9 @@ typedef struct
      * @param[in] pin        GPIO pin number.
      * @param[in] p_isrCtx   Pointer to @ref SPP_GpioIsrCtx_t for this pin.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
+    SPP_RetVal_t (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
 
     /* ---- Storage (optional) ------------------------------------ */
 
@@ -108,18 +108,18 @@ typedef struct
      *
      * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t.
      *
-     * @return SPP_OK on success, SPP_ERROR on failure.
+     * @return K_SPP_OK on success, K_SPP_ERROR on failure.
      */
-    retval_t (*storageMount)(void *p_cfg);
+    SPP_RetVal_t (*storageMount)(void *p_cfg);
 
     /**
      * @brief Unmount the storage filesystem.  NULL if storage is not used.
      *
      * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*storageUnmount)(void *p_cfg);
+    SPP_RetVal_t (*storageUnmount)(void *p_cfg);
 
     /* ---- Time -------------------------------------------------- */
 

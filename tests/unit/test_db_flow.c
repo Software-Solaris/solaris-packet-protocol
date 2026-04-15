@@ -25,13 +25,13 @@ AfterEach(SPP_DbFlow_init)  {}
 
 Ensure(SPP_DbFlow_init, succeeds_on_first_call)
 {
-    assert_that(SPP_DbFlow_init(), is_equal_to(SPP_OK));
+    assert_that(SPP_DbFlow_init(), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_DbFlow_init, returns_already_initialized_on_second_call)
 {
     SPP_DbFlow_init();
-    assert_that(SPP_DbFlow_init(), is_equal_to(SPP_ERROR_ALREADY_INITIALIZED));
+    assert_that(SPP_DbFlow_init(), is_equal_to(K_SPP_ERROR_ALREADY_INITIALIZED));
 }
 
 Ensure(SPP_DbFlow_init, fifo_is_empty_after_init)
@@ -55,7 +55,7 @@ AfterEach(SPP_DbFlow_pushReady) {}
 Ensure(SPP_DbFlow_pushReady, returns_ok_for_valid_packet)
 {
     SPP_Packet_t *p_pkt = SPP_Databank_getPacket();
-    assert_that(SPP_DbFlow_pushReady(p_pkt), is_equal_to(SPP_OK));
+    assert_that(SPP_DbFlow_pushReady(p_pkt), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_DbFlow_pushReady, increments_ready_count)
@@ -67,7 +67,7 @@ Ensure(SPP_DbFlow_pushReady, increments_ready_count)
 
 Ensure(SPP_DbFlow_pushReady, rejects_null_packet)
 {
-    assert_that(SPP_DbFlow_pushReady(NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_DbFlow_pushReady(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_DbFlow_pushReady, returns_error_when_fifo_full)
@@ -76,11 +76,11 @@ Ensure(SPP_DbFlow_pushReady, returns_error_when_fifo_full)
     SPP_Packet_t fakePackets[K_SPP_DBFLOW_READY_SIZE];
     for (spp_uint32_t i = 0U; i < K_SPP_DBFLOW_READY_SIZE; i++)
     {
-        assert_that(SPP_DbFlow_pushReady(&fakePackets[i]), is_equal_to(SPP_OK));
+        assert_that(SPP_DbFlow_pushReady(&fakePackets[i]), is_equal_to(K_SPP_OK));
     }
     /* One more should fail. */
     SPP_Packet_t extra;
-    assert_that(SPP_DbFlow_pushReady(&extra), is_equal_to(SPP_ERROR));
+    assert_that(SPP_DbFlow_pushReady(&extra), is_equal_to(K_SPP_ERROR));
 }
 
 /* ----------------------------------------------------------------
@@ -101,8 +101,8 @@ Ensure(SPP_DbFlow_popReady, returns_pushed_packet)
     SPP_DbFlow_pushReady(p_pushed);
 
     SPP_Packet_t *p_popped = NULL;
-    retval_t ret = SPP_DbFlow_popReady(&p_popped);
-    assert_that(ret, is_equal_to(SPP_OK));
+    SPP_RetVal_t ret = SPP_DbFlow_popReady(&p_popped);
+    assert_that(ret, is_equal_to(K_SPP_OK));
     assert_that(p_popped, is_equal_to(p_pushed));
 }
 
@@ -119,13 +119,13 @@ Ensure(SPP_DbFlow_popReady, rejects_null_out_pointer)
 {
     SPP_Packet_t dummy;
     SPP_DbFlow_pushReady(&dummy);
-    assert_that(SPP_DbFlow_popReady(NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_DbFlow_popReady(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_DbFlow_popReady, returns_not_enough_packets_when_empty)
 {
     SPP_Packet_t *p_out = NULL;
-    assert_that(SPP_DbFlow_popReady(&p_out), is_equal_to(SPP_NOT_ENOUGH_PACKETS));
+    assert_that(SPP_DbFlow_popReady(&p_out), is_equal_to(K_SPP_NOT_ENOUGH_PACKETS));
     assert_that(p_out, is_null);
 }
 

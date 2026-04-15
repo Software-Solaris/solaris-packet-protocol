@@ -7,7 +7,7 @@
  *
  * Naming conventions used in this file:
  * - Types: SPP_GpioIsrCtx_t
- * - Public functions: SPP_Osal_event*()
+ * - Public functions: SPP_OSAL_event*()
  * - Pointer parameters: p_*
  */
 
@@ -24,12 +24,12 @@
 /**
  * @brief Context structure passed to a GPIO ISR.
  *
- * The ISR uses this to call @ref SPP_Osal_eventSetFromIsr() with the
+ * The ISR uses this to call @ref SPP_OSAL_eventSetFromIsr() with the
  * correct event group handle and bit mask.
  */
 typedef struct
 {
-    void         *p_eventGroup; /**< Event group handle created by SPP_Osal_eventCreate(). */
+    void         *p_eventGroup; /**< Event group handle created by SPP_OSAL_eventCreate(). */
     spp_uint32_t  bits;         /**< Bitmask of event bits to set from the ISR.            */
 } SPP_GpioIsrCtx_t;
 
@@ -42,7 +42,7 @@ typedef struct
  *
  * @return Opaque event group handle on success, NULL on failure.
  */
-void *SPP_Osal_eventCreate(void);
+void *SPP_OSAL_eventCreate(void);
 
 /**
  * @brief Wait for event bits from a task context.
@@ -54,9 +54,9 @@ void *SPP_Osal_eventCreate(void);
  * @param[in]  timeoutMs    Maximum wait time in ms.
  * @param[out] p_actualBits Bits set at the time of return (may be NULL).
  *
- * @return SPP_OK when satisfied, SPP_ERROR_TIMEOUT otherwise.
+ * @return K_SPP_OK when satisfied, K_SPP_ERROR_TIMEOUT otherwise.
  */
-retval_t SPP_Osal_eventWait(void *p_e, spp_uint32_t bits,
+SPP_RetVal_t SPP_OSAL_eventWait(void *p_e, spp_uint32_t bits,
                               spp_bool_t clearOnExit, spp_bool_t waitAll,
                               spp_uint32_t timeoutMs,
                               spp_uint32_t *p_actualBits);
@@ -70,9 +70,9 @@ retval_t SPP_Osal_eventWait(void *p_e, spp_uint32_t bits,
  * @param[out] p_yield  Set to true if a higher-priority task was unblocked
  *                      (caller should trigger a context switch).
  *
- * @return SPP_OK on success.
+ * @return K_SPP_OK on success.
  */
-retval_t SPP_Osal_eventSetFromIsr(void *p_e, spp_uint32_t bits,
+SPP_RetVal_t SPP_OSAL_eventSetFromIsr(void *p_e, spp_uint32_t bits,
                                    spp_uint32_t *p_prev,
                                    spp_bool_t   *p_yield);
 

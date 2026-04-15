@@ -3,7 +3,7 @@
  * @brief SPP storage HAL API — dispatches through the registered HAL port.
  *
  * Naming conventions used in this file:
- * - Public functions: SPP_Hal_storage*()
+ * - Public functions: SPP_HAL_storage*()
  * - Pointer parameters: p_*
  */
 
@@ -24,9 +24,9 @@
  *
  * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t with mount parameters.
  *
- * @return SPP_OK on success, SPP_ERROR on failure.
+ * @return K_SPP_OK on success, K_SPP_ERROR on failure.
  */
-retval_t SPP_Hal_storageMount(void *p_cfg);
+SPP_RetVal_t SPP_HAL_storageMount(void *p_cfg);
 
 /**
  * @brief Unmount the storage filesystem.
@@ -35,8 +35,8 @@ retval_t SPP_Hal_storageMount(void *p_cfg);
  *
  * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t.
  *
- * @return SPP_OK on success.
+ * @return K_SPP_OK on success.
  */
-retval_t SPP_Hal_storageUnmount(void *p_cfg);
+SPP_RetVal_t SPP_HAL_storageUnmount(void *p_cfg);
 
 #endif /* SPP_HAL_STORAGE_H */

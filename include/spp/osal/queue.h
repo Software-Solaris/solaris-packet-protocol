@@ -3,7 +3,7 @@
  * @brief SPP message queue API — dispatches through the registered OSAL port.
  *
  * Naming conventions used in this file:
- * - Public functions: SPP_Osal_queue*()
+ * - Public functions: SPP_OSAL_queue*()
  * - Pointer parameters: p_*
  */
 
@@ -25,7 +25,7 @@
  *
  * @return Opaque queue handle on success, NULL on failure.
  */
-void *SPP_Osal_queueCreate(spp_uint32_t len, spp_uint32_t itemSize);
+void *SPP_OSAL_queueCreate(spp_uint32_t len, spp_uint32_t itemSize);
 
 /**
  * @brief Send (enqueue) an item — copy semantics.
@@ -34,9 +34,9 @@ void *SPP_Osal_queueCreate(spp_uint32_t len, spp_uint32_t itemSize);
  * @param[in] p_item     Pointer to the item to copy.
  * @param[in] timeoutMs  Maximum time to wait if the queue is full (ms).
  *
- * @return SPP_OK on success, SPP_ERROR on timeout or full queue.
+ * @return K_SPP_OK on success, K_SPP_ERROR on timeout or full queue.
  */
-retval_t SPP_Osal_queueSend(void *p_q, const void *p_item,
+SPP_RetVal_t SPP_OSAL_queueSend(void *p_q, const void *p_item,
                               spp_uint32_t timeoutMs);
 
 /**
@@ -46,9 +46,9 @@ retval_t SPP_Osal_queueSend(void *p_q, const void *p_item,
  * @param[out] p_item     Buffer to copy the item into.
  * @param[in]  timeoutMs  Maximum time to wait if the queue is empty (ms).
  *
- * @return SPP_OK on success, SPP_ERROR on timeout or empty queue.
+ * @return K_SPP_OK on success, K_SPP_ERROR on timeout or empty queue.
  */
-retval_t SPP_Osal_queueRecv(void *p_q, void *p_item,
+SPP_RetVal_t SPP_OSAL_queueRecv(void *p_q, void *p_item,
                               spp_uint32_t timeoutMs);
 
 /**
@@ -58,6 +58,6 @@ retval_t SPP_Osal_queueRecv(void *p_q, void *p_item,
  *
  * @return Item count.
  */
-spp_uint32_t SPP_Osal_queueCount(void *p_q);
+spp_uint32_t SPP_OSAL_queueCount(void *p_q);
 
 #endif /* SPP_OSAL_QUEUE_H */

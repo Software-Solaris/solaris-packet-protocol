@@ -83,7 +83,7 @@ typedef struct
 /**
  * @brief SD card / filesystem mount configuration.
  *
- * Passed to @ref SPP_Hal_storageMount().
+ * Passed to @ref SPP_HAL_storageMount().
  */
 typedef struct
 {

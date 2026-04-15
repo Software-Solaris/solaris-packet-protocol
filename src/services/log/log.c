@@ -48,12 +48,12 @@ static void defaultOutput(const char *p_tag, SPP_LogLevel_t level,
  * Public API
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Log_init(void)
+SPP_RetVal_t SPP_Log_init(void)
 {
     s_level       = K_SPP_LOG_VERBOSE;
     s_p_outFn     = defaultOutput;
     s_initialized = true;
-    return SPP_OK;
+    return K_SPP_OK;
 }
 
 void SPP_Log_setLevel(SPP_LogLevel_t level)
