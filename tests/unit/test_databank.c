@@ -24,13 +24,13 @@ AfterEach(SPP_Databank_init)  {}
 
 Ensure(SPP_Databank_init, succeeds_on_first_call)
 {
-    assert_that(SPP_Databank_init(), is_equal_to(SPP_OK));
+    assert_that(SPP_Databank_init(), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Databank_init, returns_already_initialized_on_second_call)
 {
     SPP_Databank_init(); /* First — may or may not be first in process. */
-    assert_that(SPP_Databank_init(), is_equal_to(SPP_ERROR_ALREADY_INITIALIZED));
+    assert_that(SPP_Databank_init(), is_equal_to(K_SPP_ERROR_ALREADY_INITIALIZED));
 }
 
 Ensure(SPP_Databank_init, pool_is_full_after_init)
@@ -96,7 +96,7 @@ AfterEach(SPP_Databank_returnPacket)  {}
 Ensure(SPP_Databank_returnPacket, returns_ok_for_valid_packet)
 {
     SPP_Packet_t *p_pkt = SPP_Databank_getPacket();
-    assert_that(SPP_Databank_returnPacket(p_pkt), is_equal_to(SPP_OK));
+    assert_that(SPP_Databank_returnPacket(p_pkt), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Databank_returnPacket, increments_free_count)
@@ -109,21 +109,21 @@ Ensure(SPP_Databank_returnPacket, increments_free_count)
 
 Ensure(SPP_Databank_returnPacket, rejects_null_pointer)
 {
-    assert_that(SPP_Databank_returnPacket(NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_Databank_returnPacket(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_Databank_returnPacket, rejects_out_of_pool_pointer)
 {
     SPP_Packet_t fake;
-    assert_that(SPP_Databank_returnPacket(&fake), is_equal_to(SPP_ERROR));
+    assert_that(SPP_Databank_returnPacket(&fake), is_equal_to(K_SPP_ERROR));
 }
 
 Ensure(SPP_Databank_returnPacket, rejects_double_return)
 {
     SPP_Packet_t *p_pkt = SPP_Databank_getPacket();
     SPP_Databank_returnPacket(p_pkt);
-    retval_t ret = SPP_Databank_returnPacket(p_pkt);
-    assert_that(ret, is_equal_to(SPP_ERROR_ALREADY_INITIALIZED));
+    SPP_RetVal_t ret = SPP_Databank_returnPacket(p_pkt);
+    assert_that(ret, is_equal_to(K_SPP_ERROR_ALREADY_INITIALIZED));
 }
 
 Ensure(SPP_Databank_returnPacket, packet_can_be_reused_after_return)

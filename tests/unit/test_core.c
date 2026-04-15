@@ -27,12 +27,12 @@ AfterEach(SPP_Core_setOsalPort)  {}
 
 Ensure(SPP_Core_setOsalPort, rejects_null_pointer)
 {
-    assert_that(SPP_Core_setOsalPort(NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_Core_setOsalPort(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_Core_setOsalPort, accepts_valid_port)
 {
-    assert_that(SPP_Core_setOsalPort(&g_posixOsalPort), is_equal_to(SPP_OK));
+    assert_that(SPP_Core_setOsalPort(&g_posixOsalPort), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Core_setOsalPort, getOsalPort_returns_registered_port)
@@ -51,12 +51,12 @@ AfterEach(SPP_Core_setHalPort)  {}
 
 Ensure(SPP_Core_setHalPort, rejects_null_pointer)
 {
-    assert_that(SPP_Core_setHalPort(NULL), is_equal_to(SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_Core_setHalPort(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
 Ensure(SPP_Core_setHalPort, accepts_valid_port)
 {
-    assert_that(SPP_Core_setHalPort(&g_stubHalPort), is_equal_to(SPP_OK));
+    assert_that(SPP_Core_setHalPort(&g_stubHalPort), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Core_setHalPort, getHalPort_returns_registered_port)
@@ -87,14 +87,14 @@ Ensure(SPP_Core_init, fails_when_osal_port_missing)
      * simulate by setting hal to NULL instead. */
     SPP_Core_setHalPort(NULL);
     /* Now hal is NULL → init must fail. */
-    retval_t ret = SPP_Core_init();
-    assert_that(ret, is_equal_to(SPP_ERROR_NOT_INITIALIZED));
+    SPP_RetVal_t ret = SPP_Core_init();
+    assert_that(ret, is_equal_to(K_SPP_ERROR_NOT_INITIALIZED));
 }
 
 Ensure(SPP_Core_init, succeeds_with_both_ports_registered)
 {
-    retval_t ret = SPP_Core_init();
-    assert_that(ret, is_equal_to(SPP_OK));
+    SPP_RetVal_t ret = SPP_Core_init();
+    assert_that(ret, is_equal_to(K_SPP_OK));
 }
 
 /* ----------------------------------------------------------------

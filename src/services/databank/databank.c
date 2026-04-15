@@ -5,6 +5,7 @@
 
 #include "spp/services/databank.h"
 #include "spp/core/returntypes.h"
+#include "spp/core/error.h"
 
 #include <string.h>
 
@@ -25,11 +26,11 @@ static spp_bool_t s_initialized = false;
  * Public API
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Databank_init(void)
+SPP_RetVal_t SPP_Databank_init(void)
 {
     if (s_initialized)
     {
-        return SPP_ERROR_ALREADY_INITIALIZED;
+        SPP_ERR_RETURN(K_SPP_ERROR_ALREADY_INITIALIZED);
     }
 
     memset(s_packets, 0, sizeof(s_packets));
@@ -42,7 +43,7 @@ retval_t SPP_Databank_init(void)
     }
 
     s_initialized = true;
-    return SPP_OK;
+    return K_SPP_OK;
 }
 
 SPP_Packet_t *SPP_Databank_getPacket(void)
@@ -56,18 +57,18 @@ SPP_Packet_t *SPP_Databank_getPacket(void)
     return s_databank.p_freePackets[s_databank.freeCount];
 }
 
-retval_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
+SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
 {
     if (p_packet == NULL)
     {
-        return SPP_ERROR_NULL_POINTER;
+        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
     }
 
     /* Validate that the pointer belongs to the static pool. */
     if ((p_packet < &s_packets[0]) ||
         (p_packet > &s_packets[K_SPP_DATABANK_SIZE - 1U]))
     {
-        return SPP_ERROR;
+        SPP_ERR_RETURN(K_SPP_ERROR);
     }
 
     /* Guard against double-return. */
@@ -75,18 +76,18 @@ retval_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
     {
         if (s_databank.p_freePackets[i] == p_packet)
         {
-            return SPP_ERROR_ALREADY_INITIALIZED; /* Already in free list. */
+            SPP_ERR_RETURN(K_SPP_ERROR_ALREADY_INITIALIZED); /* Already in free list. */
         }
     }
 
     if (s_databank.freeCount >= K_SPP_DATABANK_SIZE)
     {
-        return SPP_ERROR; /* Pool is already full — should not happen. */
+        SPP_ERR_RETURN(K_SPP_ERROR); /* Pool is already full — should not happen. */
     }
 
     s_databank.p_freePackets[s_databank.freeCount] = p_packet;
     s_databank.freeCount++;
-    return SPP_OK;
+    return K_SPP_OK;
 }
 
 spp_uint32_t SPP_Databank_freeCount(void)

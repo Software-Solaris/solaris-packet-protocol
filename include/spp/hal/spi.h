@@ -3,7 +3,7 @@
  * @brief SPP SPI HAL API — dispatches through the registered HAL port.
  *
  * Naming conventions used in this file:
- * - Public functions: SPP_Hal_spi*()
+ * - Public functions: SPP_HAL_spi*()
  * - Pointer parameters: p_*
  */
 
@@ -22,9 +22,9 @@
  *
  * Safe to call multiple times; subsequent calls are no-ops.
  *
- * @return SPP_OK on success.
+ * @return K_SPP_OK on success.
  */
-retval_t SPP_Hal_spiBusInit(void);
+SPP_RetVal_t SPP_HAL_spiBusInit(void);
 
 /**
  * @brief Obtain the SPI device handle for the given device index.
@@ -33,16 +33,16 @@ retval_t SPP_Hal_spiBusInit(void);
  *
  * @return Opaque handle on success, NULL if index is out of range.
  */
-void *SPP_Hal_spiGetHandle(spp_uint8_t deviceIdx);
+void *SPP_HAL_spiGetHandle(spp_uint8_t deviceIdx);
 
 /**
  * @brief Initialise a specific SPI device.
  *
- * @param[in] p_handle  Handle returned by @ref SPP_Hal_spiGetHandle().
+ * @param[in] p_handle  Handle returned by @ref SPP_HAL_spiGetHandle().
  *
- * @return SPP_OK on success, SPP_ERROR_NULL_POINTER if handle is NULL.
+ * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if handle is NULL.
  */
-retval_t SPP_Hal_spiDeviceInit(void *p_handle);
+SPP_RetVal_t SPP_HAL_spiDeviceInit(void *p_handle);
 
 /**
  * @brief Perform a full-duplex SPI transaction.
@@ -51,9 +51,9 @@ retval_t SPP_Hal_spiDeviceInit(void *p_handle);
  * @param[in,out] p_data    TX data in, RX data out (in-place).
  * @param[in]     length    Number of bytes in the transaction.
  *
- * @return SPP_OK on success, SPP_ERROR_ON_SPI_TRANSACTION on failure.
+ * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
  */
-retval_t SPP_Hal_spiTransmit(void *p_handle, spp_uint8_t *p_data,
+SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data,
                                spp_uint8_t length);
 
 #endif /* SPP_HAL_SPI_H */

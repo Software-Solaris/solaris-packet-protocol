@@ -4,6 +4,7 @@
  */
 
 #include "spp/services/service.h"
+#include "spp/core/error.h"
 #include "spp/services/log.h"
 
 #include <string.h>
@@ -28,18 +29,18 @@ static spp_uint32_t   s_count = 0U;
  * Public API
  * ---------------------------------------------------------------- */
 
-retval_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
+SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
                                void *p_ctx, const void *p_cfg)
 {
     if ((p_desc == NULL) || (p_ctx == NULL))
     {
-        return SPP_ERROR_NULL_POINTER;
+        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
     }
 
     if (s_count >= K_SPP_MAX_SERVICES)
     {
         SPP_LOGE(k_tag, "Registry full — cannot register '%s'", p_desc->p_name);
-        return SPP_ERROR_REGISTRY_FULL;
+        SPP_ERR_RETURN(K_SPP_ERROR_REGISTRY_FULL);
     }
 
     s_registry[s_count].p_desc = p_desc;
@@ -48,12 +49,12 @@ retval_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
     s_count++;
 
     SPP_LOGI(k_tag, "Registered service '%s' (apid=0x%04X)", p_desc->p_name, p_desc->apid);
-    return SPP_OK;
+    return K_SPP_OK;
 }
 
-retval_t SPP_Service_initAll(void)
+SPP_RetVal_t SPP_Service_initAll(void)
 {
-    retval_t result = SPP_OK;
+    SPP_RetVal_t result = K_SPP_OK;
 
     for (spp_uint32_t i = 0U; i < s_count; i++)
     {
@@ -63,8 +64,8 @@ retval_t SPP_Service_initAll(void)
             continue;
         }
 
-        retval_t ret = p_entry->p_desc->init(p_entry->p_ctx, p_entry->p_cfg);
-        if (ret != SPP_OK)
+        SPP_RetVal_t ret = p_entry->p_desc->init(p_entry->p_ctx, p_entry->p_cfg);
+        if (ret != K_SPP_OK)
         {
             SPP_LOGE(k_tag, "Service '%s' init failed (%d)",
                      p_entry->p_desc->p_name, (int)ret);
@@ -74,9 +75,9 @@ retval_t SPP_Service_initAll(void)
     return result;
 }
 
-retval_t SPP_Service_startAll(void)
+SPP_RetVal_t SPP_Service_startAll(void)
 {
-    retval_t result = SPP_OK;
+    SPP_RetVal_t result = K_SPP_OK;
 
     for (spp_uint32_t i = 0U; i < s_count; i++)
     {
@@ -86,8 +87,8 @@ retval_t SPP_Service_startAll(void)
             continue;
         }
 
-        retval_t ret = p_entry->p_desc->start(p_entry->p_ctx);
-        if (ret != SPP_OK)
+        SPP_RetVal_t ret = p_entry->p_desc->start(p_entry->p_ctx);
+        if (ret != K_SPP_OK)
         {
             SPP_LOGE(k_tag, "Service '%s' start failed (%d)",
                      p_entry->p_desc->p_name, (int)ret);
@@ -97,9 +98,9 @@ retval_t SPP_Service_startAll(void)
     return result;
 }
 
-retval_t SPP_Service_stopAll(void)
+SPP_RetVal_t SPP_Service_stopAll(void)
 {
-    retval_t result = SPP_OK;
+    SPP_RetVal_t result = K_SPP_OK;
 
     /* Stop in reverse registration order. */
     for (spp_uint32_t i = s_count; i > 0U; i--)
@@ -110,8 +111,8 @@ retval_t SPP_Service_stopAll(void)
             continue;
         }
 
-        retval_t ret = p_entry->p_desc->stop(p_entry->p_ctx);
-        if (ret != SPP_OK)
+        SPP_RetVal_t ret = p_entry->p_desc->stop(p_entry->p_ctx);
+        if (ret != K_SPP_OK)
         {
             SPP_LOGE(k_tag, "Service '%s' stop failed (%d)",
                      p_entry->p_desc->p_name, (int)ret);

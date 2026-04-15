@@ -33,7 +33,7 @@
  * @brief Disable RTOS task and synchronisation primitives.
  *
  * When set, the cooperative bare-metal scheduler is used instead.
- * Services must not block; they yield via SPP_Osal_taskDelayMs().
+ * Services must not block; they yield via SPP_OSAL_taskDelayMs().
  */
 #ifndef SPP_NO_RTOS
 #define SPP_NO_RTOS 0
@@ -42,7 +42,7 @@
 /**
  * @brief Disable SD card / filesystem storage support.
  *
- * When set, the storage HAL stubs return SPP_OK without doing anything.
+ * When set, the storage HAL stubs return K_SPP_OK without doing anything.
  */
 #ifndef SPP_NO_STORAGE
 #define SPP_NO_STORAGE 0

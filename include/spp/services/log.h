@@ -60,9 +60,9 @@ typedef void (*SPP_LogOutputFn_t)(const char *p_tag, SPP_LogLevel_t level,
  * Sets the default level to K_SPP_LOG_VERBOSE and registers a stdout
  * callback.  Safe to call multiple times.
  *
- * @return SPP_OK on success.
+ * @return K_SPP_OK on success.
  */
-retval_t SPP_Log_init(void);
+SPP_RetVal_t SPP_Log_init(void);
 
 /**
  * @brief Set the global log level filter.

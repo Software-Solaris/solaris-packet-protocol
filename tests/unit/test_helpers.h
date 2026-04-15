@@ -23,7 +23,7 @@ extern const SPP_HalPort_t  g_stubHalPort;
  * below where each test suite re-links a fresh translation unit.
  *
  * For simplicity in these unit tests we call each module's init() and rely
- * on the SPP_ERROR_ALREADY_INITIALIZED guard, then reset by relinking.
+ * on the K_SPP_ERROR_ALREADY_INITIALIZED guard, then reset by relinking.
  * The CMakeLists compiles each test binary with its own object copy.
  */
 static inline void sppTestSetup(void)

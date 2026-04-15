@@ -3,7 +3,7 @@
  * @brief SPP mutex API — dispatches through the registered OSAL port.
  *
  * Naming conventions used in this file:
- * - Public functions: SPP_Osal_mutex*()
+ * - Public functions: SPP_OSAL_mutex*()
  * - Pointer parameters: p_*
  */
 
@@ -22,7 +22,7 @@
  *
  * @return Opaque mutex handle on success, NULL on failure.
  */
-void *SPP_Osal_mutexCreate(void);
+void *SPP_OSAL_mutexCreate(void);
 
 /**
  * @brief Acquire the mutex.
@@ -30,17 +30,17 @@ void *SPP_Osal_mutexCreate(void);
  * @param[in] p_m        Mutex handle.
  * @param[in] timeoutMs  Maximum wait time in ms; 0 = non-blocking.
  *
- * @return SPP_OK on success, SPP_ERROR on timeout.
+ * @return K_SPP_OK on success, K_SPP_ERROR on timeout.
  */
-retval_t SPP_Osal_mutexLock(void *p_m, spp_uint32_t timeoutMs);
+SPP_RetVal_t SPP_OSAL_mutexLock(void *p_m, spp_uint32_t timeoutMs);
 
 /**
  * @brief Release the mutex.
  *
  * @param[in] p_m  Mutex handle.
  *
- * @return SPP_OK on success.
+ * @return K_SPP_OK on success.
  */
-retval_t SPP_Osal_mutexUnlock(void *p_m);
+SPP_RetVal_t SPP_OSAL_mutexUnlock(void *p_m);
 
 #endif /* SPP_OSAL_MUTEX_H */

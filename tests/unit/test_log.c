@@ -50,7 +50,7 @@ AfterEach(SPP_Log_init)  {}
 
 Ensure(SPP_Log_init, returns_ok)
 {
-    assert_that(SPP_Log_init(), is_equal_to(SPP_OK));
+    assert_that(SPP_Log_init(), is_equal_to(K_SPP_OK));
 }
 
 Ensure(SPP_Log_init, sets_verbose_level_by_default)

@@ -56,36 +56,36 @@ typedef struct
      * @param[out] p_ctx  Pointer to the service's opaque context buffer.
      * @param[in]  p_cfg  Pointer to the service configuration struct.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*init)(void *p_ctx, const void *p_cfg);
+    SPP_RetVal_t (*init)(void *p_ctx, const void *p_cfg);
 
     /**
      * @brief Start the service (e.g. create its task).
      *
      * @param[in] p_ctx  Service context.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*start)(void *p_ctx);
+    SPP_RetVal_t (*start)(void *p_ctx);
 
     /**
      * @brief Stop the service gracefully.
      *
      * @param[in] p_ctx  Service context.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*stop)(void *p_ctx);
+    SPP_RetVal_t (*stop)(void *p_ctx);
 
     /**
      * @brief Release all resources held by the service.
      *
      * @param[in] p_ctx  Service context.
      *
-     * @return SPP_OK on success.
+     * @return K_SPP_OK on success.
      */
-    retval_t (*deinit)(void *p_ctx);
+    SPP_RetVal_t (*deinit)(void *p_ctx);
 
 } SPP_ServiceDesc_t;
 
@@ -105,32 +105,32 @@ typedef struct
  *                    (must be at least @c p_desc->ctxSize bytes).
  * @param[in] p_cfg   Pointer to the caller-allocated configuration struct.
  *
- * @return SPP_OK on success, SPP_ERROR_REGISTRY_FULL if the registry is full.
+ * @return K_SPP_OK on success, K_SPP_ERROR_REGISTRY_FULL if the registry is full.
  */
-retval_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
+SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
                                void *p_ctx, const void *p_cfg);
 
 /**
  * @brief Call @c init on all registered services in registration order.
  *
- * @return SPP_OK if all services initialised successfully; the first error
+ * @return K_SPP_OK if all services initialised successfully; the first error
  *         code encountered otherwise (remaining services are still attempted).
  */
-retval_t SPP_Service_initAll(void);
+SPP_RetVal_t SPP_Service_initAll(void);
 
 /**
  * @brief Call @c start on all registered services in registration order.
  *
- * @return SPP_OK if all services started successfully.
+ * @return K_SPP_OK if all services started successfully.
  */
-retval_t SPP_Service_startAll(void);
+SPP_RetVal_t SPP_Service_startAll(void);
 
 /**
  * @brief Call @c stop on all registered services in reverse order.
  *
- * @return SPP_OK if all services stopped successfully.
+ * @return K_SPP_OK if all services stopped successfully.
  */
-retval_t SPP_Service_stopAll(void);
+SPP_RetVal_t SPP_Service_stopAll(void);
 
 /**
  * @brief Return the number of currently registered services.
