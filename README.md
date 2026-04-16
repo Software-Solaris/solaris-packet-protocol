@@ -1,6 +1,34 @@
 # Solaris Packet Protocol (SPP)
 
-SPP is a small, portable C library for packaging and routing sensor data as structured packets. It has no dynamic memory allocation (`malloc` is never called) — all buffers are statically declared at compile time. The same core library runs on an ESP32 microcontroller and on a standard PC (for unit tests), because hardware and OS details are hidden behind two thin abstraction layers: HAL and OSAL.
+SPP is a small, portable C11 library for packaging and routing sensor data as structured packets on embedded systems. It has **no dynamic memory allocation** — all buffers are statically declared at compile time. The same core library runs on an ESP32-S3 microcontroller and on a standard Linux PC (for unit tests), because hardware and OS details are hidden behind two thin abstraction layers: **HAL** and **OSAL**.
+
+---
+
+## Architecture
+
+```
+  ┌──────────────────────────────────────────────────────────┐
+  │                      Application                         │
+  │                    main / user code                      │
+  ├──────────────────────────────────────────────────────────┤
+  │                  Sensor Services                         │
+  │        bmp390 · icm20948 · datalogger                    │
+  ├──────────────────────────────────────────────────────────┤
+  │                  SPP Services                            │
+  │      databank · db_flow · log · service registry         │
+  ├────────────────────────┬─────────────────────────────────┤
+  │          HAL           │             OSAL                │
+  │  SPI · GPIO · Storage  │  Tasks · Queues · Events        │
+  │  (contracts only)      │  (contracts only)               │
+  ├────────────────────────┴─────────────────────────────────┤
+  │                  Platform Ports                          │
+  │   ports/hal/esp32/        ports/osal/freertos/           │
+  │   ports/hal/stub/         ports/osal/baremetal/          │
+  │                           ports/osal/posix/              │
+  └──────────────────────────────────────────────────────────┘
+```
+
+HAL and OSAL are **orthogonal axes** — they are independent and mix freely. The ESP32 HAL works with the FreeRTOS OSAL, the baremetal OSAL, or any other OSAL. Porting to a new MCU means implementing the HAL for it; porting to a new OS means implementing the OSAL for it. Neither affects the other.
 
 ---
 
@@ -8,215 +36,180 @@ SPP is a small, portable C library for packaging and routing sensor data as stru
 
 ```
 spp/
-├── include/spp/          # Public headers — everything you #include
-│   ├── core/             # Packet format, portable types, error codes
-│   ├── services/         # Databank, DB Flow, logging, sensor service headers
-│   ├── hal/              # Hardware interface contracts (SPI, GPIO, storage)
-│   ├── osal/             # OS interface contracts (tasks, queues, mutexes, events)
-│   └── util/             # CRC16, compile-time macros, structof helper
-├── src/                  # Implementations of core, services, and dispatch glue
-├── ports/                # Concrete implementations per platform
-│   ├── osal/freertos/    # FreeRTOS OSAL port (tasks, queues, event groups)
-│   ├── osal/baremetal/   # Cooperative scheduler port (no RTOS required)
-│   └── hal/esp32/        # ESP32 SPI bus, GPIO interrupts, SD card storage
-├── services/             # Optional sensor and logging services
-│   ├── bmp390/           # BMP390 pressure sensor service
-│   ├── icm20948/         # ICM20948 IMU service
-│   └── datalogger/       # SD card datalogger service
-└── tests/                # Unit tests — run on a PC, no hardware needed
+├── core/           Packet format, portable types, return codes, core init
+├── osal/           OS abstraction contract (tasks, queues, mutexes, events)
+├── hal/            Hardware abstraction contract (SPI, GPIO, storage)
+├── services/       Packet lifecycle services and sensor drivers
+│   ├── databank/   Static packet pool (producer side)
+│   ├── db_flow/    Circular FIFO routing packets to consumers
+│   ├── log/        Level-filtered logging with swappable output
+│   ├── bmp390/     BMP390 pressure / altitude sensor service
+│   ├── icm20948/   ICM20948 IMU service (accel + gyro + DMP)
+│   └── datalogger/ SD card packet logger service
+├── util/           CRC-16, compile-time flags, structof macro
+├── ports/          Concrete platform implementations
+│   ├── osal/
+│   │   ├── freertos/   FreeRTOS OSAL port
+│   │   ├── baremetal/  Cooperative scheduler OSAL (no OS required)
+│   │   └── posix/      POSIX/Linux OSAL (for host unit tests)
+│   └── hal/
+│       ├── esp32/      ESP32-S3 SPI, GPIO, SD card HAL
+│       └── stub/       No-op HAL stub (for host unit tests)
+└── tests/          Cgreen unit tests — run on a PC, no hardware needed
+    ├── core/
+    ├── services/
+    └── util/
 ```
+
+Each module directory contains its header(s) and source(s) together. There is no separate `include/` or `src/` tree.
 
 ---
 
-## Layer diagram
+## Include path
 
-```
-  ┌──────────────────────────────────────────────────────┐
-  │                    Application                       │
-  │                  main/main.c                         │
-  ├──────────────────────────────────────────────────────┤
-  │                     Services                         │
-  │   BMP390 · ICM20948 · Datalogger  (sensor services)  │
-  │   Databank · DB Flow · Logging    (SPP services)     │
-  ├──────────────────────────────────────────────────────┤
-  │                     SPP Core                         │
-  │           packet · types · returntypes               │
-  ├────────────────────────┬─────────────────────────────┤
-  │          HAL           │           OSAL              │
-  │  SPI · GPIO · Storage  │  Tasks · Queues · Events    │
-  │  (interface only)      │  (interface only)           │
-  ├────────────────────────┴─────────────────────────────┤
-  │              Platform ports                          │
-  │  ports/hal/esp32/         ports/osal/freertos/       │
-  │  ports/hal/esp32_bm/      ports/osal/baremetal/      │
-  └──────────────────────────────────────────────────────┘
-           Hardware: ESP32-S3 · SPI bus · FreeRTOS
-```
-
----
-
-## Layer explanations
-
-### Core
-
-Core defines `SPP_Packet_t`, the single data container used everywhere in the stack. A packet has a primary header (APID identifying the source, sequence number, payload length), a secondary header (timestamp, drop counter), up to 48 bytes of payload, and a CRC16 for integrity checking. Portable integer types (`spp_uint8_t`, `spp_int32_t`, etc.) and the `SPP_RetVal_t` error code enum are also defined here.
-
-### Services
-
-Three built-in SPP services handle packet lifecycle:
-
-- **Databank**: a fixed pool of 5 packets. Call `SPP_Databank_getPacket()` to lease one, fill its payload, and call `SPP_Databank_returnPacket()` when done. No `malloc` is ever called.
-- **DB Flow**: a 16-slot circular FIFO of packet pointers. Sensor tasks push with `SPP_DbFlow_pushReady()`; the logger task pops with `SPP_DbFlow_popReady()`.
-- **Logging**: level-filtered log macros `SPP_LOGI`, `SPP_LOGW`, `SPP_LOGE` that route output through a registered callback — making it easy to redirect logs to UART, a file, or a test buffer.
-
-Sensor services (BMP390, ICM20948, Datalogger) live in `services/` and use the Databank and DB Flow to produce and consume packets.
-
-### HAL
-
-HAL defines *what* hardware operations exist (SPI bus init, GPIO interrupt config, SD card mount) but contains no implementation. The headers in `include/spp/hal/` describe the `SPP_HalPort_t` struct — a table of function pointers. The concrete implementations live in `ports/hal/`.
-
-### OSAL
-
-OSAL does the same for OS primitives. `include/spp/osal/` defines `SPP_OsalPort_t` — function pointers for task creation, queue send/receive, mutex lock/unlock, and event group operations. The core and services call only these wrappers, so you can swap FreeRTOS for a cooperative scheduler without touching any other code.
-
-### Ports
-
-A port fills in `SPP_HalPort_t` and `SPP_OsalPort_t` with real function implementations for a specific target. For ESP32 + FreeRTOS, the port is split across:
-
-- `ports/hal/esp32/hal_esp32.c` — SPI2_HOST driver, GPIO ISR service, FATFS SD card
-- `ports/osal/freertos/osal_freertos.c` — `xTaskCreateStatic`, `xQueueCreate`, `xEventGroupCreate`, etc.
-
-See `ports/freertos/` as a working reference when porting to a new platform.
-
----
-
-## Typical data flow
-
-### 1. Boot — register ports and initialise core
+SPP uses `spp/` as a namespace prefix in all `#include` directives:
 
 ```c
-// Register the platform implementations
-SPP_Core_setOsalPort(&g_freertosOsalPort);
-SPP_Core_setHalPort(&g_esp32HalPort);
-
-// Initialise the stack (logging + databank)
-SPP_Core_init();
-SPP_Databank_init();
-SPP_DbFlow_init();
-SPP_Hal_spiBusInit();
+#include "spp/core/packet.h"
+#include "spp/services/databank/databank.h"
+#include "spp/osal/port.h"
 ```
 
-### 2. Sensor task — acquire packet, fill payload, push to FIFO
-
-```c
-SPP_Packet_t *p_pkt = SPP_Databank_getPacket();
-if (p_pkt == NULL) { /* pool exhausted, drop reading */ return; }
-
-p_pkt->primaryHeader.apid       = 0x0101;
-p_pkt->primaryHeader.seq        = s_seq++;
-p_pkt->secondaryHeader.timestampMs = SPP_Hal_getTimeMs();
-p_pkt->primaryHeader.payloadLen = 12U;
-
-// Write 3 floats (altitude, pressure, temperature) into the payload
-memcpy(p_pkt->payload, &altitude, 4U);
-memcpy(p_pkt->payload + 4U, &pressure, 4U);
-memcpy(p_pkt->payload + 8U, &temperature, 4U);
-
-SPP_DbFlow_pushReady(p_pkt);
-```
-
-### 3. Logger task — pop packet, log to SD, return to pool
-
-```c
-SPP_Packet_t *p_pkt = NULL;
-SPP_DbFlow_popReady(&p_pkt);
-
-DATALOGGER_LogPacket(&s_logger, p_pkt);
-
-SPP_Databank_returnPacket(p_pkt);
-```
-
----
-
-## Adding a new sensor service
-
-### Step 1 — Create the service files
-
-```
-services/
-└── mysensor/
-    ├── include/spp/services/mysensor.h    # public API
-    └── src/myensor_service.c             # implementation
-```
-
-### Step 2 — Add a CMake option in `compiler/spp/CMakeLists.txt`
+Set your include root to the **parent directory of `spp/`**:
 
 ```cmake
-option(SPP_SERVICE_MYsensor "Enable MySensor service" ON)
+# In CMakeLists.txt (standalone):
+target_include_directories(my_target PRIVATE path/to/parent_of_spp)
 
-if(SPP_SERVICE_MYENSOR)
-    list(APPEND SPP_SOURCES
-        "${SPP_ROOT}/services/myensor/src/myensor_service.c"
-    )
-    list(APPEND SPP_INCLUDE_DIRS
-        "${SPP_ROOT}/services/myensor/include"
-    )
-endif()
+# The ESP-IDF wrappers in compiler/ handle this automatically.
 ```
 
-### Step 3 — Implement the service descriptor and register it
+Or include everything via the umbrella header:
 
 ```c
-// myensor_service.c
-static retval_t myensor_init(void *p_ctx, const void *p_cfg) { /* ... */ return K_SPP_OK; }
-static retval_t myensor_start(void *p_ctx)                   { /* ... */ return K_SPP_OK; }
-static retval_t myensor_stop(void *p_ctx)                    { /* ... */ return K_SPP_OK; }
-
-const SPP_ServiceDesc_t g_mysensorServiceDesc = {
-    .p_name  = "myensor",
-    .apid    = 0x0102,
-    .ctxSize = sizeof(MySensor_Ctx_t),
-    .init    = myensor_init,
-    .start   = myensor_start,
-    .stop    = myensor_stop,
-    .deinit  = NULL,
-};
+#include "spp/spp.h"
 ```
 
-Then in `main.c`:
+---
+
+## Quick start
+
+### 1. Register ports and initialise
 
 ```c
-static MySensor_Ctx_t  s_mysensorCtx;
-static MySensor_Cfg_t  s_mysensorCfg = { .csPin = 10U };
-SPP_Service_register(&g_mysensorServiceDesc, &s_mysensorCtx, &s_mysensorCfg);
+#include "spp/spp.h"
+
+// Defined in your chosen port files
+extern const SPP_OsalPort_t g_freertosOsalPort;
+extern const SPP_HalPort_t  g_esp32HalPort;
+
+void app_main(void)
+{
+    SPP_Core_setOsalPort(&g_freertosOsalPort);
+    SPP_Core_setHalPort(&g_esp32HalPort);
+    SPP_Core_init();
+
+    SPP_Databank_init();
+    SPP_DbFlow_init();
+    SPP_Hal_spiBusInit();
+}
+```
+
+### 2. Register and start services
+
+```c
+extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
+
+static BMP390_ServiceCtx_t s_bmpCtx;
+static BMP390_ServiceCfg_t s_bmpCfg = { .csPin = 18U, .intPin = 5U };
+
+SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
 SPP_Service_startAll();
 ```
+
+### 3. Typical sensor task data flow
+
+```
+getPacket() → fill payload → pushReady()    [producer task]
+                                  ↓
+                             db_flow FIFO
+                                  ↓
+popReady() → process/log → returnPacket()   [consumer task]
+```
+
+---
+
+## Packet format
+
+Every piece of data in SPP is carried in an `SPP_Packet_t`:
+
+| Field | Size | Description |
+|---|---|---|
+| `primaryHeader.version` | 1 B | Protocol version (= 1) |
+| `primaryHeader.apid` | 2 B | Source identifier |
+| `primaryHeader.seq` | 2 B | Sequence counter |
+| `primaryHeader.payloadLen` | 2 B | Payload length in bytes |
+| `secondaryHeader.timestampMs` | 4 B | Creation time (ms) |
+| `secondaryHeader.dropCounter` | 1 B | Packets dropped since reset |
+| `payload` | 0–48 B | Raw data |
+| `crc` | 2 B | CRC-16/CCITT (0 = not computed) |
+
+---
+
+## Building
+
+### Standalone (host / unit tests)
+
+```bash
+cmake -S . -B build -DSPP_BUILD_TESTS=ON -DSPP_PORT=posix
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+### ESP-IDF (via component wrappers)
+
+The `compiler/spp` and `compiler/spp_ports` ESP-IDF components handle the build automatically. Control services and ports at build time:
+
+```bash
+idf.py build \
+  -DSPP_SERVICE_BMP390=ON \
+  -DSPP_SERVICE_ICM20948=ON \
+  -DSPP_SERVICE_DATALOGGER=ON \
+  -DSPP_OSAL_FREERTOS=ON \
+  -DSPP_HAL_ESP32=ON
+```
+
+---
+
+## Adding a new service
+
+1. Create `services/myservice/myservice.h` and `myservice.c`
+2. Implement the four lifecycle callbacks: `init`, `start`, `stop`, `deinit`
+3. Declare a `const SPP_ServiceDesc_t g_myServiceDesc` with your APID and callbacks
+4. Add the source to `CMakeLists.txt` (and to `compiler/spp/CMakeLists.txt` for ESP-IDF)
+
+See [`services/README.md`](services/README.md) for a full walkthrough.
 
 ---
 
 ## Porting to a new platform
 
-You only need to provide two structs full of function pointers: `SPP_OsalPort_t` (OS primitives) and `SPP_HalPort_t` (hardware drivers). Fill each field with a function from your target's SDK, then register them at boot:
+Implement `SPP_OsalPort_t` (OS primitives) and/or `SPP_HalPort_t` (hardware drivers), place the files under `ports/osal/<os>/` or `ports/hal/<target>/`, then register them at boot.
 
-```c
-static const SPP_OsalPort_t g_myOsalPort = {
-    .taskCreate   = myos_task_create,
-    .taskDelayMs  = myos_delay_ms,
-    .queueCreate  = myos_queue_create,
-    .queueSend    = myos_queue_send,
-    .queueRecv    = myos_queue_recv,
-    // ... fill in the remaining fields
-};
+See [`ports/README.md`](ports/README.md) for a step-by-step guide.
 
-static const SPP_HalPort_t g_myHalPort = {
-    .spiBusInit        = mymcu_spi_init,
-    .spiTransmit       = mymcu_spi_transmit,
-    .gpioConfigInterrupt = mymcu_gpio_config,
-    // ... fill in the remaining fields
-};
+---
 
-SPP_Core_setOsalPort(&g_myOsalPort);
-SPP_Core_setHalPort(&g_myHalPort);
+## Running unit tests
+
+```bash
+# From the spp/ directory
+cmake -S . -B build -DSPP_BUILD_TESTS=ON -DSPP_PORT=posix
+cmake --build build
+ctest --test-dir build --output-on-failure
+
+# Or from the devcontainer terminal:
+run_tests solaris-v1/spp
 ```
 
-See `ports/osal/freertos/osal_freertos.c` and `ports/hal/esp32/hal_esp32.c` for a complete working example. The unit tests in `tests/` use the POSIX port (`ports/osal/posix/`) and run on any PC without hardware — a good starting point to verify your OSAL port before flashing anything.
+See [`tests/README.md`](tests/README.md) for details.
