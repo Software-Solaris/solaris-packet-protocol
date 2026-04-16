@@ -14,21 +14,42 @@ option(SPP_BUILD_TESTS "Build Cgreen unit tests (requires host build)" OFF)
 option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
 
 # ----------------------------------------------------------------
-# Core SPP library (platform-agnostic)
+# Services — opt-in (all ON by default)
 # ----------------------------------------------------------------
-file(GLOB_RECURSE SPP_CORE_SOURCES
-    "src/core/*.c"
-    "src/osal/*.c"
-    "src/hal/*.c"
-    "src/services/*.c"
-    "src/util/*.c"
+option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  ON)
+option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            ON)
+option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    ON)
+
+# ----------------------------------------------------------------
+# Core SPP library (platform-agnostic)
+# Sources are co-located with headers — one directory per module.
+# ----------------------------------------------------------------
+set(SPP_CORE_SOURCES
+    core/core.c
+    core/error.c
+    osal/dispatch.c
+    hal/dispatch.c
+    services/service.c
+    services/databank/databank.c
+    services/db_flow/db_flow.c
+    services/log/log.c
+    util/crc.c
 )
+
+if(SPP_SERVICE_BMP390)
+    list(APPEND SPP_CORE_SOURCES services/bmp390/bmp390.c)
+endif()
+if(SPP_SERVICE_ICM20948)
+    list(APPEND SPP_CORE_SOURCES services/icm20948/icm20948.c)
+endif()
+if(SPP_SERVICE_DATALOGGER)
+    list(APPEND SPP_CORE_SOURCES services/datalogger/datalogger.c)
+endif()
 
 add_library(spp STATIC ${SPP_CORE_SOURCES})
 
-target_include_directories(spp PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+# Include root is the parent of spp/ so #include "spp/core/packet.h" resolves correctly.
+target_include_directories(spp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if(SPP_NO_RTOS)
     target_compile_definitions(spp PUBLIC SPP_NO_RTOS=1)
@@ -44,18 +65,36 @@ endif()
 # Port selection
 # ----------------------------------------------------------------
 if(SPP_PORT STREQUAL "posix")
-    file(GLOB_RECURSE SPP_PORT_SOURCES
-        "ports/posix/osal/*.c"
-        "ports/posix/hal/*.c"
+    set(SPP_PORT_SOURCES
+        ports/osal/posix/osal_posix.c
+        ports/hal/stub/hal_stub.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
-    target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
     target_link_libraries(spp_port PUBLIC spp pthread)
 
-elseif(SPP_PORT STREQUAL "baremetal")
-    file(GLOB_RECURSE SPP_PORT_SOURCES "ports/baremetal/osal/*.c")
+elseif(SPP_PORT STREQUAL "freertos")
+    set(SPP_PORT_SOURCES
+        ports/osal/freertos/osal_freertos.c
+        ports/hal/esp32/hal_esp32.c
+    )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
-    target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_include_directories(spp_port PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}/ports/hal/esp32
+    )
+    target_link_libraries(spp_port PUBLIC spp)
+
+elseif(SPP_PORT STREQUAL "baremetal")
+    set(SPP_PORT_SOURCES
+        ports/osal/baremetal/osal_baremetal.c
+        ports/hal/esp32/hal_esp32_baremetal.c
+    )
+    add_library(spp_port STATIC ${SPP_PORT_SOURCES})
+    target_include_directories(spp_port PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}/ports/hal/esp32
+    )
     target_link_libraries(spp_port PUBLIC spp)
 endif()
 
@@ -67,12 +106,17 @@ if(SPP_BUILD_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(CGREEN REQUIRED cgreen)
 
-    file(GLOB SPP_TEST_SOURCES "tests/unit/*.c")
+    file(GLOB_RECURSE SPP_TEST_SOURCES
+        "tests/run_all_tests.c"
+        "tests/core/*.c"
+        "tests/services/**/*.c"
+        "tests/util/*.c"
+    )
 
     add_executable(spp_tests ${SPP_TEST_SOURCES})
 
     target_include_directories(spp_tests PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CGREEN_INCLUDE_DIRS}
     )
 
@@ -85,7 +129,7 @@ if(SPP_BUILD_TESTS)
 
     target_compile_options(spp_tests PRIVATE
         -Wall -Wextra -Wpedantic
-        --coverage          # gcov coverage
+        --coverage
         -fprofile-arcs
         -ftest-coverage
     )

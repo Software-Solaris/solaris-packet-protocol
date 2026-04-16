@@ -6,14 +6,14 @@
  * altitude, pressure and temperature at 5 Hz and logs packets to SD card.
  */
 
-#include "spp/services/bmp390.h"
-#include "spp/services/datalogger.h"
+#include "spp/services/bmp390/bmp390.h"
+#include "spp/services/datalogger/datalogger.h"
 
 #include "spp/hal/spi.h"
 #include "spp/osal/task.h"
-#include "spp/services/log.h"
-#include "spp/services/databank.h"
-#include "spp/services/db_flow.h"
+#include "spp/services/log/log.h"
+#include "spp/services/databank/databank.h"
+#include "spp/services/db_flow/db_flow.h"
 #include "spp/core/packet.h"
 
 #include <string.h>

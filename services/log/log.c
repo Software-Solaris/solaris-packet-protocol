@@ -3,7 +3,7 @@
  * @brief SPP logging service implementation.
  */
 
-#include "spp/services/log.h"
+#include "spp/services/log/log.h"
 
 #include <stdio.h>
 #include <stdarg.h>

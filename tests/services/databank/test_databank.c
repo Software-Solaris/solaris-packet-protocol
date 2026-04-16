@@ -10,7 +10,7 @@
  */
 
 #include <cgreen/cgreen.h>
-#include "spp/services/databank.h"
+#include "spp/services/databank/databank.h"
 #include "spp/core/returntypes.h"
 #include "spp/util/macros.h"
 

@@ -34,9 +34,9 @@
 
 /* Services */
 #include "spp/services/service.h"
-#include "spp/services/databank.h"
-#include "spp/services/db_flow.h"
-#include "spp/services/log.h"
+#include "spp/services/databank/databank.h"
+#include "spp/services/db_flow/db_flow.h"
+#include "spp/services/log/log.h"
 
 /* Utilities */
 #include "spp/util/macros.h"
