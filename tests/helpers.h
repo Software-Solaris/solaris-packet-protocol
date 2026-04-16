@@ -7,9 +7,9 @@
 #define SPP_TEST_HELPERS_H
 
 #include "spp/core/core.h"
-#include "spp/services/databank.h"
-#include "spp/services/db_flow.h"
-#include "spp/services/log.h"
+#include "spp/services/databank/databank.h"
+#include "spp/services/db_flow/db_flow.h"
+#include "spp/services/log/log.h"
 
 /* Declared in osal_posix.c and hal_stub.c */
 extern const SPP_OsalPort_t g_posixOsalPort;

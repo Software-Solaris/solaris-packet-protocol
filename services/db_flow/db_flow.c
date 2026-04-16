@@ -3,7 +3,7 @@
  * @brief Circular FIFO packet router implementation.
  */
 
-#include "spp/services/db_flow.h"
+#include "spp/services/db_flow/db_flow.h"
 #include "spp/core/returntypes.h"
 #include "spp/core/error.h"
 

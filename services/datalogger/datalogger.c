@@ -3,10 +3,10 @@
  * @brief SD card packet logger implementation.
  */
 
-#include "spp/services/datalogger.h"
+#include "spp/services/datalogger/datalogger.h"
 
 #include "spp/hal/storage.h"
-#include "spp/services/log.h"
+#include "spp/services/log/log.h"
 #include "spp/core/types.h"
 
 #include <string.h>

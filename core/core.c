@@ -7,9 +7,9 @@
 #include "spp/core/returntypes.h"
 #include "spp/core/error.h"
 #include "spp/core/version.h"
-#include "spp/services/databank.h"
-#include "spp/services/db_flow.h"
-#include "spp/services/log.h"
+#include "spp/services/databank/databank.h"
+#include "spp/services/db_flow/db_flow.h"
+#include "spp/services/log/log.h"
 
 /* ----------------------------------------------------------------
  * Private state

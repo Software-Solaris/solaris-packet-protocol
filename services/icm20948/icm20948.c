@@ -7,13 +7,13 @@
  * descriptor so the device can be registered in the service registry.
  */
 
-#include "spp/services/icm20948_service.h"
+#include "spp/services/icm20948/icm20948.h"
 
 #include "spp/core/returntypes.h"
 #include "spp/hal/spi.h"
 #include "spp/osal/task.h"
 #include "spp/core/types.h"
-#include "spp/services/log.h"
+#include "spp/services/log/log.h"
 
 #include <string.h>
 #include <math.h>
@@ -53,7 +53,7 @@ typedef struct
  * ---------------------------------------------------------------- */
 
 static const spp_uint8_t s_dmp3Image[] = {
-#include "icm20948_img.dmp3a.h"
+#include "dmp_image.h"
 };
 
 /* ----------------------------------------------------------------

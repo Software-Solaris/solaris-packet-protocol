@@ -3,7 +3,7 @@
  * @brief Static packet pool implementation.
  */
 
-#include "spp/services/databank.h"
+#include "spp/services/databank/databank.h"
 #include "spp/core/returntypes.h"
 #include "spp/core/error.h"
 
