@@ -6,8 +6,12 @@
 #include "spp/services/databank/databank.h"
 #include "spp/core/returntypes.h"
 #include "spp/core/error.h"
+#include "spp/core/packet.h"
+#include "spp/hal/time.h"
+#include "spp/util/crc.h"
 
 #include <string.h>
+#include <stddef.h>
 
 /* ----------------------------------------------------------------
  * Private state
@@ -93,4 +97,52 @@ SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
 spp_uint32_t SPP_Databank_freeCount(void)
 {
     return s_databank.freeCount;
+}
+
+/* ----------------------------------------------------------------
+ * Private helpers
+ * ---------------------------------------------------------------- */
+
+static spp_uint16_t packetCrc(const SPP_Packet_t *p_packet)
+{
+    /* CRC covers all bytes up to (but not including) the crc field.
+     * The packet is zeroed before filling, so padding bytes are 0
+     * and contribute deterministically to the checksum. */
+    return SPP_Util_crc16((const spp_uint8_t *)p_packet,
+                          (spp_uint32_t)offsetof(SPP_Packet_t, crc));
+}
+
+/* ----------------------------------------------------------------
+ * Packet fill helper
+ * ---------------------------------------------------------------- */
+
+SPP_RetVal_t SPP_Databank_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
+                                      spp_uint16_t seq, const void *p_data,
+                                      spp_uint16_t dataLen)
+{
+    if ((p_packet == NULL) || (p_data == NULL))
+    {
+        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
+    }
+    if (dataLen > K_SPP_PKT_PAYLOAD_MAX)
+    {
+        SPP_ERR_RETURN(K_SPP_ERROR_INVALID_PARAMETER);
+    }
+
+    /* Zero the whole struct so padding bytes are deterministic. */
+    memset(p_packet, 0, sizeof(SPP_Packet_t));
+
+    p_packet->primaryHeader.version    = K_SPP_PKT_VERSION;
+    p_packet->primaryHeader.apid       = apid;
+    p_packet->primaryHeader.seq        = seq;
+    p_packet->primaryHeader.payloadLen = dataLen;
+
+    p_packet->secondaryHeader.timestampMs = SPP_HAL_getTimeMs();
+    p_packet->secondaryHeader.dropCounter = 0U;
+
+    memcpy(p_packet->payload, p_data, dataLen);
+
+    p_packet->crc = packetCrc(p_packet);
+
+    return K_SPP_OK;
 }

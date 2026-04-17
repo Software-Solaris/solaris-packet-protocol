@@ -21,6 +21,7 @@
 
 #include "spp/core/packet.h"
 #include "spp/core/returntypes.h"
+#include "spp/core/types.h"
 #include "spp/util/macros.h"
 
 /* ----------------------------------------------------------------
@@ -82,5 +83,28 @@ SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet);
  * @return Free packet count (0 … K_SPP_DATABANK_SIZE).
  */
 spp_uint32_t SPP_Databank_freeCount(void);
+
+/**
+ * @brief Fill a packet with data and compute its CRC.
+ *
+ * Zeroes the entire packet (including any struct padding), writes all header
+ * fields, copies @p p_data into the payload, and computes a CRC-16/CCITT
+ * checksum over every byte of the packet except the @c crc field itself.
+ *
+ * The timestamp is captured automatically via @ref SPP_HAL_getTimeMs().
+ *
+ * @param[out] p_packet  Packet previously acquired from @ref SPP_Databank_getPacket().
+ * @param[in]  apid      Application Process Identifier.
+ * @param[in]  seq       Packet sequence counter (maintained by the caller).
+ * @param[in]  p_data    Pointer to the payload data to copy.
+ * @param[in]  dataLen   Number of bytes to copy (must be ≤ K_SPP_PKT_PAYLOAD_MAX).
+ *
+ * @return K_SPP_OK on success.
+ * @return K_SPP_ERROR_NULL_POINTER if @p p_packet or @p p_data is NULL.
+ * @return K_SPP_ERROR_INVALID_PARAMETER if @p dataLen exceeds K_SPP_PKT_PAYLOAD_MAX.
+ */
+SPP_RetVal_t SPP_Databank_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
+                                      spp_uint16_t seq, const void *p_data,
+                                      spp_uint16_t dataLen);
 
 #endif /* SPP_DATABANK_H */
