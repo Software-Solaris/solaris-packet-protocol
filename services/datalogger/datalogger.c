@@ -6,6 +6,7 @@
 #include "spp/services/datalogger/datalogger.h"
 
 #include "spp/hal/storage.h"
+#include "spp/core/packet.h"
 #include "spp/services/log/log.h"
 #include "spp/core/types.h"
 
@@ -59,40 +60,53 @@ SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_
     }
 
     int n;
-    n = fprintf(p_logger->p_file,
-                "pkt=%lu ver=%u apid=0x%04X seq=%u len=%u ts=%lu drop=%u crc=%u payload_hex=",
-                (unsigned long)p_logger->logged_packets,
-                (unsigned)p_packet->primaryHeader.version,
-                (unsigned)p_packet->primaryHeader.apid,
-                (unsigned)p_packet->primaryHeader.seq,
-                (unsigned)p_packet->primaryHeader.payloadLen,
-                (unsigned long)p_packet->secondaryHeader.timestampMs,
-                (unsigned)p_packet->secondaryHeader.dropCounter,
-                (unsigned)p_packet->crc);
-    if (n < 0)
-    {
-        SPP_LOGE(k_tag, "fprintf header failed");
-        return K_SPP_ERROR;
-    }
 
-    for (spp_uint16_t i = 0U; i < p_packet->primaryHeader.payloadLen; i++)
+    if (p_packet->primaryHeader.apid == K_SPP_APID_LOG)
     {
-        n = fprintf(p_logger->p_file, "%02X", (unsigned)p_packet->payload[i]);
+        /* Log packets carry a null-terminated string — write it directly. */
+        n = fprintf(p_logger->p_file, "%.*s\n",
+                    (int)p_packet->primaryHeader.payloadLen,
+                    (const char *)p_packet->payload);
+    }
+    else
+    {
+        /* Sensor/telemetry packet: one line with hex payload. */
+        n = fprintf(p_logger->p_file,
+                    "ts=%lu apid=0x%04X seq=%u len=%u payload_hex=",
+                    (unsigned long)p_packet->secondaryHeader.timestampMs,
+                    (unsigned)p_packet->primaryHeader.apid,
+                    (unsigned)p_packet->primaryHeader.seq,
+                    (unsigned)p_packet->primaryHeader.payloadLen);
         if (n < 0)
         {
-            SPP_LOGE(k_tag, "fprintf payload failed");
+            SPP_LOGE(k_tag, "fprintf header failed");
             return K_SPP_ERROR;
         }
 
-        if (i + 1U < p_packet->primaryHeader.payloadLen)
+        for (spp_uint16_t i = 0U; i < p_packet->primaryHeader.payloadLen; i++)
         {
-            (void)fprintf(p_logger->p_file, " ");
+            n = fprintf(p_logger->p_file, "%02X", (unsigned)p_packet->payload[i]);
+            if (n < 0)
+            {
+                SPP_LOGE(k_tag, "fprintf payload failed");
+                return K_SPP_ERROR;
+            }
+            if (i + 1U < p_packet->primaryHeader.payloadLen)
+            {
+                (void)fprintf(p_logger->p_file, " ");
+            }
         }
+
+        n = fprintf(p_logger->p_file, "\n");
     }
 
-    (void)fprintf(p_logger->p_file, "\n");
-    p_logger->logged_packets++;
+    if (n < 0)
+    {
+        SPP_LOGE(k_tag, "fprintf failed");
+        return K_SPP_ERROR;
+    }
 
+    p_logger->logged_packets++;
     return K_SPP_OK;
 }
 
