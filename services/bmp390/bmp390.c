@@ -515,54 +515,41 @@ SPP_RetVal_t BMP390_intEnableDrdy(void *p_spi)
  * Service — acquisition task
  * ---------------------------------------------------------------- */
 
-static void BMP390_ServiceTask(void *p_arg)
+void BMP390_ServiceTask(BMP390_ServiceCtx_t *p_ctx)
 {
-    BMP390_ServiceCtx_t *ctx = (BMP390_ServiceCtx_t *)p_arg;
-    SPP_RetVal_t ret;
+    float altitude    = 0.0f;
+    float pressure    = 0.0f;
+    float temperature = 0.0f;
 
-    SPP_LOGI(k_svcTag, "Task start");
+    p_ctx->bmpData.drdyFlag = false;
 
-    for (;;)
+    SPP_Packet_t *p_packet = SPP_Databank_getPacket();
+    if (p_packet == NULL)
     {
-        SPP_Packet_t *p_packet = NULL;
-        float altitude    = 0.0f;
-        float pressure    = 0.0f;
-        float temperature = 0.0f;
-
-        ret = BMP390_waitDrdy(&ctx->bmpData, K_BMP390_DRDY_TIMEOUT_MS);
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_svcTag, "DRDY wait failed ret=%d", (int)ret);
-            continue;
-        }
-
-        p_packet = SPP_Databank_getPacket();
-        if (p_packet == NULL)
-        {
-            SPP_LOGI(k_svcTag, "No free packet");
-            continue;
-        }
-
-        ret = BMP390_getAltitude(ctx->p_spi, &ctx->bmpData, &altitude, &pressure, &temperature);
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_svcTag, "BMP390_getAltitude failed ret=%d", (int)ret);
-            (void)SPP_Databank_returnPacket(p_packet);
-            continue;
-        }
-
-        float payload[3] = {altitude, pressure, temperature};
-        ret = SPP_Databank_packetData(p_packet, K_BMP_SERVICE_APID_DBG, ctx->seq++,
-                                       payload, (spp_uint16_t)sizeof(payload));
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
-            (void)SPP_Databank_returnPacket(p_packet);
-            continue;
-        }
-
-        (void)SPP_PubSub_publish(p_packet);
+        SPP_LOGW(k_svcTag, "No free packet");
+        return;
     }
+
+    SPP_RetVal_t ret = BMP390_getAltitude(p_ctx->p_spi, &p_ctx->bmpData,
+                                           &altitude, &pressure, &temperature);
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(k_svcTag, "BMP390_getAltitude failed ret=%d", (int)ret);
+        (void)SPP_Databank_returnPacket(p_packet);
+        return;
+    }
+
+    float payload[3] = {altitude, pressure, temperature};
+    ret = SPP_Databank_packetData(p_packet, K_BMP_SERVICE_APID_DBG, p_ctx->seq++,
+                                   payload, (spp_uint16_t)sizeof(payload));
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
+        (void)SPP_Databank_returnPacket(p_packet);
+        return;
+    }
+
+    (void)SPP_PubSub_publish(p_packet);
 }
 
 /* ----------------------------------------------------------------
