@@ -127,7 +127,7 @@ Ensure(SPP_Service_lifecycle, initAll_propagates_error)
 
 TestSuite *service_suite(void)
 {
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("service");
 
     add_test_with_context(suite, SPP_Service_register, rejects_null_descriptor);
     add_test_with_context(suite, SPP_Service_register, rejects_null_context);
