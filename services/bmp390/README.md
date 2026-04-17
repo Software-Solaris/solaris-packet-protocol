@@ -1,6 +1,6 @@
 # services/bmp390/
 
-BMP390 barometric pressure and temperature sensor service. Runs as an OSAL task, waits for the DRDY interrupt, reads raw ADC data over SPI, compensates it using the sensor's factory calibration, and pushes altitude / pressure / temperature packets into the `db_flow` FIFO.
+BMP390 barometric pressure and temperature sensor service. Waits for the DRDY interrupt (via a `volatile` flag set by the GPIO ISR), reads raw ADC data over SPI, compensates it using the sensor's factory calibration, and publishes altitude / pressure / temperature packets via pub/sub.
 
 APID: `0x0101`
 
@@ -19,20 +19,22 @@ APID: `0x0101`
 
 ```c
 typedef struct {
-    uint8_t  csPin;       // SPI chip-select GPIO
-    uint8_t  intPin;      // DRDY interrupt GPIO
-    uint32_t intrType;    // Platform interrupt trigger type
-    uint32_t pull;        // Pull resistor: 0=none 1=up 2=down
+    spp_uint8_t  spiDevIdx;   // SPI device index (1 = BMP390 on ESP32 port)
+    spp_uint8_t  intPin;      // DRDY interrupt GPIO
+    spp_uint32_t intIntrType; // Platform interrupt trigger type (rising edge = 1)
+    spp_uint32_t intPull;     // Pull resistor: 0=none 1=up 2=down
 } BMP390_ServiceCfg_t;
 
 typedef struct {
-    void              *p_spiHandle;
-    void              *p_eventGroup;
-    SPP_GpioIsrCtx_t   isrCtx;
-    BMP390_TempParams_t tempParams;
+    void                *p_spi;
+    BMP390_Data_t        bmpData;   // drdyFlag + ISR context
+    BMP390_TempParams_t  tempParams;
     BMP390_PressParams_t pressParams;
+    spp_uint16_t         seq;
 } BMP390_ServiceCtx_t;
 ```
+
+`BMP390_Data_t` contains a `volatile spp_bool_t drdyFlag` that the GPIO ISR sets. The superloop polls this flag and calls `BMP390_ServiceTask()`.
 
 ---
 
@@ -43,14 +45,28 @@ extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
 
 static BMP390_ServiceCtx_t s_bmpCtx;
 static BMP390_ServiceCfg_t s_bmpCfg = {
-    .csPin    = 18U,
-    .intPin   = 5U,
-    .intrType = GPIO_INTR_POSEDGE,
-    .pull     = 0U,
+    .spiDevIdx   = 1U,
+    .intPin      = 5U,
+    .intIntrType = 1U,   // rising edge
+    .intPull     = 0U,   // no pull
 };
 
 SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
 ```
+
+---
+
+## Superloop integration
+
+```c
+// In the application superloop:
+if (s_bmpCtx.bmpData.drdyFlag)
+{
+    BMP390_ServiceTask(&s_bmpCtx);
+}
+```
+
+`BMP390_ServiceTask()` clears `drdyFlag`, reads the sensor FIFO, calls `SPP_Databank_getPacket()` → `SPP_Databank_packetData()` → `SPP_PubSub_publish()`.
 
 ---
 
@@ -66,9 +82,8 @@ SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
 
 ## Hardware configuration (ESP32-S3)
 
-- SPI bus: SPI2_HOST
-- CS GPIO: 18
-- DRDY interrupt GPIO: configured per application
+- SPI device index: 1 (CS GPIO 18, 500 kHz, MODE0)
+- DRDY interrupt GPIO: 5 (configured via `BMP390_ServiceCfg_t`)
 - ODR: 50 Hz
 - IIR filter: coefficient 2
 - Over-sampling: default (OSR = 0)

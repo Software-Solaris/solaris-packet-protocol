@@ -1,6 +1,6 @@
 # core/
 
-Foundation layer of SPP. Defines the packet format, portable types, error codes, and the startup sequence that wires the platform ports into the rest of the stack. Everything else in SPP depends on `core/`; `core/` depends on nothing inside SPP.
+Foundation layer of SPP. Defines the packet format, portable types, error codes, and the startup sequence that wires the HAL port into the rest of the stack. Everything else in SPP depends on `core/`; `core/` depends on nothing inside SPP.
 
 ---
 
@@ -13,7 +13,7 @@ Foundation layer of SPP. Defines the packet format, portable types, error codes,
 | `packet.h` | `SPP_Packet_t` — the on-wire packet layout (primary header + secondary header + 48 B payload + CRC) |
 | `version.h` | `K_SPP_VERSION_MAJOR / MINOR / PATCH` compile-time constants |
 | `error.h` | Extended error context (error code + optional string message) |
-| `core.h` | `SPP_Core_setOsalPort()`, `SPP_Core_setHalPort()`, `SPP_Core_init()` |
+| `core.h` | `SPP_Core_setHalPort()`, `SPP_Core_init()` |
 | `core.c` | Implementation of port registration and startup |
 | `error.c` | Implementation of error context helpers |
 
@@ -33,10 +33,10 @@ Foundation layer of SPP. Defines the packet format, portable types, error codes,
  └───────────────────────────────────────┘
 ```
 
-- **apid** — Application Process ID. Each service has a unique APID (e.g. BMP390 = `0x0101`). Used by consumers to route or filter packets.
+- **apid** — Application Process ID. Each service has a unique APID (e.g. BMP390 = `0x0101`, ICM20948 = `0x0201`). `K_SPP_APID_LOG` (`0x0001`) is reserved for log message packets. Subscribers use APID to filter packets.
 - **seq** — Monotonically increasing counter per service. Gaps indicate dropped packets.
 - **payloadLen** — Number of valid bytes in `payload`. Must be ≤ `K_SPP_PKT_PAYLOAD_MAX` (48).
-- **crc** — CRC-16/CCITT computed over the full packet. Set to 0 if not used.
+- **crc** — CRC-16/CCITT computed over the full packet minus the CRC field. Computed automatically by `SPP_Databank_packetData()`. Set to 0 if not used.
 
 ---
 
@@ -56,7 +56,7 @@ All SPP functions return `SPP_RetVal_t`. Always check the return value.
 | `K_SPP_ERROR_INVALID_PARAMETER` | Argument out of range |
 | `K_SPP_ERROR_ON_SPI_TRANSACTION` | SPI transaction failed |
 | `K_SPP_ERROR_TIMEOUT` | Operation timed out |
-| `K_SPP_ERROR_NO_PORT` | OSAL or HAL port not registered |
+| `K_SPP_ERROR_NO_PORT` | HAL port not registered |
 | `K_SPP_ERROR_REGISTRY_FULL` | Service registry is full |
 
 ---
@@ -64,19 +64,18 @@ All SPP functions return `SPP_RetVal_t`. Always check the return value.
 ## Startup sequence
 
 ```c
-// 1. Register ports (mandatory before SPP_Core_init)
-SPP_Core_setOsalPort(&g_myOsalPort);
+// 1. Register HAL port (mandatory before SPP_Core_init)
 SPP_Core_setHalPort(&g_myHalPort);
 
-// 2. Initialise core (logging + databank)
+// 2. Initialise core (calls SPP_Databank_init + SPP_PubSub_init internally)
 SPP_Core_init();
 
-// 3. Initialise remaining services
-SPP_Databank_init();
-SPP_DbFlow_init();
+// 3. Subscribe consumers
+SPP_PubSub_subscribe(K_SPP_APID_ALL, myHandler, &myCtx);
 
 // 4. Register and start application services
 SPP_Service_register(&g_bmp390ServiceDesc, &s_ctx, &s_cfg);
+SPP_Service_initAll();
 SPP_Service_startAll();
 ```
 

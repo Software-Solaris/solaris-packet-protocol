@@ -11,10 +11,11 @@ Hardware Abstraction Layer. Defines the **contract** that any hardware port must
 | File | Description |
 |---|---|
 | `port.h` | `SPP_HalPort_t` — the full contract struct with all function pointer signatures |
-| `spi.h` | `SPP_Hal_spiBusInit()`, `SPP_Hal_spiGetHandle()`, `SPP_Hal_spiDeviceInit()`, `SPP_Hal_spiTransmit()` |
-| `gpio.h` | `SPP_Hal_gpioConfigInterrupt()`, `SPP_Hal_gpioRegisterIsr()` and `SPP_GpioIsrCtx_t` |
-| `storage.h` | `SPP_Hal_storageMount()`, `SPP_Hal_storageUnmount()` |
-| `dispatch.c` | Routes every `SPP_Hal_*()` call through the port registered via `SPP_Core_setHalPort()` |
+| `spi.h` | `SPP_HAL_spiBusInit()`, `SPP_HAL_spiGetHandle()`, `SPP_HAL_spiDeviceInit()`, `SPP_HAL_spiTransmit()` |
+| `gpio.h` | `SPP_HAL_gpioConfigInterrupt()`, `SPP_HAL_gpioRegisterIsr()` and `SPP_GpioIsrCtx_t` |
+| `storage.h` | `SPP_HAL_storageMount()`, `SPP_HAL_storageUnmount()` |
+| `time.h` | `SPP_HAL_getTimeMs()` — monotonic millisecond counter |
+| `dispatch.c` | Routes every `SPP_HAL_*()` call through the port registered via `SPP_Core_setHalPort()` |
 
 ---
 
@@ -24,20 +25,20 @@ Hardware Abstraction Layer. Defines the **contract** that any hardware port must
 typedef struct {
     // SPI bus
     SPP_RetVal_t  (*spiBusInit)(void);
-    void         *(*spiGetHandle)(uint8_t deviceIdx);
-    SPP_RetVal_t  (*spiDeviceInit)(void *handle);
-    SPP_RetVal_t  (*spiTransmit)(void *handle, uint8_t *data, uint8_t len);
+    void         *(*spiGetHandle)(spp_uint8_t deviceIdx);
+    SPP_RetVal_t  (*spiDeviceInit)(void *p_handle);
+    SPP_RetVal_t  (*spiTransmit)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t len);
 
     // GPIO interrupts
-    SPP_RetVal_t  (*gpioConfigInterrupt)(uint32_t pin, uint32_t intrType, uint32_t pull);
-    SPP_RetVal_t  (*gpioRegisterIsr)(uint32_t pin, void *isrCtx);
+    SPP_RetVal_t  (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
+    SPP_RetVal_t  (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
 
     // Storage (optional — may be NULL if unused)
-    SPP_RetVal_t  (*storageMount)(void *cfg);
-    SPP_RetVal_t  (*storageUnmount)(void *cfg);
+    SPP_RetVal_t  (*storageMount)(void *p_cfg);
+    SPP_RetVal_t  (*storageUnmount)(void *p_cfg);
 
     // Time
-    uint32_t      (*getTimeMs)(void);
+    spp_uint32_t  (*getTimeMs)(void);
 } SPP_HalPort_t;
 ```
 
@@ -61,17 +62,19 @@ Your port defines its own mapping inside `spiGetHandle()`.
 
 ## GPIO ISR context
 
-Sensor drivers that use data-ready interrupts pass an `SPP_GpioIsrCtx_t` to `gpioRegisterIsr()`. The ISR sets the event group bits, waking the waiting sensor task:
+Sensor services that use data-ready interrupts pass an `SPP_GpioIsrCtx_t` to `gpioRegisterIsr()`. The ISR sets a `volatile` flag; the superloop polls it. No RTOS primitives are involved.
 
 ```c
 SPP_GpioIsrCtx_t isrCtx = {
-    .p_eventGroup = p_eventGroup,
-    .bits         = K_DRDY_BIT,
+    .p_flag = &myData.drdyFlag,  // volatile spp_bool_t
 };
-SPP_Hal_gpioRegisterIsr(BMP390_INT_PIN, &isrCtx);
+SPP_HAL_gpioRegisterIsr(INT_PIN, &isrCtx);
 
-// In the sensor task:
-SPP_Osal_eventWait(p_eventGroup, K_DRDY_BIT, true, false, 5000U, NULL);
+// In the superloop:
+if (myData.drdyFlag)
+{
+    MyService_ServiceTask(&s_ctx);
+}
 ```
 
 ---
@@ -80,8 +83,7 @@ SPP_Osal_eventWait(p_eventGroup, K_DRDY_BIT, true, false, 5000U, NULL);
 
 | Port | Location | Notes |
 |---|---|---|
-| ESP32 (FreeRTOS) | `ports/hal/esp32/hal_esp32.c` | SPI2_HOST, DMA, FreeRTOS-aware |
-| ESP32 (baremetal) | `ports/hal/esp32/hal_esp32_baremetal.c` | Polling SPI, no FreeRTOS dependency |
+| ESP32 | `ports/hal/esp32/hal_esp32.c` | Polling SPI, no FreeRTOS dependency — primary target |
 | Stub | `ports/hal/stub/hal_stub.c` | No-op, always returns `K_SPP_OK` — for host tests |
 
 ---

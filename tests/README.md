@@ -1,6 +1,6 @@
 # tests/
 
-Cgreen unit tests for SPP. Run entirely on a host PC — no ESP32 or hardware required. Uses the `posix` OSAL port and the `stub` HAL.
+Cgreen unit tests for SPP. Run entirely on a host PC — no ESP32 or hardware required. Uses the `stub` HAL port.
 
 ---
 
@@ -8,20 +8,18 @@ Cgreen unit tests for SPP. Run entirely on a host PC — no ESP32 or hardware re
 
 ```
 tests/
-├── run_all_tests.c         Entry point — aggregates all suites
-├── helpers.h               Shared test utilities and fixtures
 ├── core/
-│   └── test_core.c         Tests for SPP_Core_init and port registration
+│   └── test_core.c             Tests for SPP_Core_init and port registration
 ├── services/
 │   ├── databank/
-│   │   └── test_databank.c Tests for SPP_Databank_*
-│   ├── db_flow/
-│   │   └── test_db_flow.c  Tests for SPP_DbFlow_*
+│   │   └── test_databank.c     Tests for SPP_Databank_*
+│   ├── pubsub/
+│   │   └── test_pubsub.c       Tests for SPP_PubSub_*
 │   ├── log/
-│   │   └── test_log.c      Tests for SPP_Log_*
-│   └── test_service.c      Tests for SPP_Service_register / startAll
+│   │   └── test_log.c          Tests for SPP_Log_*
+│   └── test_service.c          Tests for SPP_Service_register / initAll / startAll
 └── util/
-    └── test_crc.c          Tests for SPP_Util_crc16
+    └── test_crc.c              Tests for SPP_Util_crc16
 ```
 
 The test tree mirrors the module tree — every module that has a public API has a corresponding test file under the same relative path.
@@ -64,30 +62,23 @@ gcov build/CMakeFiles/spp_tests.dir/**/*.gcno
 Each test file focuses on **one module**. Within that file, each Cgreen `Describe` block focuses on **one function**:
 
 ```c
-// test_databank.c
+// test_pubsub.c
 
-Describe(SPP_Databank_init);
-BeforeEach(SPP_Databank_init) { /* reset state */ }
-AfterEach(SPP_Databank_init)  { /* teardown    */ }
+Describe(SPP_PubSub_subscribe);
+BeforeEach(SPP_PubSub_subscribe) { SPP_PubSub_init(); }
+AfterEach(SPP_PubSub_subscribe)  { /* teardown */ }
 
-Ensure(SPP_Databank_init, returns_ok_on_first_call) {
-    assert_that(SPP_Databank_init(), is_equal_to(K_SPP_OK));
-}
-
-Ensure(SPP_Databank_init, returns_already_initialized_on_second_call) {
-    SPP_Databank_init();
-    assert_that(SPP_Databank_init(), is_equal_to(K_SPP_ERROR_ALREADY_INITIALIZED));
+Ensure(SPP_PubSub_subscribe, rejects_null_handler) {
+    assert_that(SPP_PubSub_subscribe(0x0101U, NULL, NULL),
+                is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 ```
-
-Declare the suite function at the bottom of the file, and add it to `run_all_tests.c`.
 
 ---
 
 ## Adding a new test file
 
-1. Create `tests/<module>/test_<function>.c`
+1. Create `tests/<module>/test_<module>.c`
 2. Implement `Describe` + `Ensure` blocks
-3. Define `TestSuite *<module>_<function>_suite(void)` at the bottom
-4. Add the declaration and `add_suite()` call to `run_all_tests.c`
-5. The `CMakeLists.txt` picks it up automatically via `file(GLOB_RECURSE ...)`
+3. Define `TestSuite *<module>_suite(void)` at the bottom
+4. Add `spp_add_test_module(spp_test_<module> tests/<module>/test_<module>.c)` to `CMakeLists.txt`
