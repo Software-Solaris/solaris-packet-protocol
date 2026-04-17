@@ -29,9 +29,7 @@
 #include <stdint.h>
 #include "spp/core/returntypes.h"
 #include "spp/core/types.h"
-#include "spp/osal/event.h"
 #include "spp/hal/gpio.h"
-#include "spp/hal/storage.h"
 #include "spp/services/service.h"
 
 #ifdef __cplusplus
@@ -42,14 +40,8 @@ extern "C" {
  * Initialisation Constants
  * ========================================================================= */
 
-/** @brief FreeRTOS task priority for the BMP390 initialisation task. */
-#define K_BMP_INIT_PRIO              4
-
-/** @brief Stack size in bytes for the BMP390 initialisation task. */
-#define K_BMP_INIT_TASK_STACK_SIZE   4096
-
-/** @brief Event group bit indicating BMP390 data-ready. */
-#define K_BMP390_EVT_DRDY            (1u << 0)
+/** @brief Timeout in ms for waiting for the BMP390 data-ready interrupt. */
+#define K_BMP390_DRDY_TIMEOUT_MS     5000U
 
 /* ============================================================================
  * Data Types — driver context
@@ -58,17 +50,17 @@ extern "C" {
 /**
  * @brief BMP390 device context.
  *
- * Groups the SPI handler, event group, ISR context and GPIO interrupt
+ * Groups the SPI handler, DRDY flag, ISR context and GPIO interrupt
  * configuration required to operate one BMP390 sensor instance.
  */
 typedef struct
 {
-    void            *p_handler_spi;  /**< SPI device handle.                */
-    void            *p_event_group;  /**< Event group for DRDY signalling.  */
-    SPP_GpioIsrCtx_t isr_ctx;       /**< ISR context (event group + bits). */
-    spp_uint32_t     intPin;         /**< GPIO pin number for the interrupt.*/
-    spp_uint32_t     intIntrType;    /**< Interrupt trigger type.           */
-    spp_uint32_t     intPull;        /**< Pull resistor: 0=none,1=up,2=down.*/
+    void              *p_handler_spi;  /**< SPI device handle.                         */
+    volatile spp_bool_t drdyFlag;      /**< Set by ISR when data-ready fires.          */
+    SPP_GpioIsrCtx_t   isr_ctx;       /**< ISR context (points at drdyFlag).          */
+    spp_uint32_t       intPin;         /**< GPIO pin number for the interrupt.         */
+    spp_uint32_t       intIntrType;    /**< Interrupt trigger type.                    */
+    spp_uint32_t       intPull;        /**< Pull resistor: 0=none, 1=up, 2=down.       */
 } BMP390_Data_t;
 
 /** @brief Chip-select GPIO pin for the BMP390 (informational; set by HAL). */
@@ -186,13 +178,10 @@ typedef struct
  */
 typedef struct
 {
-    spp_uint8_t          spiDevIdx;      /**< SPI device handle index.          */
-    spp_uint32_t         intPin;         /**< GPIO pin for DRDY interrupt.      */
-    spp_uint32_t         intIntrType;    /**< Interrupt edge type (1=rising).   */
-    spp_uint32_t         intPull;        /**< Pull resistor (0=none,1=up).      */
-    SPP_StorageInitCfg_t sdCfg;         /**< SD card storage configuration.    */
-    const char          *p_logFilePath; /**< File path on SD card.             */
-    spp_uint32_t         logMaxPackets; /**< Stop logging after N packets.     */
+    spp_uint8_t  spiDevIdx;   /**< SPI device handle index.        */
+    spp_uint32_t intPin;      /**< GPIO pin for DRDY interrupt.    */
+    spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising). */
+    spp_uint32_t intPull;     /**< Pull resistor (0=none,1=up).    */
 } BMP390_ServiceCfg_t;
 
 /**
