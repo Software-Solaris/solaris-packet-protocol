@@ -44,7 +44,7 @@
 
 /** @brief Number of packets in the static databank pool. */
 #ifndef K_SPP_DATABANK_SIZE
-#define K_SPP_DATABANK_SIZE (5U)
+#define K_SPP_DATABANK_SIZE (1000U)
 #endif
 
 /** @brief Maximum number of pub/sub subscribers that can be registered. */
