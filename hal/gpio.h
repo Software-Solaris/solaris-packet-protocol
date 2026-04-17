@@ -12,7 +12,21 @@
 
 #include "spp/core/types.h"
 #include "spp/core/returntypes.h"
-#include "spp/osal/event.h"
+
+/* ----------------------------------------------------------------
+ * ISR context
+ * ---------------------------------------------------------------- */
+
+/**
+ * @brief Context passed to the GPIO ISR handler.
+ *
+ * The ISR sets @c *p_flag to @c SPP_TRUE when the interrupt fires.
+ * The application superloop polls this flag to detect the event.
+ */
+typedef struct
+{
+    volatile spp_bool_t *p_flag; /**< Flag set by the ISR on interrupt. */
+} SPP_GpioIsrCtx_t;
 
 /* ----------------------------------------------------------------
  * Public API
@@ -31,14 +45,13 @@ SPP_RetVal_t SPP_HAL_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType
                                       spp_uint32_t pull);
 
 /**
- * @brief Register an ISR handler for a GPIO pin using an SPP event group.
+ * @brief Register an ISR handler for a GPIO pin.
  *
- * The ISR will call @ref SPP_OSAL_eventSetFromIsr() with the bits defined
- * in @p p_isrCtx whenever the configured interrupt fires.
+ * The ISR sets @c *p_isrCtx->p_flag to @c SPP_TRUE whenever the configured
+ * interrupt fires.
  *
  * @param[in] pin       GPIO pin number.
- * @param[in] p_isrCtx  Pointer to a @ref SPP_GpioIsrCtx_t that carries the
- *                      event group handle and bit mask.
+ * @param[in] p_isrCtx  Pointer to a @ref SPP_GpioIsrCtx_t for this pin.
  *
  * @return K_SPP_OK on success.
  */
