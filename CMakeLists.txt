@@ -5,11 +5,10 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # ----------------------------------------------------------------
-# Feature flags (override with -DSPP_NO_RTOS=1 etc.)
+# Feature flags
 # ----------------------------------------------------------------
-option(SPP_NO_RTOS    "Disable RTOS task APIs (use baremetal port)" OFF)
-option(SPP_NO_MALLOC  "Disable dynamic memory allocation"           OFF)
-option(SPP_NO_STORAGE "Disable storage HAL"                         OFF)
+option(SPP_NO_MALLOC  "Disable dynamic memory allocation" OFF)
+option(SPP_NO_STORAGE "Disable storage HAL"               OFF)
 option(SPP_BUILD_TESTS "Build Cgreen unit tests (requires host build)" OFF)
 option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
 
@@ -27,11 +26,10 @@ option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    ON)
 set(SPP_CORE_SOURCES
     core/core.c
     core/error.c
-    osal/dispatch.c
     hal/dispatch.c
     services/service.c
     services/databank/databank.c
-    services/db_flow/db_flow.c
+    services/pubsub/pubsub.c
     services/log/log.c
     util/crc.c
 )
@@ -51,9 +49,6 @@ add_library(spp STATIC ${SPP_CORE_SOURCES})
 # Include root is the parent of spp/ so #include "spp/core/packet.h" resolves correctly.
 target_include_directories(spp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-if(SPP_NO_RTOS)
-    target_compile_definitions(spp PUBLIC SPP_NO_RTOS=1)
-endif()
 if(SPP_NO_MALLOC)
     target_compile_definitions(spp PUBLIC SPP_NO_MALLOC=1)
 endif()
@@ -66,7 +61,6 @@ endif()
 # ----------------------------------------------------------------
 if(SPP_PORT STREQUAL "posix")
     set(SPP_PORT_SOURCES
-        ports/osal/posix/osal_posix.c
         ports/hal/stub/hal_stub.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
@@ -75,7 +69,6 @@ if(SPP_PORT STREQUAL "posix")
 
 elseif(SPP_PORT STREQUAL "freertos")
     set(SPP_PORT_SOURCES
-        ports/osal/freertos/osal_freertos.c
         ports/hal/esp32/hal_esp32.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
@@ -87,7 +80,6 @@ elseif(SPP_PORT STREQUAL "freertos")
 
 elseif(SPP_PORT STREQUAL "baremetal")
     set(SPP_PORT_SOURCES
-        ports/osal/baremetal/osal_baremetal.c
         ports/hal/esp32/hal_esp32_baremetal.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
@@ -103,37 +95,38 @@ endif()
 # ----------------------------------------------------------------
 if(SPP_BUILD_TESTS)
     enable_testing()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(CGREEN REQUIRED cgreen)
+    find_package(cgreen REQUIRED)
+    find_program(CGREEN_RUNNER cgreen-runner REQUIRED)
 
-    file(GLOB_RECURSE SPP_TEST_SOURCES
-        "tests/run_all_tests.c"
-        "tests/core/*.c"
-        "tests/services/**/*.c"
-        "tests/util/*.c"
-    )
+    set_property(TARGET spp spp_port PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-    add_executable(spp_tests ${SPP_TEST_SOURCES})
-
-    target_include_directories(spp_tests PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-        ${CGREEN_INCLUDE_DIRS}
-    )
-
-    target_link_libraries(spp_tests PRIVATE
-        spp
-        spp_port
-        ${CGREEN_LIBRARIES}
-        pthread
-    )
-
-    target_compile_options(spp_tests PRIVATE
+    set(SPP_TEST_COMPILE_OPTIONS
         -Wall -Wextra -Wpedantic
-        --coverage
-        -fprofile-arcs
-        -ftest-coverage
+        --coverage -fprofile-arcs -ftest-coverage
     )
-    target_link_options(spp_tests PRIVATE --coverage)
 
-    add_test(NAME spp_unit_tests COMMAND spp_tests)
+    # Helper to define a test module as a shared library consumed by cgreen-runner.
+    function(spp_add_test_module name src)
+        add_library(${name} SHARED ${src})
+        target_include_directories(${name} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/..
+            ${CGREEN_INCLUDE_DIRS}
+        )
+        target_link_libraries(${name} PRIVATE spp spp_port ${CGREEN_LIBRARIES} pthread)
+        target_compile_options(${name} PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
+        target_link_options(${name} PRIVATE --coverage)
+        add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
+    endfunction()
+
+    spp_add_test_module(spp_test_core     tests/core/test_core.c)
+    spp_add_test_module(spp_test_util     tests/util/test_crc.c)
+    spp_add_test_module(spp_test_databank tests/services/databank/test_databank.c)
+    spp_add_test_module(spp_test_pubsub   tests/services/pubsub/test_pubsub.c)
+    spp_add_test_module(spp_test_log      tests/services/log/test_log.c)
+    spp_add_test_module(spp_test_service  tests/services/test_service.c)
+
+    set_tests_properties(
+        spp_test_databank spp_test_pubsub spp_test_log spp_test_service
+        PROPERTIES LABELS "services"
+    )
 endif()
