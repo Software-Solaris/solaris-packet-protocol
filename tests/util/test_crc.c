@@ -47,7 +47,7 @@ Ensure(SPP_Util_crc16, different_data_gives_different_result)
 
 TestSuite *crc_suite(void)
 {
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("crc");
     add_test_with_context(suite, SPP_Util_crc16, returns_init_value_for_empty_buffer);
     add_test_with_context(suite, SPP_Util_crc16, known_vector_0x31_0x32_0x33);
     add_test_with_context(suite, SPP_Util_crc16, single_byte_zero);

@@ -154,7 +154,7 @@ Ensure(SPP_Log_emit, all_macros_reach_callback)
 
 TestSuite *log_suite(void)
 {
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("log");
 
     add_test_with_context(suite, SPP_Log_init, returns_ok);
     add_test_with_context(suite, SPP_Log_init, sets_verbose_level_by_default);

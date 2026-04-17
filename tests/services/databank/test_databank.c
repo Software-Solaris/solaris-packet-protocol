@@ -140,7 +140,7 @@ Ensure(SPP_Databank_returnPacket, packet_can_be_reused_after_return)
 
 TestSuite *databank_suite(void)
 {
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("databank");
 
     add_test_with_context(suite, SPP_Databank_init, succeeds_on_first_call);
     add_test_with_context(suite, SPP_Databank_init, returns_already_initialized_on_second_call);
