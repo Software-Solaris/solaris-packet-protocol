@@ -1,15 +1,14 @@
 /**
  * @file hal_esp32.c
- * @brief ESP32 HAL port for SPP (SPI, GPIO, storage).
+ * @brief ESP32 HAL port for SPP — polling SPI, no FreeRTOS dependency.
  *
- * Implements @ref SPP_HalPort_t using ESP-IDF driver APIs.
  * Register @ref g_esp32HalPort before calling @ref SPP_Core_init().
  */
 
 #include "spp/hal/port.h"
 #include "spp/core/returntypes.h"
 #include "spp/core/types.h"
-#include "spp/osal/event.h"
+#include "spp/hal/gpio.h"
 #include "macros_esp32.h"
 
 #include "driver/spi_common.h"
@@ -19,8 +18,7 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/portmacro.h"
+#include "esp_timer.h"
 
 #include <string.h>
 
@@ -28,20 +26,20 @@
  * Private state
  * ---------------------------------------------------------------- */
 
-static const char *const k_tag = "SPP_HAL_ESP32";
+static const char *const k_tag = "SPP_HAL";
 
 static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
-static spp_uint8_t         s_spiDevCount = 0U;
-static spp_bool_t          s_busInitialized = false;
+static spp_uint8_t s_spiDevCount = 0U;
+static spp_bool_t s_busInitialized = false;
 
-static sdmmc_card_t *s_p_sdCard   = NULL;
-static spp_bool_t    s_sdMounted  = false;
+static sdmmc_card_t *s_p_sdCard = NULL;
+static spp_bool_t s_sdMounted = false;
 
 /* ----------------------------------------------------------------
- * SPI implementation
+ * SPI
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t esp32SpiBusInit(void)
+static SPP_RetVal_t HAL_ESP32S3_spiBusInit(void)
 {
     if (s_busInitialized)
     {
@@ -49,11 +47,11 @@ static SPP_RetVal_t esp32SpiBusInit(void)
     }
 
     spi_bus_config_t busCfg = {
-        .miso_io_num     = K_ESP32_PIN_MISO,
-        .mosi_io_num     = K_ESP32_PIN_MOSI,
-        .sclk_io_num     = K_ESP32_PIN_CLK,
-        .quadwp_io_num   = -1,
-        .quadhd_io_num   = -1,
+        .miso_io_num = K_ESP32_PIN_MISO,
+        .mosi_io_num = K_ESP32_PIN_MOSI,
+        .sclk_io_num = K_ESP32_PIN_CLK,
+        .quadwp_io_num = -1,
+        .quadhd_io_num = -1,
         .max_transfer_sz = 0,
     };
 
@@ -68,7 +66,7 @@ static SPP_RetVal_t esp32SpiBusInit(void)
     return K_SPP_OK;
 }
 
-static void *esp32SpiGetHandle(spp_uint8_t deviceIdx)
+static void *HAL_ESP32S3_spiGetHandle(spp_uint8_t deviceIdx)
 {
     if (deviceIdx >= K_ESP32_MAX_SPI_DEVICES)
     {
@@ -77,7 +75,7 @@ static void *esp32SpiGetHandle(spp_uint8_t deviceIdx)
     return (void *)&s_spiHandles[deviceIdx];
 }
 
-static SPP_RetVal_t esp32SpiDeviceInit(void *p_handle)
+static SPP_RetVal_t HAL_ESP32S3_spiDeviceInit(void *p_handle)
 {
     if (p_handle == NULL)
     {
@@ -94,16 +92,16 @@ static SPP_RetVal_t esp32SpiDeviceInit(void *p_handle)
     if (s_spiDevCount == K_ESP32_SPI_IDX_ICM)
     {
         devCfg.clock_speed_hz = 1 * 1000 * 1000;
-        devCfg.mode           = 0;
-        devCfg.spics_io_num   = K_ESP32_PIN_CS_ICM;
-        devCfg.queue_size     = 20;
+        devCfg.mode = 0;
+        devCfg.spics_io_num = K_ESP32_PIN_CS_ICM;
+        devCfg.queue_size = 1;
     }
     else if (s_spiDevCount == K_ESP32_SPI_IDX_BMP)
     {
         devCfg.clock_speed_hz = 500 * 1000;
-        devCfg.mode           = 0;
-        devCfg.spics_io_num   = K_ESP32_PIN_CS_BMP;
-        devCfg.queue_size     = 20;
+        devCfg.mode = 0;
+        devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
+        devCfg.queue_size = 1;
     }
     else
     {
@@ -122,7 +120,8 @@ static SPP_RetVal_t esp32SpiDeviceInit(void *p_handle)
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t esp32SpiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
+static SPP_RetVal_t HAL_ESP32S3_spiTransmit(void *p_handle, spp_uint8_t *p_data,
+                                             spp_uint8_t length)
 {
     if ((p_handle == NULL) || (p_data == NULL) || (length == 0U))
     {
@@ -142,21 +141,19 @@ static SPP_RetVal_t esp32SpiTransmit(void *p_handle, spp_uint8_t *p_data, spp_ui
 
         if (p_data[i] & 0x80U)
         {
-            /* Read: 3-byte transaction (cmd + 2 bytes). */
-            trans.length    = 8U * 3U;
+            trans.length = 8U * 3U;
             trans.tx_buffer = &p_data[i];
             trans.rx_buffer = &p_data[i];
             i += 3U;
         }
         else
         {
-            /* Write: 2-byte transaction (cmd + 1 byte). */
-            trans.length    = 8U * 2U;
+            trans.length = 8U * 2U;
             trans.tx_buffer = &p_data[i];
             i += 2U;
         }
 
-        esp_err_t ret = spi_device_transmit(hDev, &trans);
+        esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
         if (ret != ESP_OK)
         {
             return K_SPP_ERROR_ON_SPI_TRANSACTION;
@@ -166,39 +163,40 @@ static SPP_RetVal_t esp32SpiTransmit(void *p_handle, spp_uint8_t *p_data, spp_ui
 }
 
 /* ----------------------------------------------------------------
- * GPIO implementation
+ * GPIO
  * ---------------------------------------------------------------- */
 
-static void gpioInternalIsr(void *p_arg)
+static void IRAM_ATTR HAL_ESP32S3_gpioIsr(void *p_arg)
 {
     SPP_GpioIsrCtx_t *p_ctx = (SPP_GpioIsrCtx_t *)p_arg;
-    spp_bool_t yield = false;
-    (void)SPP_OSAL_eventSetFromIsr(p_ctx->p_eventGroup, p_ctx->bits, NULL, &yield);
-    if (yield)
-    {
-        portYIELD_FROM_ISR();
-    }
+    *p_ctx->p_flag = true;
 }
 
-static SPP_RetVal_t esp32GpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                          spp_uint32_t pull)
+static SPP_RetVal_t HAL_ESP32S3_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
+                                                     spp_uint32_t pull)
 {
     gpio_config_t ioCfg = {
         .pin_bit_mask = (1ULL << pin),
-        .mode         = GPIO_MODE_INPUT,
-        .intr_type    = (gpio_int_type_t)intrType,
-        .pull_up_en   = GPIO_PULLUP_DISABLE,
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = (gpio_int_type_t)intrType,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
     };
 
-    if (pull == 1U) ioCfg.pull_up_en   = GPIO_PULLUP_ENABLE;
-    if (pull == 2U) ioCfg.pull_down_en = GPIO_PULLDOWN_ENABLE;
+    if (pull == 1U)
+    {
+        ioCfg.pull_up_en = GPIO_PULLUP_ENABLE;
+    }
+    if (pull == 2U)
+    {
+        ioCfg.pull_down_en = GPIO_PULLDOWN_ENABLE;
+    }
 
     gpio_config(&ioCfg);
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t esp32GpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
+static SPP_RetVal_t HAL_ESP32S3_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
 {
     static spp_bool_t s_serviceInstalled = false;
     if (!s_serviceInstalled)
@@ -206,33 +204,36 @@ static SPP_RetVal_t esp32GpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
         gpio_install_isr_service(0);
         s_serviceInstalled = true;
     }
-    gpio_isr_handler_add((gpio_num_t)pin, gpioInternalIsr, p_isrCtx);
+    gpio_isr_handler_add((gpio_num_t)pin, HAL_ESP32S3_gpioIsr, p_isrCtx);
     return K_SPP_OK;
 }
 
 /* ----------------------------------------------------------------
- * Storage implementation
+ * Storage
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t esp32StorageMount(void *p_cfg)
+static SPP_RetVal_t HAL_ESP32S3_storageMount(void *p_cfg)
 {
-    if (s_sdMounted) return K_SPP_OK;
+    if (s_sdMounted)
+    {
+        return K_SPP_OK;
+    }
 
     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
 
-    sdmmc_host_t        host       = SDSPI_HOST_DEFAULT();
-    sdspi_device_config_t slotCfg  = SDSPI_DEVICE_CONFIG_DEFAULT();
-    slotCfg.gpio_cs  = (gpio_num_t)p_c->pinCs;
-    slotCfg.host_id  = (spi_host_device_t)p_c->spiHostId;
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    sdspi_device_config_t slotCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
+    slotCfg.gpio_cs = (gpio_num_t)p_c->pinCs;
+    slotCfg.host_id = (spi_host_device_t)p_c->spiHostId;
 
     esp_vfs_fat_mount_config_t mountCfg = {
         .format_if_mount_failed = (bool)p_c->formatIfMountFailed,
-        .max_files              = (int)p_c->maxFiles,
-        .allocation_unit_size   = (size_t)p_c->allocationUnitSize,
+        .max_files = (int)p_c->maxFiles,
+        .allocation_unit_size = (size_t)p_c->allocationUnitSize,
     };
 
-    esp_err_t ret = esp_vfs_fat_sdspi_mount(p_c->p_basePath, &host,
-                                             &slotCfg, &mountCfg, &s_p_sdCard);
+    esp_err_t ret =
+        esp_vfs_fat_sdspi_mount(p_c->p_basePath, &host, &slotCfg, &mountCfg, &s_p_sdCard);
     if (ret != ESP_OK)
     {
         s_p_sdCard = NULL;
@@ -244,16 +245,17 @@ static SPP_RetVal_t esp32StorageMount(void *p_cfg)
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t esp32StorageUnmount(void *p_cfg)
+static SPP_RetVal_t HAL_ESP32S3_storageUnmount(void *p_cfg)
 {
-    if (!s_sdMounted) return K_SPP_OK;
+    if (!s_sdMounted)
+    {
+        return K_SPP_OK;
+    }
 
     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
     esp_err_t ret = esp_vfs_fat_sdcard_unmount(p_c->p_basePath, s_p_sdCard);
-
     s_sdMounted = false;
-    s_p_sdCard  = NULL;
-
+    s_p_sdCard = NULL;
     return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR;
 }
 
@@ -261,9 +263,17 @@ static SPP_RetVal_t esp32StorageUnmount(void *p_cfg)
  * Time
  * ---------------------------------------------------------------- */
 
-static spp_uint32_t esp32GetTimeMs(void)
+static spp_uint32_t HAL_ESP32S3_getTimeMs(void)
 {
-    return (spp_uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
+    return (spp_uint32_t)(esp_timer_get_time() / 1000LL);
+}
+
+static void HAL_ESP32S3_delayMs(spp_uint32_t ms)
+{
+    spp_uint32_t start = HAL_ESP32S3_getTimeMs();
+    while ((HAL_ESP32S3_getTimeMs() - start) < ms)
+    { /* busy-wait */
+    }
 }
 
 /* ----------------------------------------------------------------
@@ -271,13 +281,14 @@ static spp_uint32_t esp32GetTimeMs(void)
  * ---------------------------------------------------------------- */
 
 const SPP_HalPort_t g_esp32HalPort = {
-    .spiBusInit          = esp32SpiBusInit,
-    .spiGetHandle        = esp32SpiGetHandle,
-    .spiDeviceInit       = esp32SpiDeviceInit,
-    .spiTransmit         = esp32SpiTransmit,
-    .gpioConfigInterrupt = esp32GpioConfigInterrupt,
-    .gpioRegisterIsr     = esp32GpioRegisterIsr,
-    .storageMount        = esp32StorageMount,
-    .storageUnmount      = esp32StorageUnmount,
-    .getTimeMs           = esp32GetTimeMs,
+    .spiBusInit          = HAL_ESP32S3_spiBusInit,
+    .spiGetHandle        = HAL_ESP32S3_spiGetHandle,
+    .spiDeviceInit       = HAL_ESP32S3_spiDeviceInit,
+    .spiTransmit         = HAL_ESP32S3_spiTransmit,
+    .gpioConfigInterrupt = HAL_ESP32S3_gpioConfigInterrupt,
+    .gpioRegisterIsr     = HAL_ESP32S3_gpioRegisterIsr,
+    .storageMount        = HAL_ESP32S3_storageMount,
+    .storageUnmount      = HAL_ESP32S3_storageUnmount,
+    .getTimeMs           = HAL_ESP32S3_getTimeMs,
+    .delayMs             = HAL_ESP32S3_delayMs,
 };
