@@ -42,6 +42,8 @@ static spp_uint32_t stubGetTimeMs(void)
     return (spp_uint32_t)((tv.tv_sec * 1000UL) + (tv.tv_usec / 1000UL));
 }
 
+static void stubDelayMs(spp_uint32_t ms) { (void)ms; }
+
 /* ----------------------------------------------------------------
  * Port descriptor
  * ---------------------------------------------------------------- */
@@ -56,4 +58,5 @@ const SPP_HalPort_t g_stubHalPort = {
     .storageMount        = stubStorageMount,
     .storageUnmount      = stubStorageUnmount,
     .getTimeMs           = stubGetTimeMs,
+    .delayMs             = stubDelayMs,
 };
