@@ -1,6 +1,6 @@
 # util/
 
-Standalone utilities used across SPP. No dependencies on OSAL, HAL, or services.
+Standalone utilities used across SPP. No dependencies on HAL or services.
 
 ---
 
@@ -20,14 +20,11 @@ Override any of these in your `CMakeLists.txt` to tune SPP for your target:
 
 ```cmake
 target_compile_definitions(spp PUBLIC
-    K_SPP_DATABANK_SIZE=10          # Default: 5
-    K_SPP_DBFLOW_READY_SIZE=32      # Default: 16 (must be power of two)
-    K_SPP_STACK_SIZE=8192           # Default: 4096 bytes
-    K_SPP_MAX_TASKS=12              # Default: 8
-    K_SPP_MAX_SERVICES=8            # Default: 16
-    SPP_NO_RTOS=1                   # Disable RTOS, use baremetal port
-    SPP_NO_MALLOC=1                 # Disable dynamic allocation
-    SPP_NO_STORAGE=1                # Disable SD card / filesystem
+    K_SPP_DATABANK_SIZE=10           # Default: 5 — packet pool size
+    K_SPP_PUBSUB_MAX_SUBSCRIBERS=16  # Default: 8 — max registered subscribers
+    K_SPP_MAX_SERVICES=8             # Default: 16 — service registry slots
+    SPP_NO_MALLOC=1                  # Disable dynamic allocation
+    SPP_NO_STORAGE=1                 # Disable SD card / filesystem
 )
 ```
 
@@ -35,16 +32,20 @@ target_compile_definitions(spp PUBLIC
 
 ## crc.h — CRC-16/CCITT
 
+`SPP_Databank_packetData()` calls this automatically — you do not need to call it directly unless computing a CRC on a raw buffer.
+
 ```c
-// Compute CRC over a packet's full content before transmitting
+// Manual CRC example (not needed for normal SPP usage):
 spp_uint16_t crc = SPP_Util_crc16(
-    (const uint8_t *)p_pkt,
-    sizeof(SPP_Packet_t) - sizeof(uint16_t)  // exclude the crc field itself
+    (const spp_uint8_t *)p_pkt,
+    (spp_uint32_t)offsetof(SPP_Packet_t, crc)  // exclude the crc field itself
 );
 p_pkt->crc = crc;
 ```
 
 Polynomial: **0x1021**, initial value: **0xFFFF**. Compatible with standard CRC-16/CCITT implementations.
+
+The full packet struct is `memset` to zero before filling, so compiler padding bytes are always 0 and the CRC is deterministic across compilers and architectures.
 
 ---
 

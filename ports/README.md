@@ -1,55 +1,15 @@
 # ports/
 
-Concrete platform implementations of the HAL and OSAL contracts. HAL and OSAL are **independent axes** — pick one from each and combine them freely.
+Concrete platform implementations of the HAL contract. Each port implements `SPP_HalPort_t` for a specific MCU or host environment.
 
 ```
 ports/
-├── osal/               OS implementations (independent of hardware)
-│   ├── freertos/       FreeRTOS tasks, queues, mutexes, event groups
-│   ├── baremetal/      Cooperative scheduler — no OS required
-│   └── posix/          POSIX pthreads — for host-side unit tests
-└── hal/                Hardware implementations (independent of OS)
+└── hal/                Hardware implementations
     ├── esp32/          ESP32-S3 SPI2, GPIO ISR, SD card via FATFS
     └── stub/           No-op stubs returning K_SPP_OK — for host tests
 ```
 
----
-
-## Mixing ports
-
-| OSAL | HAL | Use case |
-|---|---|---|
-| `freertos` | `esp32` | ESP32-S3 in production |
-| `baremetal` | `esp32` | ESP32-S3 without FreeRTOS |
-| `posix` | `stub` | Host unit tests (no hardware needed) |
-| `freertos` | *(your new HAL)* | New MCU, reuse FreeRTOS OSAL |
-| *(your new OSAL)* | `esp32` | Alternative OS on ESP32 |
-
----
-
-## Available OSAL ports
-
-### `osal/freertos/` — FreeRTOS
-
-Maps SPP primitives to FreeRTOS APIs using static allocation where possible:
-
-| SPP | FreeRTOS |
-|---|---|
-| `taskCreate` | `xTaskCreateStatic` |
-| `taskDelayMs` | `vTaskDelay(pdMS_TO_TICKS(ms))` |
-| `queueCreate` | `xQueueCreate` |
-| `queueSend` | `xQueueSend` |
-| `mutexCreate` | `xSemaphoreCreateMutex` |
-| `eventCreate` | `xEventGroupCreate` |
-| `eventSetFromIsr` | `xEventGroupSetBitsFromISR` |
-
-### `osal/baremetal/` — Cooperative scheduler
-
-Implements a simple round-robin tick loop. Tasks are function pointers called in sequence. `taskDelayMs` busy-loops or yields to the next task depending on build flags.
-
-### `osal/posix/` — POSIX
-
-Uses `pthread_create` for tasks, POSIX semaphores for mutexes, and a condition-variable-based event group implementation. Used exclusively for running the Cgreen unit test suite on a development PC.
+There is no OSAL layer. SPP runs in a bare-metal superloop — ISRs set `volatile` flags, the superloop polls them. No tasks, queues, or event groups are needed.
 
 ---
 
@@ -57,37 +17,27 @@ Uses `pthread_create` for tasks, POSIX semaphores for mutexes, and a condition-v
 
 ### `hal/esp32/`
 
-Two variants sharing the same GPIO and SPI pin definitions (`macros_esp32.h`):
-
 | File | Description |
 |---|---|
-| `hal_esp32.c` | FreeRTOS-aware SPI (DMA, transaction queues) |
-| `hal_esp32_baremetal.c` | Polling SPI (no FreeRTOS dependencies) |
+| `hal_esp32.c` | Polling SPI (`spi_device_polling_transmit`), no FreeRTOS dependencies — primary target |
 | `macros_esp32.h` | Pin definitions: MISO=47, MOSI=38, CLK=48, CS_ICM=21, CS_BMP=18, CS_SDC=8 |
+
+Exports: `const SPP_HalPort_t g_esp32HalPort`
+
+Register at startup:
+```c
+SPP_Core_setHalPort(&g_esp32HalPort);
+```
 
 ### `hal/stub/`
 
-Every function returns `K_SPP_OK` immediately. Used with `osal/posix/` for host-side unit tests where no hardware is present.
+Every function returns `K_SPP_OK` immediately. Used for host-side unit tests where no hardware is present.
+
+Exports: `const SPP_HalPort_t g_stubHalPort`
 
 ---
 
-## Implementing a new port
-
-### New OSAL port (new OS)
-
-1. Create `ports/osal/<os>/osal_<os>.c`
-2. Fill all fields of `SPP_OsalPort_t` with your OS's APIs
-3. Declare `const SPP_OsalPort_t g_<os>OsalPort = { ... }`
-4. At startup: `SPP_Core_setOsalPort(&g_<os>OsalPort)`
-5. Add the source to `CMakeLists.txt`
-
-Minimum checklist:
-- [ ] `taskCreate` — create a task with the given stack size and priority
-- [ ] `taskDelayMs` — block for at least N milliseconds
-- [ ] `getTickMs` — return monotonic ms counter
-- [ ] `queueCreate` / `queueSend` / `queueRecv` — FIFO with timeout
-- [ ] `mutexCreate` / `mutexLock` / `mutexUnlock`
-- [ ] `eventCreate` / `eventWait` / `eventSetFromIsr`
+## Implementing a new HAL port
 
 ### New HAL port (new MCU)
 
@@ -102,4 +52,18 @@ Minimum checklist:
 - [ ] `getTimeMs`
 - [ ] `storageMount` / `storageUnmount` (or leave NULL if no storage)
 
-See `hal/esp32/hal_esp32.c` and `osal/freertos/osal_freertos.c` as complete reference implementations.
+See `hal/esp32/hal_esp32.c` as the complete reference implementation.
+
+---
+
+## GPIO ISR pattern
+
+The ISR sets a `volatile` flag through `SPP_GpioIsrCtx_t`:
+
+```c
+typedef struct {
+    volatile spp_bool_t *p_flag;
+} SPP_GpioIsrCtx_t;
+```
+
+The port ISR handler reads `p_flag` from the context pointer and sets `*p_flag = true`. No RTOS calls. No yield. The superloop detects the flag on the next iteration.
