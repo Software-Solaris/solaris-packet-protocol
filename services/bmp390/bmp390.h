@@ -202,6 +202,16 @@ typedef struct
  */
 extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
 
+/**
+ * @brief Service task — call from the superloop when drdyFlag is set.
+ *
+ * Clears drdyFlag, reads altitude/pressure/temperature, and publishes
+ * a packet via SPP_PubSub_publish().
+ *
+ * @param[in,out] p_ctx  Pointer to the service context.
+ */
+void BMP390_ServiceTask(BMP390_ServiceCtx_t *p_ctx);
+
 /* ============================================================================
  * Driver API (low-level — used internally and for testing)
  * ========================================================================= */
