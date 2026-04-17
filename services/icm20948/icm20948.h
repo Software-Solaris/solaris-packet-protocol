@@ -21,6 +21,7 @@
 
 #include "spp/core/returntypes.h"
 #include "spp/core/types.h"
+#include "spp/hal/gpio.h"
 #include "spp/services/service.h"
 
 #ifdef __cplusplus
@@ -423,12 +424,47 @@ typedef union
  * Service types
  * ---------------------------------------------------------------- */
 
+/** @brief APID used by the ICM20948 service. */
+#define K_ICM20948_SERVICE_APID (0x0201U)
+
+/**
+ * @brief Parsed sensor sample from the DMP FIFO.
+ */
+typedef struct
+{
+    float      ax;        /**< Accelerometer X (g)   */
+    float      ay;        /**< Accelerometer Y (g)   */
+    float      az;        /**< Accelerometer Z (g)   */
+    float      gx;        /**< Gyroscope X (dps)     */
+    float      gy;        /**< Gyroscope Y (dps)     */
+    float      gz;        /**< Gyroscope Z (dps)     */
+    float      mx;        /**< Magnetometer X (uT)   */
+    float      my;        /**< Magnetometer Y (uT)   */
+    float      mz;        /**< Magnetometer Z (uT)   */
+    spp_bool_t dataReady; /**< Set when a FIFO packet has been parsed. */
+} ICM20948_SensorData_t;
+
+/**
+ * @brief ICM20948 interrupt and GPIO context.
+ */
+typedef struct
+{
+    volatile spp_bool_t  drdyFlag;      /**< Set by ISR on data-ready interrupt. */
+    SPP_GpioIsrCtx_t     isr_ctx;       /**< ISR context (points at drdyFlag).   */
+    spp_uint32_t         intPin;        /**< GPIO interrupt pin number.           */
+    spp_uint32_t         intIntrType;   /**< Interrupt trigger type (1=rising).   */
+    spp_uint32_t         intPull;       /**< Pull resistor: 0=none, 1=up, 2=down. */
+} ICM20948_Data_t;
+
 /**
  * @brief Configuration for the ICM20948 service instance.
  */
 typedef struct
 {
-    spp_uint8_t spiDevIdx; /**< SPI device handle index (ICM = 0). */
+    spp_uint8_t  spiDevIdx;   /**< SPI device handle index (ICM = 0). */
+    spp_uint32_t intPin;      /**< GPIO interrupt pin number.          */
+    spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising).     */
+    spp_uint32_t intPull;     /**< Pull resistor (0=none, 1=up).       */
 } ICM20948_ServiceCfg_t;
 
 /**
@@ -436,7 +472,10 @@ typedef struct
  */
 typedef struct
 {
-    void *p_spi; /**< SPI device handle. */
+    void                  *p_spi;    /**< SPI device handle.              */
+    ICM20948_Data_t        icmData;  /**< Interrupt flag and ISR context. */
+    ICM20948_SensorData_t  lastData; /**< Last parsed FIFO sample.        */
+    spp_uint16_t           seq;      /**< Packet sequence counter.        */
 } ICM20948_ServiceCtx_t;
 
 /**
@@ -455,7 +494,23 @@ SPP_RetVal_t ICM20948_loadDmp(void *p_data);
 SPP_RetVal_t ICM20948_dmpStart(void *p_data);
 SPP_RetVal_t ICM20948_readSensors(void *p_data);
 void     ICM20948_getSensorsData(void *p_data);
-void     ICM20948_checkFifoData(void *p_data);
+void     ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
+
+/**
+ * @brief Initialise the ICM20948 interrupt context and register the GPIO ISR.
+ *
+ * @param[out] p_icm  Pointer to the ICM20948 device context to initialise.
+ */
+void ICM20948_init(ICM20948_Data_t *p_icm);
+
+/**
+ * @brief Read the DMP FIFO, package sensor data and publish via pub/sub.
+ *
+ * Call from the superloop when @c icmData.drdyFlag is set.
+ *
+ * @param[in] p_ctx  Pointer to the ICM20948 service context.
+ */
+void ICM20948_ServiceTask(void *p_ctx);
 
 #ifdef __cplusplus
 }
