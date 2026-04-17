@@ -6,6 +6,7 @@
 #include "spp/hal/spi.h"
 #include "spp/hal/gpio.h"
 #include "spp/hal/storage.h"
+#include "spp/hal/time.h"
 #include "spp/core/core.h"
 #include "spp/core/returntypes.h"
 #include "spp/core/error.h"
@@ -119,4 +120,27 @@ SPP_RetVal_t SPP_HAL_storageUnmount(void *p_cfg)
         return K_SPP_OK;
     }
     return p_port->storageUnmount(p_cfg);
+}
+
+/* ----------------------------------------------------------------
+ * Time dispatch
+ * ---------------------------------------------------------------- */
+
+spp_uint32_t SPP_HAL_getTimeMs(void)
+{
+    const SPP_HalPort_t *p_port = getPort();
+    if ((p_port == NULL) || (p_port->getTimeMs == NULL))
+    {
+        return 0U;
+    }
+    return p_port->getTimeMs();
+}
+
+void SPP_HAL_delayMs(spp_uint32_t ms)
+{
+    const SPP_HalPort_t *p_port = getPort();
+    if ((p_port != NULL) && (p_port->delayMs != NULL))
+    {
+        p_port->delayMs(ms);
+    }
 }

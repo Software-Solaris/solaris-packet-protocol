@@ -132,6 +132,16 @@ typedef struct
      */
     spp_uint32_t (*getTimeMs)(void);
 
+    /**
+     * @brief Block for the requested number of milliseconds.
+     *
+     * Used during sensor initialisation sequences that require a fixed delay.
+     * On baremetal targets this is a busy-wait; on RTOS targets it may yield.
+     *
+     * @param[in] ms  Number of milliseconds to delay.
+     */
+    void (*delayMs)(spp_uint32_t ms);
+
 } SPP_HalPort_t;
 
 #endif /* SPP_HAL_PORT_H */
