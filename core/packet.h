@@ -21,10 +21,17 @@
  * ---------------------------------------------------------------- */
 
 /** @brief Current SPP protocol version embedded in each packet. */
-#define K_SPP_PKT_VERSION    (1U)
+#define K_SPP_PKT_VERSION     (1U)
 
 /** @brief Maximum payload size in bytes per packet. */
 #define K_SPP_PKT_PAYLOAD_MAX (48U)
+
+/* ----------------------------------------------------------------
+ * Reserved APIDs
+ * ---------------------------------------------------------------- */
+
+/** @brief APID reserved for SPP log message packets. */
+#define K_SPP_APID_LOG (0x0001U)
 
 /* ----------------------------------------------------------------
  * Packet header types
