@@ -1,5 +1,5 @@
 /**
- * @file macros_esp32.h
+ * @file macrosEsp32.h
  * @brief ESP32 hardware pin definitions and SPI constants.
  *
  * Naming conventions used in this file:

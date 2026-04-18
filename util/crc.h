@@ -4,7 +4,7 @@
  *
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_CRC_*
- * - Public functions: SPP_Util_crc16()
+ * - Public functions: SPP_UTIL_crc16()
  */
 
 #ifndef SPP_CRC_H
@@ -34,6 +34,6 @@
  *
  * @return 16-bit CRC value.
  */
-spp_uint16_t SPP_Util_crc16(const spp_uint8_t *p_data, spp_uint32_t length);
+spp_uint16_t SPP_UTIL_crc16(const spp_uint8_t *p_data, spp_uint32_t length);
 
 #endif /* SPP_CRC_H */

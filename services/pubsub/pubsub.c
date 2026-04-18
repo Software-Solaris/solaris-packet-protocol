@@ -30,7 +30,7 @@ static spp_bool_t  s_initialized = false;
  * Public API
  * ---------------------------------------------------------------- */
 
-void SPP_PubSub_init(void)
+void SPP_SERVICES_PUBSUB_init(void)
 {
     spp_uint8_t i;
     for (i = 0U; i < K_SPP_PUBSUB_MAX_SUBSCRIBERS; i++)
@@ -43,7 +43,7 @@ void SPP_PubSub_init(void)
     s_initialized = true;
 }
 
-SPP_RetVal_t SPP_PubSub_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handler,
+SPP_RetVal_t SPP_SERVICES_PUBSUB_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handler,
                                    void *p_ctx)
 {
     if (!s_initialized)
@@ -67,7 +67,7 @@ SPP_RetVal_t SPP_PubSub_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handle
     return K_SPP_OK;
 }
 
-SPP_RetVal_t SPP_PubSub_publish(SPP_Packet_t *p_packet)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet)
 {
     spp_uint8_t i;
 
@@ -85,11 +85,11 @@ SPP_RetVal_t SPP_PubSub_publish(SPP_Packet_t *p_packet)
         }
     }
 
-    (void)SPP_Databank_returnPacket(p_packet);
+    (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
     return K_SPP_OK;
 }
 
-spp_uint8_t SPP_PubSub_subscriberCount(void)
+spp_uint8_t SPP_SERVICES_PUBSUB_subscriberCount(void)
 {
     return s_count;
 }

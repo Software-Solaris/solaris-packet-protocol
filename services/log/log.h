@@ -9,7 +9,7 @@
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_LOG_*, SPP_LOG*
  * - Types: SPP_LogLevel_t, SPP_LogOutputFn_t
- * - Public functions: SPP_Log_*()
+ * - Public functions: SPP_SERVICES_LOG_*()
  * - Pointer parameters: p_*
  */
 
@@ -17,7 +17,7 @@
 #define SPP_LOG_H
 
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
  * Log level enumeration
@@ -62,7 +62,7 @@ typedef void (*SPP_LogOutputFn_t)(const char *p_tag, SPP_LogLevel_t level,
  *
  * @return K_SPP_OK on success.
  */
-SPP_RetVal_t SPP_Log_init(void);
+SPP_RetVal_t SPP_SERVICES_LOG_init(void);
 
 /**
  * @brief Set the global log level filter.
@@ -71,14 +71,14 @@ SPP_RetVal_t SPP_Log_init(void);
  *
  * @param[in] level  New log level.
  */
-void SPP_Log_setLevel(SPP_LogLevel_t level);
+void SPP_SERVICES_LOG_setLevel(SPP_LogLevel_t level);
 
 /**
  * @brief Return the current global log level.
  *
  * @return Current @ref SPP_LogLevel_t.
  */
-SPP_LogLevel_t SPP_Log_getLevel(void);
+SPP_LogLevel_t SPP_SERVICES_LOG_getLevel(void);
 
 /**
  * @brief Register a custom log output callback.
@@ -87,7 +87,7 @@ SPP_LogLevel_t SPP_Log_getLevel(void);
  *
  * @param[in] p_fn  Callback function pointer (may be NULL).
  */
-void SPP_Log_registerOutput(SPP_LogOutputFn_t p_fn);
+void SPP_SERVICES_LOG_registerOutput(SPP_LogOutputFn_t p_fn);
 
 /**
  * @brief Internal log emit function — use macros instead of calling directly.
@@ -97,7 +97,7 @@ void SPP_Log_registerOutput(SPP_LogOutputFn_t p_fn);
  * @param[in] p_fmt   printf-style format string.
  * @param[in] ...     Format arguments.
  */
-void SPP_Log_emit(const char *p_tag, SPP_LogLevel_t level,
+void SPP_SERVICES_LOG_emit(const char *p_tag, SPP_LogLevel_t level,
                   const char *p_fmt, ...);
 
 /* ----------------------------------------------------------------
@@ -106,22 +106,22 @@ void SPP_Log_emit(const char *p_tag, SPP_LogLevel_t level,
 
 /** @brief Log an error message. */
 #define SPP_LOGE(tag, fmt, ...) \
-    SPP_Log_emit((tag), K_SPP_LOG_ERROR,   (fmt), ##__VA_ARGS__)
+    SPP_SERVICES_LOG_emit((tag), K_SPP_LOG_ERROR,   (fmt), ##__VA_ARGS__)
 
 /** @brief Log a warning message. */
 #define SPP_LOGW(tag, fmt, ...) \
-    SPP_Log_emit((tag), K_SPP_LOG_WARN,    (fmt), ##__VA_ARGS__)
+    SPP_SERVICES_LOG_emit((tag), K_SPP_LOG_WARN,    (fmt), ##__VA_ARGS__)
 
 /** @brief Log an informational message. */
 #define SPP_LOGI(tag, fmt, ...) \
-    SPP_Log_emit((tag), K_SPP_LOG_INFO,    (fmt), ##__VA_ARGS__)
+    SPP_SERVICES_LOG_emit((tag), K_SPP_LOG_INFO,    (fmt), ##__VA_ARGS__)
 
 /** @brief Log a debug message. */
 #define SPP_LOGD(tag, fmt, ...) \
-    SPP_Log_emit((tag), K_SPP_LOG_DEBUG,   (fmt), ##__VA_ARGS__)
+    SPP_SERVICES_LOG_emit((tag), K_SPP_LOG_DEBUG,   (fmt), ##__VA_ARGS__)
 
 /** @brief Log a verbose trace message. */
 #define SPP_LOGV(tag, fmt, ...) \
-    SPP_Log_emit((tag), K_SPP_LOG_VERBOSE, (fmt), ##__VA_ARGS__)
+    SPP_SERVICES_LOG_emit((tag), K_SPP_LOG_VERBOSE, (fmt), ##__VA_ARGS__)
 
 #endif /* SPP_LOG_H */

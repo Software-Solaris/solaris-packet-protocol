@@ -11,7 +11,7 @@
 #define SPP_HAL_GPIO_H
 
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
  * ISR context

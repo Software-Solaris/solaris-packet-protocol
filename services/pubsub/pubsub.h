@@ -2,7 +2,7 @@
  * @file pubsub.h
  * @brief Synchronous publish-subscribe packet router.
  *
- * Producers call @ref SPP_PubSub_publish() after filling a packet.  The
+ * Producers call @ref SPP_SERVICES_PUBSUB_publish() after filling a packet.  The
  * publish function dispatches the packet to every registered subscriber whose
  * APID matches, then returns the packet to the databank.
  *
@@ -21,7 +21,7 @@
 
 #include "spp/core/packet.h"
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief Subscriber callback signature.
  *
- * Called synchronously inside @ref SPP_PubSub_publish().  The packet pointer
+ * Called synchronously inside @ref SPP_SERVICES_PUBSUB_publish().  The packet pointer
  * is valid only for the duration of the call — do not store it.
  *
  * @param[in] p_packet  Published packet (read-only).
@@ -58,7 +58,7 @@ typedef void (*SPP_PubSub_Handler_t)(const SPP_Packet_t *p_packet, void *p_ctx);
  *
  * Clears all subscriptions.  Safe to call multiple times.
  */
-void SPP_PubSub_init(void);
+void SPP_SERVICES_PUBSUB_init(void);
 
 /**
  * @brief Register a subscriber for a given APID.
@@ -69,7 +69,7 @@ void SPP_PubSub_init(void);
  *
  * @return K_SPP_OK on success, or an error code otherwise.
  */
-SPP_RetVal_t SPP_PubSub_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handler,
+SPP_RetVal_t SPP_SERVICES_PUBSUB_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handler,
                                    void *p_ctx);
 
 /**
@@ -77,23 +77,23 @@ SPP_RetVal_t SPP_PubSub_subscribe(spp_uint16_t apid, SPP_PubSub_Handler_t handle
  *
  * Dispatches @p p_packet synchronously to every subscriber whose APID equals
  * @c p_packet->primaryHeader.apid or is @ref K_SPP_APID_ALL, then returns
- * the packet to the databank via @ref SPP_Databank_returnPacket().
+ * the packet to the databank via @ref SPP_SERVICES_DATABANK_returnPacket().
  *
  * The packet pointer becomes invalid after this call returns — subscribers
  * must not retain it.
  *
- * @param[in] p_packet  Filled packet obtained from @ref SPP_Databank_getPacket().
+ * @param[in] p_packet  Filled packet obtained from @ref SPP_SERVICES_DATABANK_getPacket().
  *
  * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if @p p_packet is NULL.
  */
-SPP_RetVal_t SPP_PubSub_publish(SPP_Packet_t *p_packet);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet);
 
 /**
  * @brief Return the number of currently registered subscribers.
  *
  * @return Subscriber count.
  */
-spp_uint8_t SPP_PubSub_subscriberCount(void);
+spp_uint8_t SPP_SERVICES_PUBSUB_subscriberCount(void);
 
 #ifdef __cplusplus
 }

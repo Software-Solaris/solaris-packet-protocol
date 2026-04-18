@@ -4,10 +4,10 @@
  *
  * Mirrors the pattern from lley-core's errnum.h:
  *
- *   SPP_ERR_get() / SPP_ERR_set()   — thread-local last error
+ *   SPP_CORE_errGet() / SPP_CORE_errSet()   — thread-local last error
  *                                     (static global when SPP_NO_RTOS=1)
- *   SPP_ERR_toString()              — pointer to internal buffer (not reentrant)
- *   SPP_ERR_toString_r()            — caller-supplied buffer (reentrant)
+ *   SPP_CORE_errToString()              — pointer to internal buffer (not reentrant)
+ *   SPP_CORE_errToString()            — caller-supplied buffer (reentrant)
  *   SPP_ErrCtx_t                    — extended context: code + file + line
  *   SPP_ERR_SET(code)               — set context with __FILE__ / __LINE__
  *
@@ -20,7 +20,7 @@
 #ifndef SPP_ERROR_H
 #define SPP_ERROR_H
 
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include <stddef.h>
 
 /* ----------------------------------------------------------------
@@ -42,7 +42,7 @@
 /**
  * @brief Extended error context — error code plus source location.
  *
- * Set via SPP_ERR_SET(); retrieved via SPP_ERR_getCtx().
+ * Set via SPP_ERR_SET(); retrieved via SPP_CORE_errGetCtx().
  */
 typedef struct
 {
@@ -60,10 +60,10 @@ typedef struct
  *
  * Equivalent to lley-core's get_errc().
  *
- * @return The last @ref SPP_RetVal_t value stored by SPP_ERR_set() or
+ * @return The last @ref SPP_RetVal_t value stored by SPP_CORE_errSet() or
  *         SPP_ERR_SET(), or K_SPP_OK if none has been set.
  */
-SPP_RetVal_t SPP_ERR_get(void);
+SPP_RetVal_t SPP_CORE_errGet(void);
 
 /**
  * @brief Sets the last error code for the calling thread.
@@ -72,7 +72,7 @@ SPP_RetVal_t SPP_ERR_get(void);
  *
  * @param[in] err Error code to store.
  */
-void SPP_ERR_set(SPP_RetVal_t err);
+void SPP_CORE_errSet(SPP_RetVal_t err);
 
 /* ----------------------------------------------------------------
  * Extended context get / set
@@ -81,10 +81,10 @@ void SPP_ERR_set(SPP_RetVal_t err);
 /**
  * @brief Returns the extended error context for the calling thread.
  *
- * @return A copy of the last @ref SPP_ErrCtx_t stored by SPP_ERR_setCtx()
+ * @return A copy of the last @ref SPP_ErrCtx_t stored by SPP_CORE_errSetCtx()
  *         or SPP_ERR_SET().
  */
-SPP_ErrCtx_t SPP_ERR_getCtx(void);
+SPP_ErrCtx_t SPP_CORE_errGetCtx(void);
 
 /**
  * @brief Sets the extended error context for the calling thread.
@@ -96,7 +96,7 @@ SPP_ErrCtx_t SPP_ERR_getCtx(void);
  * @param[in] p_file Source file name (typically __FILE__).
  * @param[in] line   Source line number (typically __LINE__).
  */
-void SPP_ERR_setCtx(SPP_RetVal_t code, const char *p_file, int line);
+void SPP_CORE_errSetCtx(SPP_RetVal_t code, const char *p_file, int line);
 
 /* ----------------------------------------------------------------
  * String conversion
@@ -106,13 +106,13 @@ void SPP_ERR_setCtx(SPP_RetVal_t code, const char *p_file, int line);
  * @brief Returns a human-readable string for @p err.
  *
  * Uses an internal thread-local (or static) buffer.  The pointer is
- * valid until the next call to SPP_ERR_toString() on the same thread.
+ * valid until the next call to SPP_CORE_errToString() on the same thread.
  * Equivalent to lley-core's errc2str().
  *
  * @param[in] err Error code.
  * @return Null-terminated ASCII string, never NULL.
  */
-static inline const char *SPP_ERR_toString(SPP_RetVal_t err);
+static inline const char *SPP_CORE_errToString(SPP_RetVal_t err);
 
 /**
  * @brief Reentrant variant — copies the error string into @p p_buf.
@@ -124,16 +124,16 @@ static inline const char *SPP_ERR_toString(SPP_RetVal_t err);
  * @param[in]  bufLen  Size of @p p_buf in bytes. Ignored when @p p_buf is NULL.
  * @return @p p_buf when not NULL; internal buffer otherwise.
  */
-const char *SPP_ERR_toString_r(SPP_RetVal_t err, char *p_buf, size_t bufLen);
+const char *SPP_CORE_errToString(SPP_RetVal_t err, char *p_buf, size_t bufLen);
 
 /* ----------------------------------------------------------------
- * Inline implementation of SPP_ERR_toString
+ * Inline implementation of SPP_CORE_errToString
  * ---------------------------------------------------------------- */
 
 static inline const char *
-SPP_ERR_toString(SPP_RetVal_t err)
+SPP_CORE_errToString(SPP_RetVal_t err)
 {
-    return SPP_ERR_toString_r(err, NULL, 0U);
+    return SPP_CORE_errToString(err, NULL, 0U);
 }
 
 /* ----------------------------------------------------------------
@@ -148,14 +148,14 @@ SPP_ERR_toString(SPP_RetVal_t err)
  *         SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
  * @endcode
  */
-#define SPP_ERR_SET(code) SPP_ERR_setCtx((code), __FILE__, __LINE__)
+#define SPP_ERR_SET(code) SPP_CORE_errSetCtx((code), __FILE__, __LINE__)
 
 /**
  * @brief Set error context and return in one step.
  *
  * Equivalent to calling SPP_ERR_SET() followed by return. Ensures every
  * error path captures the source location so callers can retrieve it via
- * SPP_ERR_getCtx() and print it with SPP_ERR_toString().
+ * SPP_CORE_errGetCtx() and print it with SPP_CORE_errToString().
  *
  * @code
  *     if (p_buf == NULL)

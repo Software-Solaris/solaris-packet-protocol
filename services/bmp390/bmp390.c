@@ -50,7 +50,7 @@ static float s_compPress;
  * Driver — initialisation
  * ---------------------------------------------------------------- */
 
-void BMP390_init(void *p_data)
+void SPP_SERVICES_BMP390_init(void *p_data)
 {
     BMP390_Data_t *p_bmp = (BMP390_Data_t *)p_data;
 
@@ -65,7 +65,7 @@ void BMP390_init(void *p_data)
  * Driver — configuration helpers
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t BMP390_softReset(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spi)
 {
     spp_uint8_t buf[2] = {(spp_uint8_t)K_BMP390_SOFT_RESET_REG, (spp_uint8_t)BMP390_SOFT_RESET_CMD};
     SPP_RetVal_t ret = SPP_HAL_spiTransmit(p_spi, buf, sizeof(buf));
@@ -73,7 +73,7 @@ SPP_RetVal_t BMP390_softReset(void *p_spi)
     return ret;
 }
 
-SPP_RetVal_t BMP390_enableSpiMode(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spi)
 {
     spp_uint8_t buf[2] = {(spp_uint8_t)K_BMP390_IF_CONF_REG, (spp_uint8_t)BMP390_IF_CONF_SPI};
     SPP_RetVal_t ret = SPP_HAL_spiTransmit(p_spi, buf, (spp_uint8_t)sizeof(buf));
@@ -81,7 +81,7 @@ SPP_RetVal_t BMP390_enableSpiMode(void *p_spi)
     return ret;
 }
 
-SPP_RetVal_t BMP390_configCheck(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spi)
 {
     spp_uint8_t buf[9] = {(spp_uint8_t)(K_BMP390_SPI_READ | K_BMP390_IF_CONF_REG),
                           K_BMP390_SPI_WRITE,
@@ -110,23 +110,23 @@ SPP_RetVal_t BMP390_configCheck(void *p_spi)
     return ret;
 }
 
-SPP_RetVal_t BMP390_auxConfig(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spi)
 {
     SPP_RetVal_t ret;
 
-    ret = BMP390_softReset(p_spi);
+    ret = SPP_SERVICES_BMP390_softReset(p_spi);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = BMP390_enableSpiMode(p_spi);
+    ret = SPP_SERVICES_BMP390_enableSpiMode(p_spi);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = BMP390_configCheck(p_spi);
+    ret = SPP_SERVICES_BMP390_configCheck(p_spi);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -135,7 +135,7 @@ SPP_RetVal_t BMP390_auxConfig(void *p_spi)
     return ret;
 }
 
-SPP_RetVal_t BMP390_prepareMeasure(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spi)
 {
     spp_uint8_t buf[8] = {(spp_uint8_t)K_BMP390_REG_OSR,     (spp_uint8_t)BMP390_VALUE_OSR,
                           (spp_uint8_t)K_BMP390_REG_ODR,     (spp_uint8_t)BMP390_VALUE_ODR,
@@ -145,7 +145,7 @@ SPP_RetVal_t BMP390_prepareMeasure(void *p_spi)
     return SPP_HAL_spiTransmit(p_spi, buf, sizeof(buf));
 }
 
-SPP_RetVal_t BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms)
+SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms)
 {
     spp_uint32_t start = SPP_HAL_getTimeMs();
 
@@ -164,7 +164,7 @@ SPP_RetVal_t BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms)
  * Driver — temperature
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib)
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib)
 {
     spp_uint8_t buf[15] = {(spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_TEMP_CALIB_REG_START + 0)),
                            K_BMP390_SPI_WRITE,
@@ -202,11 +202,11 @@ SPP_RetVal_t BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib)
     return ret;
 }
 
-SPP_RetVal_t BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out)
+SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out)
 {
     BMP390_temp_calib_t raw;
 
-    SPP_RetVal_t ret = BMP390_readRawTempCoeffs(p_spi, &raw);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawTempCoeffs(p_spi, &raw);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -219,7 +219,7 @@ SPP_RetVal_t BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out)
     return ret;
 }
 
-SPP_RetVal_t BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp)
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp)
 {
     spp_uint8_t buf[9] = {(spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_TEMP_RAW_REG + 0)),
                           K_BMP390_SPI_WRITE,
@@ -246,7 +246,7 @@ SPP_RetVal_t BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp)
     return ret;
 }
 
-float BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *params)
+float SPP_SERVICES_BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *params)
 {
     float partial1 = (float)raw_temp - params->PAR_T1;
     float partial2 = partial1 * params->PAR_T2;
@@ -255,16 +255,16 @@ float BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *
     return t_lin;
 }
 
-SPP_RetVal_t BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
+SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
                                spp_uint32_t *raw_temp, float *comp_temp)
 {
-    SPP_RetVal_t ret = BMP390_readRawTemp(p_spi, raw_temp);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawTemp(p_spi, raw_temp);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    *comp_temp = BMP390_compensateTemperature(*raw_temp, (BMP390_temp_params_t *)temp_params);
+    *comp_temp = SPP_SERVICES_BMP390_compensateTemperature(*raw_temp, (BMP390_temp_params_t *)temp_params);
 
     return ret;
 }
@@ -273,7 +273,7 @@ SPP_RetVal_t BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_par
  * Driver — pressure
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib)
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib)
 {
     spp_uint8_t buf[48] = {(spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_PRESS_CALIB_REG_START + 0)),
                            K_BMP390_SPI_WRITE,
@@ -351,11 +351,11 @@ SPP_RetVal_t BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib
     return ret;
 }
 
-SPP_RetVal_t BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out)
+SPP_RetVal_t SPP_SERVICES_BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out)
 {
     BMP390_press_calib_t raw;
 
-    SPP_RetVal_t ret = BMP390_readRawPressCoeffs(p_spi, &raw);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawPressCoeffs(p_spi, &raw);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -376,7 +376,7 @@ SPP_RetVal_t BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out
     return ret;
 }
 
-SPP_RetVal_t BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press)
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press)
 {
     spp_uint8_t buf[9] = {(spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_PRESS_RAW_REG + 0)),
                           K_BMP390_SPI_WRITE,
@@ -403,7 +403,7 @@ SPP_RetVal_t BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press)
     return ret;
 }
 
-float BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin, BMP390_press_params_t *p)
+float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin, BMP390_press_params_t *p)
 {
     s_pd1 = p->PAR_P6 * t_lin;
     s_pd2 = p->PAR_P7 * (t_lin * t_lin);
@@ -425,17 +425,17 @@ float BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin, BMP390_pres
     return s_compPress;
 }
 
-SPP_RetVal_t BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params, float t_lin,
+SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params, float t_lin,
                                 spp_uint32_t *raw_press, float *comp_press)
 {
-    SPP_RetVal_t ret = BMP390_readRawPress(p_spi, raw_press);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawPress(p_spi, raw_press);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
     *comp_press =
-        BMP390_compensatePressure(*raw_press, t_lin, (BMP390_press_params_t *)press_params);
+        SPP_SERVICES_BMP390_compensatePressure(*raw_press, t_lin, (BMP390_press_params_t *)press_params);
 
     return ret;
 }
@@ -444,7 +444,7 @@ SPP_RetVal_t BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_
  * Driver — altitude
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
+SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
                                 float *pressure_pa, float *temperature_c)
 {
     (void)p_bmp; /* DRDY wait is handled by the caller */
@@ -465,13 +465,13 @@ SPP_RetVal_t BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitu
 
     if (s_inited == false)
     {
-        SPP_RetVal_t ret = BMP390_calibrateTempParams(p_spi, &s_tempParams);
+        SPP_RetVal_t ret = SPP_SERVICES_BMP390_calibrateTempParams(p_spi, &s_tempParams);
         if (ret != K_SPP_OK)
         {
             return ret;
         }
 
-        ret = BMP390_calibratePressParams(p_spi, &s_pressParams);
+        ret = SPP_SERVICES_BMP390_calibratePressParams(p_spi, &s_pressParams);
         if (ret != K_SPP_OK)
         {
             return ret;
@@ -480,13 +480,13 @@ SPP_RetVal_t BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitu
         s_inited = true;
     }
 
-    SPP_RetVal_t ret = BMP390_auxGetTemp(p_spi, &s_tempParams, &s_rawTemp, &t_lin);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_auxGetTemp(p_spi, &s_tempParams, &s_rawTemp, &t_lin);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = BMP390_auxGetPress(p_spi, &s_pressParams, t_lin, &s_rawPress, &compPress);
+    ret = SPP_SERVICES_BMP390_auxGetPress(p_spi, &s_pressParams, t_lin, &s_rawPress, &compPress);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -503,7 +503,7 @@ SPP_RetVal_t BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitu
  * Driver — interrupt
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t BMP390_intEnableDrdy(void *p_spi)
+SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi)
 {
     spp_uint8_t buf[2] = {K_BMP390_REG_INT_CTRL,
                           (spp_uint8_t)(K_BMP390_INT_CTRL_LEVEL | K_BMP390_INT_CTRL_DRDY_EN)};
@@ -515,7 +515,7 @@ SPP_RetVal_t BMP390_intEnableDrdy(void *p_spi)
  * Service — acquisition task
  * ---------------------------------------------------------------- */
 
-void BMP390_ServiceTask(BMP390_ServiceCtx_t *p_ctx)
+void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx)
 {
     float altitude    = 0.0f;
     float pressure    = 0.0f;
@@ -523,40 +523,40 @@ void BMP390_ServiceTask(BMP390_ServiceCtx_t *p_ctx)
 
     p_ctx->bmpData.drdyFlag = false;
 
-    SPP_Packet_t *p_packet = SPP_Databank_getPacket();
+    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
     if (p_packet == NULL)
     {
         SPP_LOGW(k_svcTag, "No free packet");
         return;
     }
 
-    SPP_RetVal_t ret = BMP390_getAltitude(p_ctx->p_spi, &p_ctx->bmpData,
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(p_ctx->p_spi, &p_ctx->bmpData,
                                            &altitude, &pressure, &temperature);
     if (ret != K_SPP_OK)
     {
-        SPP_LOGE(k_svcTag, "BMP390_getAltitude failed ret=%d", (int)ret);
-        (void)SPP_Databank_returnPacket(p_packet);
+        SPP_LOGE(k_svcTag, "SPP_SERVICES_BMP390_getAltitude failed ret=%d", (int)ret);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
         return;
     }
 
     float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_Databank_packetData(p_packet, K_BMP_SERVICE_APID_DBG, p_ctx->seq++,
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP_SERVICE_APID_DBG, p_ctx->seq++,
                                    payload, (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
-        (void)SPP_Databank_returnPacket(p_packet);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
         return;
     }
 
-    (void)SPP_PubSub_publish(p_packet);
+    (void)SPP_SERVICES_PUBSUB_publish(p_packet);
 }
 
 /* ----------------------------------------------------------------
  * Service — callbacks
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t BMP390_Service_init(void *p_ctx, const void *p_cfg)
+static SPP_RetVal_t SPP_SERVICES_BMP390_serviceInit(void *p_ctx, const void *p_cfg)
 {
     BMP390_ServiceCtx_t *ctx = (BMP390_ServiceCtx_t *)p_ctx;
     const BMP390_ServiceCfg_t *cfg = (const BMP390_ServiceCfg_t *)p_cfg;
@@ -570,38 +570,38 @@ static SPP_RetVal_t BMP390_Service_init(void *p_ctx, const void *p_cfg)
     ctx->bmpData.intIntrType = cfg->intIntrType;
     ctx->bmpData.intPull = cfg->intPull;
 
-    BMP390_init(&ctx->bmpData);
+    SPP_SERVICES_BMP390_init(&ctx->bmpData);
 
-    ret = BMP390_auxConfig(ctx->p_spi);
+    ret = SPP_SERVICES_BMP390_auxConfig(ctx->p_spi);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = BMP390_prepareMeasure(ctx->p_spi);
+    ret = SPP_SERVICES_BMP390_prepareMeasure(ctx->p_spi);
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = BMP390_intEnableDrdy(ctx->p_spi);
+    ret = SPP_SERVICES_BMP390_intEnableDrdy(ctx->p_spi);
     return ret;
 }
 
-static SPP_RetVal_t BMP390_Service_start(void *p_ctx)
+static SPP_RetVal_t SPP_SERVICES_BMP390_serviceStart(void *p_ctx)
 {
     (void)p_ctx;
-    SPP_LOGI(k_svcTag, "Service ready (baremetal — call BMP390_ServiceTask from superloop)");
+    SPP_LOGI(k_svcTag, "Service ready (baremetal — call SPP_SERVICES_BMP390_serviceTask from superloop)");
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t BMP390_Service_stop(void *p_ctx)
+static SPP_RetVal_t SPP_SERVICES_BMP390_serviceStop(void *p_ctx)
 {
     (void)p_ctx;
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t BMP390_Service_deinit(void *p_ctx)
+static SPP_RetVal_t SPP_SERVICES_BMP390_serviceDeinit(void *p_ctx)
 {
     (void)p_ctx;
     return K_SPP_OK;
@@ -615,8 +615,8 @@ const SPP_ServiceDesc_t g_bmp390ServiceDesc = {
     .p_name = "bmp390",
     .apid = K_BMP_SERVICE_APID_DBG,
     .ctxSize = sizeof(BMP390_ServiceCtx_t),
-    .init = BMP390_Service_init,
-    .start = BMP390_Service_start,
-    .stop = BMP390_Service_stop,
-    .deinit = BMP390_Service_deinit,
+    .init = SPP_SERVICES_BMP390_serviceInit,
+    .start = SPP_SERVICES_BMP390_serviceStart,
+    .stop = SPP_SERVICES_BMP390_serviceStop,
+    .deinit = SPP_SERVICES_BMP390_serviceDeinit,
 };

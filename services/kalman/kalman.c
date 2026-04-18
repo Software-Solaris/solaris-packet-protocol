@@ -6,7 +6,7 @@
 #include "kalman.h"
 
 
-void ekf_init(kalman_state *kal, float Pinit, float *Q, float *R)
+void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R)
 {
     kal->qw = 1.0f;
     kal->qx = 0.0f;
@@ -34,7 +34,7 @@ void ekf_init(kalman_state *kal, float Pinit, float *Q, float *R)
 }
 
 
-void ekf_predict(kalman_state *kal, float *gyr_rps, float T)
+void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T)
 {
     /* Extract measurements */
     float p = gyr_rps[0];
@@ -74,13 +74,13 @@ void ekf_predict(kalman_state *kal, float *gyr_rps, float T)
 
     // Intermidiate calculations
     float result1[16];
-    Mat4x4_Mul(F, kal->P, result1);
+    SPP_SERVICES_KALMAN_mat4x4Mul(F, kal->P, result1);
 
     float F_trans[16];
-    Mat4x4_Transpose(F, F_trans);
+    SPP_SERVICES_KALMAN_mat4x4Transpose(F, F_trans);
 
     float result2[16];
-    Mat4x4_Mul(result1, F_trans, result2);
+    SPP_SERVICES_KALMAN_mat4x4Mul(result1, F_trans, result2);
 
     // Fill updated covariance matrix P
     kal->P[0] = result2[0] + kal->Q[0];
@@ -105,7 +105,7 @@ void ekf_predict(kalman_state *kal, float *gyr_rps, float T)
 }
 
 
-void ekf_update(kalman_state *kal, float *acc_ms2)
+void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 {
     /* Extract measurements (this will be vector z)*/
     float ax = acc_ms2[0];
@@ -149,7 +149,7 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
 
     /* Calculate function h(x) = C' * g */
     float C_trans[9];
-    Mat3x3_Transpose(C, C_trans); // REVISAR DE AQUÍ PABAJO !!!
+    SPP_SERVICES_KALMAN_mat3x3Transpose(C, C_trans); // REVISAR DE AQUÍ PABAJO !!!
 
     float g_iner[3] = {0};
     g_iner[2] = g;
@@ -196,20 +196,20 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
 
     // Calculate: P * H' (4x3)
     float H_trans[12];
-    Mat3x4_Transpose(H, H_trans);
+    SPP_SERVICES_KALMAN_mat3x4Transpose(H, H_trans);
 
     float term1[12];
-    Mat4x4_Mul_4x3(kal->P, H_trans, term1);
+    SPP_SERVICES_KALMAN_mat4x4Mul4x3(kal->P, H_trans, term1);
 
     // Calculate: H * P * H' + R (3x3)
 
     // H * P (3x4)
     float term2_1[12];
-    Mat3x4_Mul_4x4(H, kal->P, term2_1);
+    SPP_SERVICES_KALMAN_mat3x4Mul4x4(H, kal->P, term2_1);
 
     // H * P * H' (3x3)
     float term2_2[9];
-    Mat3x4_Mul_4x3(H, term1, term2_2);
+    SPP_SERVICES_KALMAN_mat3x4Mul4x3(H, term1, term2_2);
 
     // H * P * H' + R (3x3)
     float term2[9];
@@ -227,10 +227,10 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
 
     // Finally: K = P * H' / (H * P * H' + R) (4x3)
     float term2_inv[9];
-    Mat3x3_Inverse(term2, term2_inv);
+    SPP_SERVICES_KALMAN_mat3x3Inverse(term2, term2_inv);
 
     float K[12];
-    Mat4x3_Mul_3x3(term1, term2_inv, K);
+    SPP_SERVICES_KALMAN_mat4x3Mul3x3(term1, term2_inv, K);
 
 
     /* Update state estimate x = x + K * (z - h) */
@@ -241,7 +241,7 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
     v[2] = az - h[2];
 
     float K_v[4];
-    Mat4x3_Mul_3x1(K, v, K_v);
+    SPP_SERVICES_KALMAN_mat4x3Mul3x1(K, v, K_v);
 
     kal->qw += K_v[0];
     kal->qx += K_v[1];
@@ -251,7 +251,7 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
     /* Update covariance matrix P = (I - K * H) * P */
 
     float K_H[16];
-    Mat4x3_Mul_3x4(K, H, K_H);
+    SPP_SERVICES_KALMAN_mat4x3Mul3x4(K, H, K_H);
 
     float I4[16] = {0};
     I4[0] = 1.0f;
@@ -260,7 +260,7 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
     I4[15] = 1.0f;
 
     float part1[16];
-    Mat4x4_Sub(I4, K_H, part1);
+    SPP_SERVICES_KALMAN_mat4x4Sub(I4, K_H, part1);
 
     float tmp_P[16];
     tmp_P[0] = kal->P[0];
@@ -283,12 +283,12 @@ void ekf_update(kalman_state *kal, float *acc_ms2)
     tmp_P[14] = kal->P[14];
     tmp_P[15] = kal->P[15];
 
-    Mat4x4_Mul(part1, tmp_P, kal->P);
+    SPP_SERVICES_KALMAN_mat4x4Mul(part1, tmp_P, kal->P);
 }
 
 
 // borrar?
-void Mat4x4_Add(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B, float *restrict out)
 {
     /* Row 1 */
     out[0] = A[0] + B[0];
@@ -316,7 +316,7 @@ void Mat4x4_Add(const float *restrict A, const float *restrict B, float *restric
 }
 
 
-void Mat4x4_Sub(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] - B[0];
@@ -344,7 +344,7 @@ void Mat4x4_Sub(const float *restrict A, const float *restrict B, float *restric
 }
 
 
-void Mat4x4_Mul(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B, float *restrict out)
 {
     /* restrict -> promise to compiler that aliasing will not occur -> makes it faster */
 
@@ -374,7 +374,7 @@ void Mat4x4_Mul(const float *restrict A, const float *restrict B, float *restric
 }
 
 
-void Mat4x4_Mul_4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
@@ -398,7 +398,7 @@ void Mat4x4_Mul_4x3(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat4x3_Mul_3x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8];
@@ -426,7 +426,7 @@ void Mat4x3_Mul_3x4(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat4x3_Mul_3x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6];
@@ -450,7 +450,7 @@ void Mat4x3_Mul_3x3(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat4x3_Mul_3x1(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[1] + A[2] * B[2];
@@ -466,7 +466,7 @@ void Mat4x3_Mul_3x1(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat3x4_Mul_4x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8] + A[3] * B[12];
@@ -488,7 +488,7 @@ void Mat3x4_Mul_4x4(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat3x4_Mul_4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
@@ -507,7 +507,7 @@ void Mat3x4_Mul_4x3(const float *restrict A, const float *restrict B, float *res
 }
 
 
-void Mat4x4_Transpose(const float *restrict A, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Transpose(const float *restrict A, float *restrict out)
 {
     /* Row 1 */
     out[0] = A[0];
@@ -535,7 +535,7 @@ void Mat4x4_Transpose(const float *restrict A, float *restrict out)
 }
 
 
-void Mat3x4_Transpose(const float *restrict A, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restrict out)
 {
     // Row 1
     out[0] = A[0];
@@ -559,7 +559,7 @@ void Mat3x4_Transpose(const float *restrict A, float *restrict out)
 }
 
 
-void Mat3x3_Transpose(const float *restrict A, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out)
 {
     // Row 1
     out[0] = A[0];
@@ -578,7 +578,7 @@ void Mat3x3_Transpose(const float *restrict A, float *restrict out)
 }
 
 
-int Mat3x3_Inverse(const float *restrict in, float *restrict out)
+int SPP_SERVICES_KALMAN_mat3x3Inverse(const float *restrict in, float *restrict out)
 {
     // Devuelve 1 si se invirtió con éxito, 0 si la matriz es singular (determinante cero)
 

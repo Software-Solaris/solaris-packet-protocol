@@ -3,17 +3,17 @@
  * @brief BDD unit tests for the SPP service registry.
  *
  * Coverage targets (100%):
- *  - SPP_Service_register()  — NULL desc, NULL ctx, valid, registry full
- *  - SPP_Service_initAll()   — calls init on all, propagates error
- *  - SPP_Service_startAll()  — calls start on all
- *  - SPP_Service_stopAll()   — calls stop in reverse order
- *  - SPP_Service_count()     — increments per registration
+ *  - SPP_SERVICES_register()  — NULL desc, NULL ctx, valid, registry full
+ *  - SPP_SERVICES_initAll()   — calls init on all, propagates error
+ *  - SPP_SERVICES_startAll()  — calls start on all
+ *  - SPP_SERVICES_stopAll()   — calls stop in reverse order
+ *  - SPP_SERVICES_count()     — increments per registration
  */
 
 #include <cgreen/cgreen.h>
 #include "spp/services/service.h"
 #include "spp/services/log/log.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
  * Stub service
@@ -49,75 +49,75 @@ static const SPP_ServiceDesc_t k_failDesc = {
 };
 
 /* ----------------------------------------------------------------
- * Describe: SPP_Service_register
+ * Describe: SPP_SERVICES_register
  * ---------------------------------------------------------------- */
 
-Describe(SPP_Service_register);
-BeforeEach(SPP_Service_register) { SPP_Log_init(); SPP_Log_setLevel(K_SPP_LOG_NONE); }
-AfterEach(SPP_Service_register)  {}
+Describe(SPP_SERVICES_register);
+BeforeEach(SPP_SERVICES_register) { SPP_SERVICES_LOG_init(); SPP_SERVICES_LOG_setLevel(K_SPP_LOG_NONE); }
+AfterEach(SPP_SERVICES_register)  {}
 
-Ensure(SPP_Service_register, rejects_null_descriptor)
+Ensure(SPP_SERVICES_register, rejects_null_descriptor)
 {
     StubCtx_t ctx = {0};
-    assert_that(SPP_Service_register(NULL, &ctx, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_SERVICES_register(NULL, &ctx, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
-Ensure(SPP_Service_register, rejects_null_context)
+Ensure(SPP_SERVICES_register, rejects_null_context)
 {
-    assert_that(SPP_Service_register(&k_stubDesc, NULL, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
+    assert_that(SPP_SERVICES_register(&k_stubDesc, NULL, NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 
-Ensure(SPP_Service_register, succeeds_with_valid_args)
+Ensure(SPP_SERVICES_register, succeeds_with_valid_args)
 {
     StubCtx_t ctx = {0};
-    assert_that(SPP_Service_register(&k_stubDesc, &ctx, NULL), is_equal_to(K_SPP_OK));
+    assert_that(SPP_SERVICES_register(&k_stubDesc, &ctx, NULL), is_equal_to(K_SPP_OK));
 }
 
-Ensure(SPP_Service_register, count_increments)
+Ensure(SPP_SERVICES_register, count_increments)
 {
-    spp_uint32_t before = SPP_Service_count();
+    spp_uint32_t before = SPP_SERVICES_count();
     StubCtx_t ctx = {0};
-    SPP_Service_register(&k_stubDesc, &ctx, NULL);
-    assert_that(SPP_Service_count(), is_equal_to(before + 1U));
+    SPP_SERVICES_register(&k_stubDesc, &ctx, NULL);
+    assert_that(SPP_SERVICES_count(), is_equal_to(before + 1U));
 }
 
 /* ----------------------------------------------------------------
- * Describe: SPP_Service_initAll / startAll / stopAll
+ * Describe: SPP_SERVICES_initAll / startAll / stopAll
  * ---------------------------------------------------------------- */
 
 Describe(SPP_Service_lifecycle);
-BeforeEach(SPP_Service_lifecycle) { SPP_Log_init(); SPP_Log_setLevel(K_SPP_LOG_NONE); }
+BeforeEach(SPP_Service_lifecycle) { SPP_SERVICES_LOG_init(); SPP_SERVICES_LOG_setLevel(K_SPP_LOG_NONE); }
 AfterEach(SPP_Service_lifecycle)  {}
 
 Ensure(SPP_Service_lifecycle, initAll_calls_init_on_registered_service)
 {
     StubCtx_t ctx = {0};
-    SPP_Service_register(&k_stubDesc, &ctx, NULL);
-    SPP_Service_initAll();
+    SPP_SERVICES_register(&k_stubDesc, &ctx, NULL);
+    SPP_SERVICES_initAll();
     assert_that(ctx.initCalled, is_greater_than(0));
 }
 
 Ensure(SPP_Service_lifecycle, startAll_calls_start_on_registered_service)
 {
     StubCtx_t ctx = {0};
-    SPP_Service_register(&k_stubDesc, &ctx, NULL);
-    SPP_Service_startAll();
+    SPP_SERVICES_register(&k_stubDesc, &ctx, NULL);
+    SPP_SERVICES_startAll();
     assert_that(ctx.startCalled, is_greater_than(0));
 }
 
 Ensure(SPP_Service_lifecycle, stopAll_calls_stop_on_registered_service)
 {
     StubCtx_t ctx = {0};
-    SPP_Service_register(&k_stubDesc, &ctx, NULL);
-    SPP_Service_stopAll();
+    SPP_SERVICES_register(&k_stubDesc, &ctx, NULL);
+    SPP_SERVICES_stopAll();
     assert_that(ctx.stopCalled, is_greater_than(0));
 }
 
 Ensure(SPP_Service_lifecycle, initAll_propagates_error)
 {
     StubCtx_t ctx = {0};
-    SPP_Service_register(&k_failDesc, &ctx, NULL);
-    SPP_RetVal_t ret = SPP_Service_initAll();
+    SPP_SERVICES_register(&k_failDesc, &ctx, NULL);
+    SPP_RetVal_t ret = SPP_SERVICES_initAll();
     assert_that(ret, is_equal_to(K_SPP_ERROR));
 }
 
@@ -129,10 +129,10 @@ TestSuite *service_suite(void)
 {
     TestSuite *suite = create_named_test_suite("service");
 
-    add_test_with_context(suite, SPP_Service_register, rejects_null_descriptor);
-    add_test_with_context(suite, SPP_Service_register, rejects_null_context);
-    add_test_with_context(suite, SPP_Service_register, succeeds_with_valid_args);
-    add_test_with_context(suite, SPP_Service_register, count_increments);
+    add_test_with_context(suite, SPP_SERVICES_register, rejects_null_descriptor);
+    add_test_with_context(suite, SPP_SERVICES_register, rejects_null_context);
+    add_test_with_context(suite, SPP_SERVICES_register, succeeds_with_valid_args);
+    add_test_with_context(suite, SPP_SERVICES_register, count_increments);
 
     add_test_with_context(suite, SPP_Service_lifecycle, initAll_calls_init_on_registered_service);
     add_test_with_context(suite, SPP_Service_lifecycle, startAll_calls_start_on_registered_service);

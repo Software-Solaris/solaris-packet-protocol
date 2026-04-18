@@ -61,7 +61,7 @@ endif()
 # ----------------------------------------------------------------
 if(SPP_PORT STREQUAL "posix")
     set(SPP_PORT_SOURCES
-        ports/hal/stub/hal_stub.c
+        ports/hal/stub/halStub.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
     target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
@@ -69,7 +69,7 @@ if(SPP_PORT STREQUAL "posix")
 
 elseif(SPP_PORT STREQUAL "freertos")
     set(SPP_PORT_SOURCES
-        ports/hal/esp32/hal_esp32.c
+        ports/hal/esp32/halEsp32.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
     target_include_directories(spp_port PUBLIC
