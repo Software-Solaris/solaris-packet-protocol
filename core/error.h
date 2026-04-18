@@ -6,8 +6,8 @@
  *
  *   SPP_CORE_errGet() / SPP_CORE_errSet()   — thread-local last error
  *                                     (static global when SPP_NO_RTOS=1)
- *   SPP_CORE_errToString()              — pointer to internal buffer (not reentrant)
- *   SPP_CORE_errToString()            — caller-supplied buffer (reentrant)
+ *   SPP_CORE_errToString()             — pointer to internal buffer (not reentrant)
+ *   SPP_CORE_errToStringR()           — caller-supplied buffer (reentrant)
  *   SPP_ErrCtx_t                    — extended context: code + file + line
  *   SPP_ERR_SET(code)               — set context with __FILE__ / __LINE__
  *
@@ -124,7 +124,7 @@ static inline const char *SPP_CORE_errToString(SPP_RetVal_t err);
  * @param[in]  bufLen  Size of @p p_buf in bytes. Ignored when @p p_buf is NULL.
  * @return @p p_buf when not NULL; internal buffer otherwise.
  */
-const char *SPP_CORE_errToString(SPP_RetVal_t err, char *p_buf, size_t bufLen);
+const char *SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen);
 
 /* ----------------------------------------------------------------
  * Inline implementation of SPP_CORE_errToString
@@ -133,7 +133,7 @@ const char *SPP_CORE_errToString(SPP_RetVal_t err, char *p_buf, size_t bufLen);
 static inline const char *
 SPP_CORE_errToString(SPP_RetVal_t err)
 {
-    return SPP_CORE_errToString(err, NULL, 0U);
+    return SPP_CORE_errToStringR(err, NULL, 0U);
 }
 
 /* ----------------------------------------------------------------

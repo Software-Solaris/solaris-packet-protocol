@@ -70,7 +70,7 @@ SPP_CORE_errSetCtx(SPP_RetVal_t code, const char *p_file, int line)
  * ---------------------------------------------------------------- */
 
 const char *
-SPP_CORE_errToString(SPP_RetVal_t err, char *p_buf, size_t bufLen)
+SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen)
 {
     static SPP_THREAD_LOCAL char s_buf[ERR_STR_SIZE];
 

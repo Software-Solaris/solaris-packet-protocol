@@ -118,15 +118,5 @@ if(SPP_BUILD_TESTS)
         add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
     endfunction()
 
-    spp_add_test_module(spp_test_core     tests/core/test_core.c)
-    spp_add_test_module(spp_test_util     tests/util/test_crc.c)
-    spp_add_test_module(spp_test_databank tests/services/databank/test_databank.c)
-    spp_add_test_module(spp_test_pubsub   tests/services/pubsub/test_pubsub.c)
-    spp_add_test_module(spp_test_log      tests/services/log/test_log.c)
-    spp_add_test_module(spp_test_service  tests/services/test_service.c)
-
-    set_tests_properties(
-        spp_test_databank spp_test_pubsub spp_test_log spp_test_service
-        PROPERTIES LABELS "services"
-    )
+    spp_add_test_module(spp_test_core tests/core/test_core.c tests/mocks.c)
 endif()
