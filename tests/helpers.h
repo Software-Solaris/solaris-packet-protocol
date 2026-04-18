@@ -11,7 +11,7 @@
 #include "spp/services/db_flow/db_flow.h"
 #include "spp/services/log/log.h"
 
-/* Declared in hal_stub.c */
+/* Declared in halStub.c */
 extern const SPP_HalPort_t g_stubHalPort;
 
 /**
@@ -22,9 +22,9 @@ extern const SPP_HalPort_t g_stubHalPort;
  */
 static inline void sppTestSetup(void)
 {
-    SPP_Core_setHalPort(&g_stubHalPort);
-    SPP_Log_init();
-    SPP_Log_setLevel(K_SPP_LOG_NONE); /* Silence during tests. */
+    SPP_CORE_setHalPort(&g_stubHalPort);
+    SPP_SERVICES_LOG_init();
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_NONE); /* Silence during tests. */
 }
 
 #endif /* SPP_TEST_HELPERS_H */

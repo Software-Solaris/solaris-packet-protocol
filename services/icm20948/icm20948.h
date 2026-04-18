@@ -6,7 +6,7 @@
  * acquisition for the TDK InvenSense ICM20948 IMU.
  *
  * To use the SPP service registry, allocate a @ref ICM20948_ServiceCtx_t and
- * a @ref ICM20948_ServiceCfg_t, then call SPP_Service_register() with
+ * a @ref ICM20948_ServiceCfg_t, then call SPP_SERVICES_register() with
  * @ref g_icm20948ServiceDesc.
  *
  * Naming conventions used in this file:
@@ -19,7 +19,7 @@
 #ifndef SPP_ICM20948_SERVICE_H
 #define SPP_ICM20948_SERVICE_H
 
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/types.h"
 #include "spp/hal/gpio.h"
 #include "spp/services/service.h"
@@ -479,7 +479,7 @@ typedef struct
 } ICM20948_ServiceCtx_t;
 
 /**
- * @brief ICM20948 service descriptor — pass to SPP_Service_register().
+ * @brief ICM20948 service descriptor — pass to SPP_SERVICES_register().
  */
 extern const SPP_ServiceDesc_t g_icm20948ServiceDesc;
 
@@ -487,21 +487,21 @@ extern const SPP_ServiceDesc_t g_icm20948ServiceDesc;
  * Public driver API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t ICM20948_config(void *p_data);
-SPP_RetVal_t ICM20948_configDmp(void *p_data);
-SPP_RetVal_t ICM20948_configDmpInit(void *p_data);
-SPP_RetVal_t ICM20948_loadDmp(void *p_data);
-SPP_RetVal_t ICM20948_dmpStart(void *p_data);
-SPP_RetVal_t ICM20948_readSensors(void *p_data);
-void     ICM20948_getSensorsData(void *p_data);
-void     ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
+SPP_RetVal_t SPP_SERVICES_ICM20948_config(void *p_data);
+SPP_RetVal_t SPP_SERVICES_ICM20948_configDmp(void *p_data);
+SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data);
+SPP_RetVal_t SPP_SERVICES_ICM20948_loadDmp(void *p_data);
+SPP_RetVal_t SPP_SERVICES_ICM20948_dmpStart(void *p_data);
+SPP_RetVal_t SPP_SERVICES_ICM20948_readSensors(void *p_data);
+void     SPP_SERVICES_ICM20948_getSensorsData(void *p_data);
+void     SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
 
 /**
  * @brief Initialise the ICM20948 interrupt context and register the GPIO ISR.
  *
  * @param[out] p_icm  Pointer to the ICM20948 device context to initialise.
  */
-void ICM20948_init(ICM20948_Data_t *p_icm);
+void SPP_SERVICES_ICM20948_init(ICM20948_Data_t *p_icm);
 
 /**
  * @brief Read the DMP FIFO, package sensor data and publish via pub/sub.
@@ -510,7 +510,7 @@ void ICM20948_init(ICM20948_Data_t *p_icm);
  *
  * @param[in] p_ctx  Pointer to the ICM20948 service context.
  */
-void ICM20948_ServiceTask(void *p_ctx);
+void SPP_SERVICES_ICM20948_serviceTask(void *p_ctx);
 
 #ifdef __cplusplus
 }

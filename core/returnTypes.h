@@ -1,5 +1,5 @@
 /**
- * @file returntypes.h
+ * @file returnTypes.h
  * @brief Standard return-value type used across all SPP modules.
  *
  * Every public SPP function returns @ref SPP_RetVal_t.  Callers must check the

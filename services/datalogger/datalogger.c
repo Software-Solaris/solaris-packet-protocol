@@ -22,7 +22,7 @@ static const char *const k_tag = "DATALOGGER";
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
                          const char *p_file_path)
 {
     SPP_RetVal_t ret;
@@ -52,7 +52,7 @@ SPP_RetVal_t DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
     return K_SPP_OK;
 }
 
-SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_packet)
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_packet)
 {
     if ((p_logger->is_initialized == 0U) || (p_logger->p_file == NULL))
     {
@@ -110,7 +110,7 @@ SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_
     return K_SPP_OK;
 }
 
-SPP_RetVal_t DATALOGGER_flush(Datalogger_t *p_logger)
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_flush(Datalogger_t *p_logger)
 {
     if ((p_logger->is_initialized == 0U) || (p_logger->p_file == NULL))
     {
@@ -127,7 +127,7 @@ SPP_RetVal_t DATALOGGER_flush(Datalogger_t *p_logger)
     return K_SPP_OK;
 }
 
-SPP_RetVal_t DATALOGGER_deinit(Datalogger_t *p_logger)
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger)
 {
     SPP_RetVal_t ret;
 

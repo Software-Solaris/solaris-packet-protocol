@@ -34,13 +34,13 @@ static SPP_THREAD_LOCAL SPP_ErrCtx_t s_lastCtx =
  * ---------------------------------------------------------------- */
 
 SPP_RetVal_t
-SPP_ERR_get(void)
+SPP_CORE_errGet(void)
 {
     return s_lastErr;
 }
 
 void
-SPP_ERR_set(SPP_RetVal_t err)
+SPP_CORE_errSet(SPP_RetVal_t err)
 {
     s_lastErr       = err;
     s_lastCtx.code  = err;
@@ -51,13 +51,13 @@ SPP_ERR_set(SPP_RetVal_t err)
  * ---------------------------------------------------------------- */
 
 SPP_ErrCtx_t
-SPP_ERR_getCtx(void)
+SPP_CORE_errGetCtx(void)
 {
     return s_lastCtx;
 }
 
 void
-SPP_ERR_setCtx(SPP_RetVal_t code, const char *p_file, int line)
+SPP_CORE_errSetCtx(SPP_RetVal_t code, const char *p_file, int line)
 {
     s_lastErr       = code;
     s_lastCtx.code  = code;
@@ -70,7 +70,7 @@ SPP_ERR_setCtx(SPP_RetVal_t code, const char *p_file, int line)
  * ---------------------------------------------------------------- */
 
 const char *
-SPP_ERR_toString_r(SPP_RetVal_t err, char *p_buf, size_t bufLen)
+SPP_CORE_errToString(SPP_RetVal_t err, char *p_buf, size_t bufLen)
 {
     static SPP_THREAD_LOCAL char s_buf[ERR_STR_SIZE];
 

@@ -4,7 +4,7 @@
  */
 
 #include "spp/services/databank/databank.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/error.h"
 #include "spp/core/packet.h"
 #include "spp/hal/time.h"
@@ -30,7 +30,7 @@ static spp_bool_t s_initialized = false;
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_Databank_init(void)
+SPP_RetVal_t SPP_SERVICES_DATABANK_init(void)
 {
     if (s_initialized)
     {
@@ -50,7 +50,7 @@ SPP_RetVal_t SPP_Databank_init(void)
     return K_SPP_OK;
 }
 
-SPP_Packet_t *SPP_Databank_getPacket(void)
+SPP_Packet_t *SPP_SERVICES_DATABANK_getPacket(void)
 {
     if (!s_initialized || (s_databank.freeCount == 0U))
     {
@@ -61,7 +61,7 @@ SPP_Packet_t *SPP_Databank_getPacket(void)
     return s_databank.p_freePackets[s_databank.freeCount];
 }
 
-SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
+SPP_RetVal_t SPP_SERVICES_DATABANK_returnPacket(SPP_Packet_t *p_packet)
 {
     if (p_packet == NULL)
     {
@@ -94,7 +94,7 @@ SPP_RetVal_t SPP_Databank_returnPacket(SPP_Packet_t *p_packet)
     return K_SPP_OK;
 }
 
-spp_uint32_t SPP_Databank_freeCount(void)
+spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void)
 {
     return s_databank.freeCount;
 }
@@ -108,7 +108,7 @@ static spp_uint16_t packetCrc(const SPP_Packet_t *p_packet)
     /* CRC covers all bytes up to (but not including) the crc field.
      * The packet is zeroed before filling, so padding bytes are 0
      * and contribute deterministically to the checksum. */
-    return SPP_Util_crc16((const spp_uint8_t *)p_packet,
+    return SPP_UTIL_crc16((const spp_uint8_t *)p_packet,
                           (spp_uint32_t)offsetof(SPP_Packet_t, crc));
 }
 
@@ -116,7 +116,7 @@ static spp_uint16_t packetCrc(const SPP_Packet_t *p_packet)
  * Packet fill helper
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_Databank_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
+SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
                                       spp_uint16_t seq, const void *p_data,
                                       spp_uint16_t dataLen)
 {

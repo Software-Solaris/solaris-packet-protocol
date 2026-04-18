@@ -5,12 +5,12 @@
  * A service is any producer or consumer of @ref SPP_Packet_t data (sensor
  * driver, telemetry downlink, SD logger, antenna control, …).  Each service
  * describes itself with a static @ref SPP_ServiceDesc_t and registers via
- * @ref SPP_Service_register().
+ * @ref SPP_SERVICES_register().
  *
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_*
  * - Types: SPP_ServiceDesc_t
- * - Public functions: SPP_Service_*()
+ * - Public functions: SPP_SERVICES_*()
  * - Pointer parameters: p_*
  */
 
@@ -18,7 +18,7 @@
 #define SPP_SERVICE_H
 
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/util/macros.h"
 
 /* ----------------------------------------------------------------
@@ -29,7 +29,7 @@
  * @brief Describes a service — filled in by the service implementer.
  *
  * Declare one @c const instance per service and pass a pointer to
- * @ref SPP_Service_register().
+ * @ref SPP_SERVICES_register().
  *
  * @code
  * // In bmp390_service.c:
@@ -37,10 +37,10 @@
  *     .p_name  = "bmp390",
  *     .apid    = 0x0101U,
  *     .ctxSize = sizeof(BMP390_ServiceCtx_t),
- *     .init    = BMP390_Service_init,
- *     .start   = BMP390_Service_start,
- *     .stop    = BMP390_Service_stop,
- *     .deinit  = BMP390_Service_deinit,
+ *     .init    = SPP_SERVICES_BMP390_serviceInit,
+ *     .start   = SPP_SERVICES_BMP390_serviceStart,
+ *     .stop    = SPP_SERVICES_BMP390_serviceStop,
+ *     .deinit  = SPP_SERVICES_BMP390_serviceDeinit,
  * };
  * @endcode
  */
@@ -107,7 +107,7 @@ typedef struct
  *
  * @return K_SPP_OK on success, K_SPP_ERROR_REGISTRY_FULL if the registry is full.
  */
-SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
+SPP_RetVal_t SPP_SERVICES_register(const SPP_ServiceDesc_t *p_desc,
                                void *p_ctx, const void *p_cfg);
 
 /**
@@ -116,27 +116,27 @@ SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
  * @return K_SPP_OK if all services initialised successfully; the first error
  *         code encountered otherwise (remaining services are still attempted).
  */
-SPP_RetVal_t SPP_Service_initAll(void);
+SPP_RetVal_t SPP_SERVICES_initAll(void);
 
 /**
  * @brief Call @c start on all registered services in registration order.
  *
  * @return K_SPP_OK if all services started successfully.
  */
-SPP_RetVal_t SPP_Service_startAll(void);
+SPP_RetVal_t SPP_SERVICES_startAll(void);
 
 /**
  * @brief Call @c stop on all registered services in reverse order.
  *
  * @return K_SPP_OK if all services stopped successfully.
  */
-SPP_RetVal_t SPP_Service_stopAll(void);
+SPP_RetVal_t SPP_SERVICES_stopAll(void);
 
 /**
  * @brief Return the number of currently registered services.
  *
  * @return Service count.
  */
-spp_uint32_t SPP_Service_count(void);
+spp_uint32_t SPP_SERVICES_count(void);
 
 #endif /* SPP_SERVICE_H */

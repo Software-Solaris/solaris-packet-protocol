@@ -29,7 +29,7 @@ static spp_uint32_t   s_count = 0U;
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
+SPP_RetVal_t SPP_SERVICES_register(const SPP_ServiceDesc_t *p_desc,
                                void *p_ctx, const void *p_cfg)
 {
     if ((p_desc == NULL) || (p_ctx == NULL))
@@ -52,7 +52,7 @@ SPP_RetVal_t SPP_Service_register(const SPP_ServiceDesc_t *p_desc,
     return K_SPP_OK;
 }
 
-SPP_RetVal_t SPP_Service_initAll(void)
+SPP_RetVal_t SPP_SERVICES_initAll(void)
 {
     SPP_RetVal_t result = K_SPP_OK;
 
@@ -75,7 +75,7 @@ SPP_RetVal_t SPP_Service_initAll(void)
     return result;
 }
 
-SPP_RetVal_t SPP_Service_startAll(void)
+SPP_RetVal_t SPP_SERVICES_startAll(void)
 {
     SPP_RetVal_t result = K_SPP_OK;
 
@@ -98,7 +98,7 @@ SPP_RetVal_t SPP_Service_startAll(void)
     return result;
 }
 
-SPP_RetVal_t SPP_Service_stopAll(void)
+SPP_RetVal_t SPP_SERVICES_stopAll(void)
 {
     SPP_RetVal_t result = K_SPP_OK;
 
@@ -122,7 +122,7 @@ SPP_RetVal_t SPP_Service_stopAll(void)
     return result;
 }
 
-spp_uint32_t SPP_Service_count(void)
+spp_uint32_t SPP_SERVICES_count(void)
 {
     return s_count;
 }

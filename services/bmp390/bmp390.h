@@ -7,13 +7,13 @@
  * interrupt via GPIO event groups.
  *
  * The driver follows a three-step workflow:
- * 1. Initialise and configure the sensor (BMP390_init, BMP390_auxConfig,
- *    BMP390_prepareMeasure).
- * 2. Wait for the data-ready interrupt (BMP390_waitDrdy).
- * 3. Read compensated altitude/pressure/temperature (BMP390_getAltitude).
+ * 1. Initialise and configure the sensor (SPP_SERVICES_BMP390_init, SPP_SERVICES_BMP390_auxConfig,
+ *    SPP_SERVICES_BMP390_prepareMeasure).
+ * 2. Wait for the data-ready interrupt (SPP_SERVICES_BMP390_waitDrdy).
+ * 3. Read compensated altitude/pressure/temperature (SPP_SERVICES_BMP390_getAltitude).
  *
  * To use the SPP service registry, allocate a @ref BMP390_ServiceCtx_t and a
- * @ref BMP390_ServiceCfg_t, then call SPP_Service_register() with
+ * @ref BMP390_ServiceCfg_t, then call SPP_SERVICES_register() with
  * @ref g_bmp390ServiceDesc.
  *
  * Naming conventions used in this file:
@@ -27,7 +27,7 @@
 #define SPP_BMP390_H
 
 #include <stdint.h>
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/types.h"
 #include "spp/hal/gpio.h"
 #include "spp/services/service.h"
@@ -173,7 +173,7 @@ typedef struct
 /**
  * @brief Configuration for the BMP390 service instance.
  *
- * Passed by the caller to SPP_Service_register() and stored by reference in
+ * Passed by the caller to SPP_SERVICES_register() and stored by reference in
  * the context.  Must remain valid for the lifetime of the service.
  */
 typedef struct
@@ -198,7 +198,7 @@ typedef struct
 } BMP390_ServiceCtx_t;
 
 /**
- * @brief BMP390 service descriptor — pass to SPP_Service_register().
+ * @brief BMP390 service descriptor — pass to SPP_SERVICES_register().
  */
 extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
 
@@ -206,39 +206,39 @@ extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
  * @brief Service task — call from the superloop when drdyFlag is set.
  *
  * Clears drdyFlag, reads altitude/pressure/temperature, and publishes
- * a packet via SPP_PubSub_publish().
+ * a packet via SPP_SERVICES_PUBSUB_publish().
  *
  * @param[in,out] p_ctx  Pointer to the service context.
  */
-void BMP390_ServiceTask(BMP390_ServiceCtx_t *p_ctx);
+void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx);
 
 /* ============================================================================
  * Driver API (low-level — used internally and for testing)
  * ========================================================================= */
 
-void     BMP390_init(void *p_data);
-SPP_RetVal_t BMP390_softReset(void *p_spi);
-SPP_RetVal_t BMP390_enableSpiMode(void *p_spi);
-SPP_RetVal_t BMP390_configCheck(void *p_spi);
-SPP_RetVal_t BMP390_auxConfig(void *p_spi);
-SPP_RetVal_t BMP390_prepareMeasure(void *p_spi);
-SPP_RetVal_t BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms);
-SPP_RetVal_t BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib);
-SPP_RetVal_t BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out);
-SPP_RetVal_t BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp);
-float    BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *params);
-SPP_RetVal_t BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
+void     SPP_SERVICES_BMP390_init(void *p_data);
+SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms);
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib);
+SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out);
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp);
+float    SPP_SERVICES_BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *params);
+SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
                              spp_uint32_t *raw_temp, float *comp_temp);
-SPP_RetVal_t BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib);
-SPP_RetVal_t BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out);
-SPP_RetVal_t BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press);
-float    BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin,
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib);
+SPP_RetVal_t SPP_SERVICES_BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out);
+SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press);
+float    SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin,
                                     BMP390_press_params_t *p);
-SPP_RetVal_t BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params,
+SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params,
                               float t_lin, spp_uint32_t *raw_press, float *comp_press);
-SPP_RetVal_t BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
+SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
                             float *pressure_pa, float *temperature_c);
-SPP_RetVal_t BMP390_intEnableDrdy(void *p_spi);
+SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi);
 
 #ifdef __cplusplus
 }

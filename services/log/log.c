@@ -48,7 +48,7 @@ static void defaultOutput(const char *p_tag, SPP_LogLevel_t level,
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_Log_init(void)
+SPP_RetVal_t SPP_SERVICES_LOG_init(void)
 {
     s_level       = K_SPP_LOG_VERBOSE;
     s_p_outFn     = defaultOutput;
@@ -56,22 +56,22 @@ SPP_RetVal_t SPP_Log_init(void)
     return K_SPP_OK;
 }
 
-void SPP_Log_setLevel(SPP_LogLevel_t level)
+void SPP_SERVICES_LOG_setLevel(SPP_LogLevel_t level)
 {
     s_level = level;
 }
 
-SPP_LogLevel_t SPP_Log_getLevel(void)
+SPP_LogLevel_t SPP_SERVICES_LOG_getLevel(void)
 {
     return s_level;
 }
 
-void SPP_Log_registerOutput(SPP_LogOutputFn_t p_fn)
+void SPP_SERVICES_LOG_registerOutput(SPP_LogOutputFn_t p_fn)
 {
     s_p_outFn = p_fn;
 }
 
-void SPP_Log_emit(const char *p_tag, SPP_LogLevel_t level,
+void SPP_SERVICES_LOG_emit(const char *p_tag, SPP_LogLevel_t level,
                   const char *p_fmt, ...)
 {
     if (!s_initialized || (level > s_level) || (s_p_outFn == NULL))

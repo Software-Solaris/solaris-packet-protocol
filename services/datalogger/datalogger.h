@@ -8,14 +8,14 @@
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_*
  * - Types: Datalogger_t
- * - Public functions: DATALOGGER_*()
+ * - Public functions: SPP_SERVICES_DATALOGGER_*()
  * - Pointer parameters: p_*
  */
 
 #ifndef SPP_DATALOGGER_H
 #define SPP_DATALOGGER_H
 
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/packet.h"
 #include "spp/services/service.h"
 
@@ -58,7 +58,7 @@ typedef struct
  *
  * @return K_SPP_OK on success, or an error code otherwise.
  */
-SPP_RetVal_t DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
                          const char *p_file_path);
 
 /**
@@ -69,7 +69,7 @@ SPP_RetVal_t DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
  *
  * @return K_SPP_OK on success, K_SPP_ERROR on write failure.
  */
-SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_packet);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_packet);
 
 /**
  * @brief Flush buffered data to the SD card.
@@ -78,7 +78,7 @@ SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_
  *
  * @return K_SPP_OK on success, K_SPP_ERROR on flush failure.
  */
-SPP_RetVal_t DATALOGGER_flush(Datalogger_t *p_logger);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_flush(Datalogger_t *p_logger);
 
 /**
  * @brief Close the log file and unmount the SD card.
@@ -87,7 +87,7 @@ SPP_RetVal_t DATALOGGER_flush(Datalogger_t *p_logger);
  *
  * @return K_SPP_OK on success, or an error code otherwise.
  */
-SPP_RetVal_t DATALOGGER_deinit(Datalogger_t *p_logger);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger);
 
 #ifdef __cplusplus
 }

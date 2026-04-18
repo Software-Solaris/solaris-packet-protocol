@@ -5,7 +5,7 @@
  * To port SPP to a new MCU (ESP32, STM32, RP2040…):
  *   1. Allocate a static @ref SPP_HalPort_t.
  *   2. Fill every mandatory function pointer.  Optional pointers may be NULL.
- *   3. Call @ref SPP_Core_setHalPort() before @ref SPP_Core_init().
+ *   3. Call @ref SPP_CORE_setHalPort() before @ref SPP_CORE_init().
  *
  * Naming conventions used in this file:
  * - Types: SPP_HalPort_t
@@ -16,7 +16,7 @@
 #define SPP_HAL_PORT_H
 
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
  * HAL port struct
@@ -25,7 +25,7 @@
 /**
  * @brief Hardware abstraction layer port descriptor.
  *
- * Register one instance per build target via @ref SPP_Core_setHalPort().
+ * Register one instance per build target via @ref SPP_CORE_setHalPort().
  * Pointers marked as optional may be set to NULL if the feature is not used.
  */
 typedef struct

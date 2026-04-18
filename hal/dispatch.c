@@ -8,7 +8,7 @@
 #include "spp/hal/storage.h"
 #include "spp/hal/time.h"
 #include "spp/core/core.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/error.h"
 
 /* ----------------------------------------------------------------
@@ -17,7 +17,7 @@
 
 static inline const SPP_HalPort_t *getPort(void)
 {
-    return SPP_Core_getHalPort();
+    return SPP_CORE_getHalPort();
 }
 
 /* ----------------------------------------------------------------

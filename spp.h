@@ -4,7 +4,7 @@
  *
  * Include this single header to access all SPP functionality.
  * Platform ports need to provide a @ref SPP_HalPort_t implementation
- * registered before @ref SPP_Core_init().
+ * registered before @ref SPP_CORE_init().
  */
 
 #ifndef SPP_H
@@ -13,7 +13,7 @@
 /* Core */
 #include "spp/core/version.h"
 #include "spp/core/types.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 #include "spp/core/packet.h"
 #include "spp/core/core.h"
 

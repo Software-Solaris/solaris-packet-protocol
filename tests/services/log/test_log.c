@@ -3,16 +3,16 @@
  * @brief BDD unit tests for the SPP logging service.
  *
  * Coverage targets (100%):
- *  - SPP_Log_init()             — initialises, sets defaults
- *  - SPP_Log_setLevel()         — sets level
- *  - SPP_Log_getLevel()         — returns current level
- *  - SPP_Log_registerOutput()   — NULL callback silences, custom callback fires
- *  - SPP_Log_emit()             — filtered by level, calls callback with correct args
+ *  - SPP_SERVICES_LOG_init()             — initialises, sets defaults
+ *  - SPP_SERVICES_LOG_setLevel()         — sets level
+ *  - SPP_SERVICES_LOG_getLevel()         — returns current level
+ *  - SPP_SERVICES_LOG_registerOutput()   — NULL callback silences, custom callback fires
+ *  - SPP_SERVICES_LOG_emit()             — filtered by level, calls callback with correct args
  */
 
 #include <cgreen/cgreen.h>
 #include "spp/services/log/log.h"
-#include "spp/core/returntypes.h"
+#include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
  * Test callback infrastructure
@@ -41,104 +41,104 @@ static void resetCapture(void)
 }
 
 /* ----------------------------------------------------------------
- * Describe: SPP_Log_init
+ * Describe: SPP_SERVICES_LOG_init
  * ---------------------------------------------------------------- */
 
-Describe(SPP_Log_init);
-BeforeEach(SPP_Log_init) { resetCapture(); }
-AfterEach(SPP_Log_init)  {}
+Describe(SPP_SERVICES_LOG_init);
+BeforeEach(SPP_SERVICES_LOG_init) { resetCapture(); }
+AfterEach(SPP_SERVICES_LOG_init)  {}
 
-Ensure(SPP_Log_init, returns_ok)
+Ensure(SPP_SERVICES_LOG_init, returns_ok)
 {
-    assert_that(SPP_Log_init(), is_equal_to(K_SPP_OK));
+    assert_that(SPP_SERVICES_LOG_init(), is_equal_to(K_SPP_OK));
 }
 
-Ensure(SPP_Log_init, sets_verbose_level_by_default)
+Ensure(SPP_SERVICES_LOG_init, sets_verbose_level_by_default)
 {
-    SPP_Log_init();
-    assert_that(SPP_Log_getLevel(), is_equal_to(K_SPP_LOG_VERBOSE));
+    SPP_SERVICES_LOG_init();
+    assert_that(SPP_SERVICES_LOG_getLevel(), is_equal_to(K_SPP_LOG_VERBOSE));
 }
 
 /* ----------------------------------------------------------------
- * Describe: SPP_Log_setLevel / getLevel
+ * Describe: SPP_SERVICES_LOG_setLevel / getLevel
  * ---------------------------------------------------------------- */
 
-Describe(SPP_Log_setLevel);
-BeforeEach(SPP_Log_setLevel) { SPP_Log_init(); }
-AfterEach(SPP_Log_setLevel)  {}
+Describe(SPP_SERVICES_LOG_setLevel);
+BeforeEach(SPP_SERVICES_LOG_setLevel) { SPP_SERVICES_LOG_init(); }
+AfterEach(SPP_SERVICES_LOG_setLevel)  {}
 
-Ensure(SPP_Log_setLevel, get_returns_set_value)
+Ensure(SPP_SERVICES_LOG_setLevel, get_returns_set_value)
 {
-    SPP_Log_setLevel(K_SPP_LOG_ERROR);
-    assert_that(SPP_Log_getLevel(), is_equal_to(K_SPP_LOG_ERROR));
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_ERROR);
+    assert_that(SPP_SERVICES_LOG_getLevel(), is_equal_to(K_SPP_LOG_ERROR));
 }
 
-Ensure(SPP_Log_setLevel, can_set_to_none)
+Ensure(SPP_SERVICES_LOG_setLevel, can_set_to_none)
 {
-    SPP_Log_setLevel(K_SPP_LOG_NONE);
-    assert_that(SPP_Log_getLevel(), is_equal_to(K_SPP_LOG_NONE));
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_NONE);
+    assert_that(SPP_SERVICES_LOG_getLevel(), is_equal_to(K_SPP_LOG_NONE));
 }
 
 /* ----------------------------------------------------------------
- * Describe: SPP_Log_emit
+ * Describe: SPP_SERVICES_LOG_emit
  * ---------------------------------------------------------------- */
 
-Describe(SPP_Log_emit);
-BeforeEach(SPP_Log_emit)
+Describe(SPP_SERVICES_LOG_emit);
+BeforeEach(SPP_SERVICES_LOG_emit)
 {
-    SPP_Log_init();
-    SPP_Log_registerOutput(captureOutput);
-    SPP_Log_setLevel(K_SPP_LOG_VERBOSE);
+    SPP_SERVICES_LOG_init();
+    SPP_SERVICES_LOG_registerOutput(captureOutput);
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_VERBOSE);
     resetCapture();
 }
-AfterEach(SPP_Log_emit) {}
+AfterEach(SPP_SERVICES_LOG_emit) {}
 
-Ensure(SPP_Log_emit, calls_output_callback)
+Ensure(SPP_SERVICES_LOG_emit, calls_output_callback)
 {
     SPP_LOGI("TEST", "hello");
     assert_that(s_callCount, is_equal_to(1));
 }
 
-Ensure(SPP_Log_emit, passes_correct_tag)
+Ensure(SPP_SERVICES_LOG_emit, passes_correct_tag)
 {
     SPP_LOGI("MY_TAG", "msg");
     assert_that(s_lastTag, is_equal_to_string("MY_TAG"));
 }
 
-Ensure(SPP_Log_emit, passes_correct_level)
+Ensure(SPP_SERVICES_LOG_emit, passes_correct_level)
 {
     SPP_LOGE("T", "err");
     assert_that(s_lastLevel, is_equal_to(K_SPP_LOG_ERROR));
 }
 
-Ensure(SPP_Log_emit, formats_message)
+Ensure(SPP_SERVICES_LOG_emit, formats_message)
 {
     SPP_LOGI("T", "val=%d", 42);
     assert_that(s_lastMsg, is_equal_to_string("val=42"));
 }
 
-Ensure(SPP_Log_emit, suppressed_when_level_below_filter)
+Ensure(SPP_SERVICES_LOG_emit, suppressed_when_level_below_filter)
 {
-    SPP_Log_setLevel(K_SPP_LOG_ERROR);
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_ERROR);
     SPP_LOGI("T", "should be suppressed");
     assert_that(s_callCount, is_equal_to(0));
 }
 
-Ensure(SPP_Log_emit, not_suppressed_at_exact_filter_level)
+Ensure(SPP_SERVICES_LOG_emit, not_suppressed_at_exact_filter_level)
 {
-    SPP_Log_setLevel(K_SPP_LOG_INFO);
+    SPP_SERVICES_LOG_setLevel(K_SPP_LOG_INFO);
     SPP_LOGI("T", "at boundary");
     assert_that(s_callCount, is_equal_to(1));
 }
 
-Ensure(SPP_Log_emit, silent_when_callback_is_null)
+Ensure(SPP_SERVICES_LOG_emit, silent_when_callback_is_null)
 {
-    SPP_Log_registerOutput(NULL);
+    SPP_SERVICES_LOG_registerOutput(NULL);
     SPP_LOGI("T", "silent");
     assert_that(s_callCount, is_equal_to(0)); /* captureOutput not called. */
 }
 
-Ensure(SPP_Log_emit, all_macros_reach_callback)
+Ensure(SPP_SERVICES_LOG_emit, all_macros_reach_callback)
 {
     SPP_LOGE("T", "e");
     SPP_LOGW("T", "w");
@@ -156,20 +156,20 @@ TestSuite *log_suite(void)
 {
     TestSuite *suite = create_named_test_suite("log");
 
-    add_test_with_context(suite, SPP_Log_init, returns_ok);
-    add_test_with_context(suite, SPP_Log_init, sets_verbose_level_by_default);
+    add_test_with_context(suite, SPP_SERVICES_LOG_init, returns_ok);
+    add_test_with_context(suite, SPP_SERVICES_LOG_init, sets_verbose_level_by_default);
 
-    add_test_with_context(suite, SPP_Log_setLevel, get_returns_set_value);
-    add_test_with_context(suite, SPP_Log_setLevel, can_set_to_none);
+    add_test_with_context(suite, SPP_SERVICES_LOG_setLevel, get_returns_set_value);
+    add_test_with_context(suite, SPP_SERVICES_LOG_setLevel, can_set_to_none);
 
-    add_test_with_context(suite, SPP_Log_emit, calls_output_callback);
-    add_test_with_context(suite, SPP_Log_emit, passes_correct_tag);
-    add_test_with_context(suite, SPP_Log_emit, passes_correct_level);
-    add_test_with_context(suite, SPP_Log_emit, formats_message);
-    add_test_with_context(suite, SPP_Log_emit, suppressed_when_level_below_filter);
-    add_test_with_context(suite, SPP_Log_emit, not_suppressed_at_exact_filter_level);
-    add_test_with_context(suite, SPP_Log_emit, silent_when_callback_is_null);
-    add_test_with_context(suite, SPP_Log_emit, all_macros_reach_callback);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, calls_output_callback);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, passes_correct_tag);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, passes_correct_level);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, formats_message);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, suppressed_when_level_below_filter);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, not_suppressed_at_exact_filter_level);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, silent_when_callback_is_null);
+    add_test_with_context(suite, SPP_SERVICES_LOG_emit, all_macros_reach_callback);
 
     return suite;
 }

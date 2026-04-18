@@ -5,7 +5,7 @@
 
 #include "spp/util/crc.h"
 
-spp_uint16_t SPP_Util_crc16(const spp_uint8_t *p_data, spp_uint32_t length)
+spp_uint16_t SPP_UTIL_crc16(const spp_uint8_t *p_data, spp_uint32_t length)
 {
     spp_uint16_t crc = K_SPP_CRC_INIT;
 
