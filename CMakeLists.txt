@@ -18,7 +18,7 @@ option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
 option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
 option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
 option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
-option(SPP_SERVICE_SX1261     "Compile sx1261 service"                  ON)
+option(SPP_SERVICE_SX1261     "Compile sx1261 service"                  OFF)
 
 
 # ----------------------------------------------------------------
@@ -72,17 +72,6 @@ if(SPP_PORT STREQUAL "posix")
     target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
     target_link_libraries(spp_port PUBLIC spp pthread)
 
-elseif(SPP_PORT STREQUAL "freertos")
-    set(SPP_PORT_SOURCES
-        ports/hal/esp32/halEsp32.c
-    )
-    add_library(spp_port STATIC ${SPP_PORT_SOURCES})
-    target_include_directories(spp_port PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-        ${CMAKE_CURRENT_SOURCE_DIR}/ports/hal/esp32
-    )
-    target_link_libraries(spp_port PUBLIC spp)
-
 elseif(SPP_PORT STREQUAL "baremetal")
     set(SPP_PORT_SOURCES
         ports/hal/esp32/hal_esp32_baremetal.c
@@ -127,19 +116,18 @@ if(SPP_BUILD_TESTS)
     target_compile_options(spp_port_testable PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
     target_link_options(spp_port_testable PRIVATE --coverage)
 
-    # Helper to define a test module as a shared library consumed by cgreen-runner.
-    function(spp_add_test_module name src)
-        add_library(${name} SHARED ${src} ${ARGN})
-        target_include_directories(${name} PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/..
-            ${CGREEN_INCLUDE_DIRS}
-        )
-        target_link_libraries(${name} PRIVATE spp_port_testable ${CGREEN_LIBRARIES} pthread)
-        target_compile_options(${name} PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
-        target_link_options(${name} PRIVATE --coverage)
-        add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
-    endfunction()
-
-    spp_add_test_module(spp_test_core tests/core/test_core.c tests/mocks.c)
-    spp_add_test_module(spp_test_services tests/services/sx1261/sx1261_init_test.c tests/mocks.c)
+    add_executable(spp_tests
+        tests/run_all_tests.c
+        tests/core/test_core.c
+        tests/services/services_register_test.c
+        tests/mocks.c
+    )
+    target_include_directories(spp_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CGREEN_INCLUDE_DIRS}
+    )
+    target_link_libraries(spp_tests PRIVATE spp_port_testable ${CGREEN_LIBRARIES} pthread)
+    target_compile_options(spp_tests PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
+    target_link_options(spp_tests PRIVATE --coverage)
+    add_test(NAME spp_tests COMMAND spp_tests)
 endif()
