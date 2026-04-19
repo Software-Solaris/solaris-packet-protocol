@@ -32,11 +32,11 @@ target_compile_definitions(spp PUBLIC
 
 ## crc.h — CRC-16/CCITT
 
-`SPP_Databank_packetData()` calls this automatically — you do not need to call it directly unless computing a CRC on a raw buffer.
+`SPP_SERVICES_DATABANK_packetData()` calls this automatically — you do not need to call it directly unless computing a CRC on a raw buffer.
 
 ```c
 // Manual CRC example (not needed for normal SPP usage):
-spp_uint16_t crc = SPP_Util_crc16(
+spp_uint16_t crc = SPP_UTIL_crc16(
     (const spp_uint8_t *)p_pkt,
     (spp_uint32_t)offsetof(SPP_Packet_t, crc)  // exclude the crc field itself
 );

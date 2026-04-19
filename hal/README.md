@@ -15,7 +15,7 @@ Hardware Abstraction Layer. Defines the **contract** that any hardware port must
 | `gpio.h` | `SPP_HAL_gpioConfigInterrupt()`, `SPP_HAL_gpioRegisterIsr()` and `SPP_GpioIsrCtx_t` |
 | `storage.h` | `SPP_HAL_storageMount()`, `SPP_HAL_storageUnmount()` |
 | `time.h` | `SPP_HAL_getTimeMs()` — monotonic millisecond counter |
-| `dispatch.c` | Routes every `SPP_HAL_*()` call through the port registered via `SPP_Core_setHalPort()` |
+| `dispatch.c` | Routes every `SPP_HAL_*()` call through the port registered via `SPP_CORE_setHalPort()` |
 
 ---
 
@@ -83,8 +83,8 @@ if (myData.drdyFlag)
 
 | Port | Location | Notes |
 |---|---|---|
-| ESP32 | `ports/hal/esp32/hal_esp32.c` | Polling SPI, no FreeRTOS dependency — primary target |
-| Stub | `ports/hal/stub/hal_stub.c` | No-op, always returns `K_SPP_OK` — for host tests |
+| ESP32 | `ports/hal/esp32/halEsp32.c` | Polling SPI, no FreeRTOS dependency — primary target |
+| Stub | `ports/hal/stub/halStub.c` | No-op, always returns `K_SPP_OK` — for host tests |
 
 ---
 
@@ -93,6 +93,6 @@ if (myData.drdyFlag)
 1. Create `ports/hal/<target>/hal_<target>.c`
 2. Implement every non-optional field in `SPP_HalPort_t`
 3. Declare a `const SPP_HalPort_t g_<target>HalPort = { ... }`
-4. Register it at startup: `SPP_Core_setHalPort(&g_<target>HalPort)`
+4. Register it at startup: `SPP_CORE_setHalPort(&g_<target>HalPort)`
 
-See `ports/hal/esp32/hal_esp32.c` as the reference implementation.
+See `ports/hal/esp32/halEsp32.c` as the reference implementation.

@@ -12,7 +12,7 @@ APID: `0x0201`
 |---|---|
 | `icm20948.h` | Public API, register map, config structs |
 | `icm20948.c` | Driver implementation, DMP loading, service task |
-| `dmp_image.h` | DMP firmware binary image (do not edit) |
+| `dmpImage.h` | DMP firmware binary image (do not edit) |
 
 ---
 
@@ -59,7 +59,7 @@ The ICM20948 has four register banks (0–3) selected via register `0x7F`. The d
 
 ## DMP support
 
-The DMP firmware (`dmp_image.h`) is loaded into the sensor's RAM at init time. When DMP is enabled:
+The DMP firmware (`dmpImage.h`) is loaded into the sensor's RAM at init time. When DMP is enabled:
 - Outputs: rotation quaternion (Q30 fixed-point), step count, activity classification
 - DMP runs independently on the sensor — the host only reads results
 
@@ -80,7 +80,7 @@ static ICM20948_ServiceCfg_t s_icmCfg = {
     .intPull     = 0U,   // no pull
 };
 
-SPP_Service_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
+SPP_SERVICES_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
 ```
 
 ---
@@ -91,11 +91,11 @@ SPP_Service_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
 // In the application superloop:
 if (s_icmCtx.icmData.drdyFlag)
 {
-    ICM20948_ServiceTask(&s_icmCtx);
+    SPP_SERVICES_ICM20948_serviceTask(&s_icmCtx);
 }
 ```
 
-`ICM20948_ServiceTask()` clears `drdyFlag`, drains the DMP FIFO, calls `SPP_Databank_getPacket()` → `SPP_Databank_packetData()` → `SPP_PubSub_publish()`.
+`SPP_SERVICES_ICM20948_serviceTask()` clears `drdyFlag`, drains the DMP FIFO, calls `SPP_SERVICES_DATABANK_getPacket()` → `SPP_SERVICES_DATABANK_packetData()` → `SPP_SERVICES_PUBSUB_publish()`.
 
 ---
 
