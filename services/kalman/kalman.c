@@ -149,7 +149,7 @@ void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 
     /* Calculate function h(x) = C' * g */
     float C_trans[9];
-    SPP_SERVICES_KALMAN_mat3x3Transpose(C, C_trans); // REVISAR DE AQUÍ PABAJO !!!
+    SPP_SERVICES_KALMAN_mat3x3Transpose(C, C_trans);
 
     float g_iner[3] = {0};
     g_iner[2] = g;
@@ -288,7 +288,8 @@ void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 
 
 // borrar?
-void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     /* Row 1 */
     out[0] = A[0] + B[0];
@@ -316,7 +317,8 @@ void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     // Row 1
     out[0] = A[0] - B[0];
@@ -344,7 +346,8 @@ void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     /* restrict -> promise to compiler that aliasing will not occur -> makes it faster */
 
@@ -374,7 +377,8 @@ void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
@@ -398,7 +402,8 @@ void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8];
@@ -426,7 +431,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6];
@@ -450,7 +456,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[1] + A[2] * B[2];
@@ -466,7 +473,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8] + A[3] * B[12];
@@ -488,7 +496,8 @@ void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
