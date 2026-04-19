@@ -9,7 +9,7 @@ Cgreen unit tests for SPP. Run entirely on a host PC — no ESP32 or hardware re
 ```
 tests/
 ├── core/
-│   └── test_core.c             Tests for SPP_Core_init and port registration
+│   └── test_core.c             Tests for SPP_CORE_init and port registration
 ├── services/
 │   ├── databank/
 │   │   └── test_databank.c     Tests for SPP_Databank_*
@@ -17,9 +17,9 @@ tests/
 │   │   └── test_pubsub.c       Tests for SPP_PubSub_*
 │   ├── log/
 │   │   └── test_log.c          Tests for SPP_Log_*
-│   └── test_service.c          Tests for SPP_Service_register / initAll / startAll
+│   └── test_service.c          Tests for SPP_SERVICES_register / initAll / startAll
 └── util/
-    └── test_crc.c              Tests for SPP_Util_crc16
+    └── test_crc.c              Tests for SPP_UTIL_crc16
 ```
 
 The test tree mirrors the module tree — every module that has a public API has a corresponding test file under the same relative path.
@@ -64,12 +64,12 @@ Each test file focuses on **one module**. Within that file, each Cgreen `Describ
 ```c
 // test_pubsub.c
 
-Describe(SPP_PubSub_subscribe);
-BeforeEach(SPP_PubSub_subscribe) { SPP_PubSub_init(); }
-AfterEach(SPP_PubSub_subscribe)  { /* teardown */ }
+Describe(SPP_SERVICES_PUBSUB_subscribe);
+BeforeEach(SPP_SERVICES_PUBSUB_subscribe) { SPP_SERVICES_PUBSUB_init(); }
+AfterEach(SPP_SERVICES_PUBSUB_subscribe)  { /* teardown */ }
 
-Ensure(SPP_PubSub_subscribe, rejects_null_handler) {
-    assert_that(SPP_PubSub_subscribe(0x0101U, NULL, NULL),
+Ensure(SPP_SERVICES_PUBSUB_subscribe, rejects_null_handler) {
+    assert_that(SPP_SERVICES_PUBSUB_subscribe(0x0101U, NULL, NULL),
                 is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 ```

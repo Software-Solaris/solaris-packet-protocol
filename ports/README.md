@@ -19,14 +19,14 @@ There is no OSAL layer. SPP runs in a bare-metal superloop — ISRs set `volatil
 
 | File | Description |
 |---|---|
-| `hal_esp32.c` | Polling SPI (`spi_device_polling_transmit`), no FreeRTOS dependencies — primary target |
-| `macros_esp32.h` | Pin definitions: MISO=47, MOSI=38, CLK=48, CS_ICM=21, CS_BMP=18, CS_SDC=8 |
+| `halEsp32.c` | Polling SPI (`spi_device_polling_transmit`), no FreeRTOS dependencies — primary target |
+| `macrosEsp32.h` | Pin definitions: MISO=47, MOSI=38, CLK=48, CS_ICM=21, CS_BMP=18, CS_SDC=8 |
 
 Exports: `const SPP_HalPort_t g_esp32HalPort`
 
 Register at startup:
 ```c
-SPP_Core_setHalPort(&g_esp32HalPort);
+SPP_CORE_setHalPort(&g_esp32HalPort);
 ```
 
 ### `hal/stub/`
@@ -44,7 +44,7 @@ Exports: `const SPP_HalPort_t g_stubHalPort`
 1. Create `ports/hal/<target>/hal_<target>.c`
 2. Fill all mandatory fields of `SPP_HalPort_t`
 3. Declare `const SPP_HalPort_t g_<target>HalPort = { ... }`
-4. At startup: `SPP_Core_setHalPort(&g_<target>HalPort)`
+4. At startup: `SPP_CORE_setHalPort(&g_<target>HalPort)`
 
 Minimum checklist:
 - [ ] `spiBusInit` / `spiGetHandle` / `spiDeviceInit` / `spiTransmit`
@@ -52,7 +52,7 @@ Minimum checklist:
 - [ ] `getTimeMs`
 - [ ] `storageMount` / `storageUnmount` (or leave NULL if no storage)
 
-See `hal/esp32/hal_esp32.c` as the complete reference implementation.
+See `hal/esp32/halEsp32.c` as the complete reference implementation.
 
 ---
 
