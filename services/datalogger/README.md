@@ -38,12 +38,12 @@ typedef struct {
 ## API
 
 ```c
-SPP_RetVal_t DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
                               const char *p_file_path);
-SPP_RetVal_t DATALOGGER_logPacket(Datalogger_t *p_logger,
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_logPacket(Datalogger_t *p_logger,
                                    const SPP_Packet_t *p_packet);
-SPP_RetVal_t DATALOGGER_flush(Datalogger_t *p_logger);
-SPP_RetVal_t DATALOGGER_deinit(Datalogger_t *p_logger);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_flush(Datalogger_t *p_logger);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger);
 ```
 
 ---
@@ -60,7 +60,7 @@ SPP_RetVal_t DATALOGGER_deinit(Datalogger_t *p_logger);
 ts=12345 apid=0x0101 seq=7 len=12 payload_hex=44 9A 4B 45 00 00 B8 43 00 80 FF 42
 ```
 
-Each line is terminated with `\n`. Call `DATALOGGER_flush()` periodically to limit data loss on power cut.
+Each line is terminated with `\n`. Call `SPP_SERVICES_DATALOGGER_flush()` periodically to limit data loss on power cut.
 
 ---
 
@@ -72,17 +72,17 @@ Each line is terminated with `\n`. Call `DATALOGGER_flush()` periodically to lim
 static void sdLogHandler(const SPP_Packet_t *p_packet, void *p_ctx)
 {
     Datalogger_t *p_log = (Datalogger_t *)p_ctx;
-    (void)DATALOGGER_logPacket(p_log, p_packet);
+    (void)SPP_SERVICES_DATALOGGER_logPacket(p_log, p_packet);
 
     if ((p_log->logged_packets % K_SD_FLUSH_EVERY) == 0U)
     {
-        (void)DATALOGGER_flush(p_log);
+        (void)SPP_SERVICES_DATALOGGER_flush(p_log);
     }
 }
 
 // Register before starting services:
-DATALOGGER_init(&s_logger, &s_storageCfg, "/sdcard/log.txt");
-SPP_PubSub_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
+SPP_SERVICES_DATALOGGER_init(&s_logger, &s_storageCfg, "/sdcard/log.txt");
+SPP_SERVICES_PUBSUB_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
 ```
 
 After this, every published packet — sensor data and log messages alike — is written to the SD card automatically.

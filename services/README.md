@@ -47,9 +47,9 @@ Registration pattern in `app_main()`:
 static BMP390_ServiceCtx_t  s_bmpCtx;
 static BMP390_ServiceCfg_t  s_bmpCfg = { .spiDevIdx = 1U, .intPin = 5U };
 
-SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
-SPP_Service_initAll();
-SPP_Service_startAll();
+SPP_SERVICES_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
+SPP_SERVICES_initAll();
+SPP_SERVICES_startAll();
 ```
 
 The registry calls `init` and `start` on each service in registration order. `stop` and `deinit` are called in reverse order on shutdown. No memory is allocated by the registry — all context buffers are caller-managed.
@@ -65,14 +65,14 @@ ISR (sets drdyFlag)
         │
         └─► ServiceTask()
               │
-              ├─ SPP_Databank_getPacket()
-              ├─ SPP_Databank_packetData(pkt, apid, seq, data, len)
+              ├─ SPP_SERVICES_DATABANK_getPacket()
+              ├─ SPP_SERVICES_DATABANK_packetData(pkt, apid, seq, data, len)
               │     fills headers, copies payload, computes CRC-16
-              └─ SPP_PubSub_publish(pkt)
+              └─ SPP_SERVICES_PUBSUB_publish(pkt)
                     │
                     ├─► subscriber A (SD card logger)
                     ├─► subscriber B (antenna encoder)
-                    └─► SPP_Databank_returnPacket(pkt)  ← automatic
+                    └─► SPP_SERVICES_DATABANK_returnPacket(pkt)  ← automatic
 ```
 
 Sensor services are **producers only** — they do not know who consumes their packets. Consumers register as subscribers at startup.
@@ -83,13 +83,13 @@ Sensor services are **producers only** — they do not know who consumes their p
 
 ```c
 // Subscribe to a specific APID
-SPP_PubSub_subscribe(K_BMP_SERVICE_APID, myHandler, &myCtx);
+SPP_SERVICES_PUBSUB_subscribe(K_BMP_SERVICE_APID, myHandler, &myCtx);
 
 // Subscribe to all packets (sensor + log messages)
-SPP_PubSub_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
+SPP_SERVICES_PUBSUB_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
 
 // Publish — dispatches to subscribers, then auto-returns packet to databank
-SPP_PubSub_publish(p_pkt);
+SPP_SERVICES_PUBSUB_publish(p_pkt);
 ```
 
 ---
@@ -113,4 +113,4 @@ SPP_PubSub_publish(p_pkt);
 3. Define a `ServiceTask()` that calls `getPacket()` → `packetData()` → `publish()`
 4. Declare `const SPP_ServiceDesc_t g_myServiceDesc = { ... }`
 5. Add `services/myservice/myservice.c` to `CMakeLists.txt`
-6. In `app_main()`: call `SPP_Service_register()` before `SPP_Service_initAll()`
+6. In `app_main()`: call `SPP_SERVICES_register()` before `SPP_SERVICES_initAll()`

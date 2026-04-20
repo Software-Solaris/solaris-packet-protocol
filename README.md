@@ -93,8 +93,8 @@ extern const SPP_HalPort_t g_esp32BaremetalHalPort;
 
 void app_main(void)
 {
-    SPP_Core_setHalPort(&g_esp32BaremetalHalPort);
-    SPP_Core_init();   // calls SPP_Databank_init + SPP_PubSub_init internally
+    SPP_CORE_setHalPort(&g_esp32BaremetalHalPort);
+    SPP_CORE_init();   // calls SPP_SERVICES_DATABANK_init + SPP_SERVICES_PUBSUB_init internally
 }
 ```
 
@@ -102,16 +102,16 @@ void app_main(void)
 
 ```c
 // SD card logger subscribes to ALL packets (sensor data + log messages)
-SPP_PubSub_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
+SPP_SERVICES_PUBSUB_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
 ```
 
 ### 3. Register and start services
 
 ```c
-SPP_Service_register(&g_bmp390ServiceDesc,   &s_bmpCtx, &s_bmpCfg);
-SPP_Service_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
-SPP_Service_initAll();
-SPP_Service_startAll();
+SPP_SERVICES_register(&g_bmp390ServiceDesc,   &s_bmpCtx, &s_bmpCfg);
+SPP_SERVICES_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
+SPP_SERVICES_initAll();
+SPP_SERVICES_startAll();
 ```
 
 ### 4. Superloop
@@ -120,10 +120,10 @@ SPP_Service_startAll();
 for (;;)
 {
     if (s_bmpCtx.bmpData.drdyFlag)
-        BMP390_ServiceTask(&s_bmpCtx);
+        SPP_SERVICES_BMP390_serviceTask(&s_bmpCtx);
 
     if (s_icmCtx.icmData.drdyFlag)
-        ICM20948_ServiceTask(&s_icmCtx);
+        SPP_SERVICES_ICM20948_serviceTask(&s_icmCtx);
 
     // SD card is passive — handled through pub/sub callbacks
 }
@@ -135,9 +135,9 @@ for (;;)
 ISR sets drdyFlag
   → superloop detects flag
     → ServiceTask reads sensor
-      → SPP_Databank_getPacket()
-      → SPP_Databank_packetData()   fills headers + computes CRC
-      → SPP_PubSub_publish()        dispatches to all subscribers, then returns packet
+      → SPP_SERVICES_DATABANK_getPacket()
+      → SPP_SERVICES_DATABANK_packetData()   fills headers + computes CRC
+      → SPP_SERVICES_PUBSUB_publish()        dispatches to all subscribers, then returns packet
 ```
 
 ---
@@ -208,7 +208,7 @@ See [`services/README.md`](services/README.md) for a full walkthrough.
 
 ## Porting to a new platform
 
-Implement `SPP_HalPort_t` (hardware drivers), place the files under `ports/hal/<target>/`, then register at boot with `SPP_Core_setHalPort()`.
+Implement `SPP_HalPort_t` (hardware drivers), place the files under `ports/hal/<target>/`, then register at boot with `SPP_CORE_setHalPort()`.
 
 See [`ports/README.md`](ports/README.md) for a step-by-step guide.
 

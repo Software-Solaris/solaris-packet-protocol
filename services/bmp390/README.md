@@ -34,7 +34,7 @@ typedef struct {
 } BMP390_ServiceCtx_t;
 ```
 
-`BMP390_Data_t` contains a `volatile spp_bool_t drdyFlag` that the GPIO ISR sets. The superloop polls this flag and calls `BMP390_ServiceTask()`.
+`BMP390_Data_t` contains a `volatile spp_bool_t drdyFlag` that the GPIO ISR sets. The superloop polls this flag and calls `SPP_SERVICES_BMP390_serviceTask()`.
 
 ---
 
@@ -51,7 +51,7 @@ static BMP390_ServiceCfg_t s_bmpCfg = {
     .intPull     = 0U,   // no pull
 };
 
-SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
+SPP_SERVICES_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
 ```
 
 ---
@@ -62,11 +62,11 @@ SPP_Service_register(&g_bmp390ServiceDesc, &s_bmpCtx, &s_bmpCfg);
 // In the application superloop:
 if (s_bmpCtx.bmpData.drdyFlag)
 {
-    BMP390_ServiceTask(&s_bmpCtx);
+    SPP_SERVICES_BMP390_serviceTask(&s_bmpCtx);
 }
 ```
 
-`BMP390_ServiceTask()` clears `drdyFlag`, reads the sensor FIFO, calls `SPP_Databank_getPacket()` → `SPP_Databank_packetData()` → `SPP_PubSub_publish()`.
+`SPP_SERVICES_BMP390_serviceTask()` clears `drdyFlag`, reads the sensor FIFO, calls `SPP_SERVICES_DATABANK_getPacket()` → `SPP_SERVICES_DATABANK_packetData()` → `SPP_SERVICES_PUBSUB_publish()`.
 
 ---
 

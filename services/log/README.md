@@ -31,10 +31,10 @@ Messages with a level **higher** than the current filter are suppressed.
 ## API
 
 ```c
-SPP_RetVal_t    SPP_Log_init(void);
-void            SPP_Log_setLevel(SPP_LogLevel_t level);
-SPP_LogLevel_t  SPP_Log_getLevel(void);
-void            SPP_Log_registerOutput(SPP_LogOutputFn_t fn);
+SPP_RetVal_t    SPP_SERVICES_LOG_init(void);
+void            SPP_SERVICES_LOG_setLevel(SPP_LogLevel_t level);
+SPP_LogLevel_t  SPP_SERVICES_LOG_getLevel(void);
+void            SPP_SERVICES_LOG_registerOutput(SPP_LogOutputFn_t fn);
 ```
 
 ---
@@ -76,7 +76,7 @@ static void logPubSubOutput(const char *p_tag, SPP_LogLevel_t level,
     if (s_logBusy) { return; }     // prevent infinite loop
     s_logBusy = true;
 
-    SPP_Packet_t *p_pkt = SPP_Databank_getPacket();
+    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
     if (p_pkt != NULL)
     {
         char buf[K_SPP_PKT_PAYLOAD_MAX];
@@ -84,15 +84,15 @@ static void logPubSubOutput(const char *p_tag, SPP_LogLevel_t level,
         spp_uint16_t len = (n > 0 && n < (int)sizeof(buf))
                            ? (spp_uint16_t)(n + 1U)
                            : (spp_uint16_t)sizeof(buf);
-        (void)SPP_Databank_packetData(p_pkt, K_SPP_APID_LOG, s_logSeq++, buf, len);
-        (void)SPP_PubSub_publish(p_pkt);
+        (void)SPP_SERVICES_DATABANK_packetData(p_pkt, K_SPP_APID_LOG, s_logSeq++, buf, len);
+        (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
     }
 
     s_logBusy = false;
 }
 
 // Register before any SPP_LOG* calls:
-SPP_Log_registerOutput(logPubSubOutput);
+SPP_SERVICES_LOG_registerOutput(logPubSubOutput);
 ```
 
 The `s_logBusy` guard prevents recursion: if a subscriber calls `SPP_LOGE()`, the bridge skips publishing that nested message to avoid an infinite loop.
@@ -110,7 +110,7 @@ static void uartLogOutput(const char *p_tag, SPP_LogLevel_t level,
     uart_write_bytes(UART_NUM_0, "\n", 1);
 }
 
-SPP_Log_registerOutput(uartLogOutput);
+SPP_SERVICES_LOG_registerOutput(uartLogOutput);
 ```
 
 Pass NULL to restore the default stdout output.
