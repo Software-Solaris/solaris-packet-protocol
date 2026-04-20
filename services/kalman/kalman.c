@@ -82,6 +82,8 @@ void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T)
     float result2[16];
     SPP_SERVICES_KALMAN_mat4x4Mul(result1, F_trans, result2);
 
+    /* FALTA EXPRESIÓN DE Q !!! */
+
     // Fill updated covariance matrix P
     kal->P[0] = result2[0] + kal->Q[0];
     kal->P[1] = result2[1];

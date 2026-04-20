@@ -17,6 +17,7 @@
  * Describe: SPP_SERVICES_KALMAN_ekfINIT
  * ---------------------------------------------------------------- */
 
+
 Describe(SPP_SERVICES_KALMAN_ekfInit);
 BeforeEach(SPP_SERVICES_KALMAN_ekfInit)
 {
@@ -24,8 +25,10 @@ BeforeEach(SPP_SERVICES_KALMAN_ekfInit)
 AfterEach(SPP_SERVICES_KALMAN_ekfInit)
 {
 }
+
 Ensure()
 {
+    assert_that();
 }
 
 
@@ -33,34 +36,22 @@ Ensure()
  * Describe: SPP_SERVICES_KALMAN_ekfPredict
  * ---------------------------------------------------------------- */
 
-Describe(SPP_SERVICES_KALMAN_ekfPredict);
-BeforeEach(SPP_SERVICES_KALMAN_ekfPredict)
-{
-}
-AfterEach(SPP_SERVICES_KALMAN_ekfPredict)
-{
-}
-Ensure()
-{
-}
-
 
 /* ----------------------------------------------------------------
  * Describe: SPP_SERVICES_KALMAN_ekfUpdate
  * ---------------------------------------------------------------- */
 
-Describe(SPP_SERVICES_KALMAN_ekfUpdate);
-BeforeEach(SPP_SERVICES_KALMAN_ekfUpdate)
-{
-}
-AfterEach(SPP_SERVICES_KALMAN_ekfUpdate)
-{
-}
-Ensure()
-{
-}
-
 
 /* ----------------------------------------------------------------
  * Test suite factory
  * ---------------------------------------------------------------- */
+
+
+TestSuite *our_tests()
+{
+    TestSuite *suite = create_test_suite();
+
+    add_test_with_context(suite);
+
+    return suite;
+}
