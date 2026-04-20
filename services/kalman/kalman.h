@@ -3,9 +3,14 @@
 
 #include <math.h>
 
-#define g (float)9.81f;
+#define g                (float)9.81f;
+#define GYRO_X_NOISE_STD 0.00026f
+#define GYRO_Y_NOISE_STD 0.00026f
+#define GYRO_Z_NOISE_STD 0.00026f
 
-
+#define GYRO_X_VAR (GYRO_X_NOISE_STD * GYRO_X_NOISE_STD)
+#define GYRO_Y_VAR (GYRO_Y_NOISE_STD * GYRO_Y_NOISE_STD)
+#define GYRO_Z_VAR (GYRO_Z_NOISE_STD * GYRO_Z_NOISE_STD)
 typedef struct
 {
     float qw;
@@ -17,7 +22,7 @@ typedef struct
     // float bz;
 
     float P[16];
-    float Q[4];
+    float Q[16];
     float R[3];
 
 } kalman_state;
@@ -27,22 +32,33 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
 void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T);
 void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2);
 
-void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
+                                   float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B,
+                                   float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B,
+                                   float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
+void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
+void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x4Transpose(const float *restrict A, float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out);
 int SPP_SERVICES_KALMAN_mat3x3Inverse(const float *restrict in, float *restrict out);
 
-void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B, float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B, float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B,
+                                   float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
+                                   float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x4Transpose(const float *restrict A, float *restrict out);
 
 

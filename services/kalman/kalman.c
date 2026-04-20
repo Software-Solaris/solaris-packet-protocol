@@ -23,10 +23,11 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
     kal->P[10] = Pinit;
     kal->P[15] = Pinit;
 
+    memset(kal->Q, 0, sizeof(kal->P));
     kal->Q[0] = Q[0];
-    kal->Q[1] = Q[1];
-    kal->Q[2] = Q[2];
-    kal->Q[3] = Q[3];
+    kal->Q[5] = Q[5];
+    kal->Q[10] = Q[10];
+    kal->Q[15] = Q[15];
 
     kal->R[0] = R[0];
     kal->R[1] = R[1];
@@ -83,27 +84,82 @@ void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T)
     SPP_SERVICES_KALMAN_mat4x4Mul(result1, F_trans, result2);
 
     /* FALTA EXPRESIÓN DE Q !!! */
+    //Jacobian W_t
+    float W_t[12];
+
+    //Row 1
+    W_t[0] = -half_T * qx_old;
+    W_t[1] = -half_T * qy_old;
+    W_t[2] = -half_T * qz_old;
+
+    //Row 2
+    W_t[3] = half_T * qw_old;
+    W_t[4] = -half_T * qz_old;
+    W_t[5] = half_T * qy_old;
+
+    //Row 3
+    W_t[6] = half_T * qz_old;
+    W_t[7] = half_T * qw_old;
+    W_t[8] = -half_T * qx_old;
+
+    //Row 4
+    W_t[9] = -half_T * qy_old;
+    W_t[10] = half_T * qx_old;
+    W_t[11] = half_T * qw_old;
+
+    //Sigma_w
+    float Sigma_w[3];
+    Sigma_w[0] = GYRO_X_VAR;
+    Sigma_w[1] = GYRO_Y_VAR;
+    Sigma_w[2] = GYRO_Z_VAR;
+
+    float result3[12];
+    //Row 1
+    result3[0] = W_t[0] * Sigma_w[0];
+    result3[1] = W_t[1] * Sigma_w[1];
+    result3[2] = W_t[2] * Sigma_w[2];
+
+    //Row 2
+    result3[3] = W_t[3] * Sigma_w[0];
+    result3[4] = W_t[4] * Sigma_w[1];
+    result3[5] = W_t[5] * Sigma_w[2];
+
+    //Row 3
+    result3[6] = W_t[6] * Sigma_w[0];
+    result3[7] = W_t[7] * Sigma_w[1];
+    result3[8] = W_t[8] * Sigma_w[2];
+
+    //Row 4
+    result3[9] = W_t[9] * Sigma_w[0];
+    result3[10] = W_t[10] * Sigma_w[1];
+    result3[11] = W_t[11] * Sigma_w[2];
+
+    float W_t_trans[12];
+    SPP_SERVICES_KALMAN_mat4x3Transpose(W_t, W_t_trans);
+
+
+    SPP_SERVICES_KALMAN_mat4x3Mul3x4(result3, W_t_trans, kal->Q);
 
     // Fill updated covariance matrix P
     kal->P[0] = result2[0] + kal->Q[0];
-    kal->P[1] = result2[1];
-    kal->P[2] = result2[2];
-    kal->P[3] = result2[3];
+    kal->P[1] = result2[1] + kal->Q[1];
+    kal->P[2] = result2[2] + kal->Q[2];
+    kal->P[3] = result2[3] + kal->Q[3];
 
-    kal->P[4] = result2[4];
-    kal->P[5] = result2[5] + kal->Q[1];
-    kal->P[6] = result2[6];
-    kal->P[7] = result2[7];
+    kal->P[4] = result2[4] + kal->Q[4];
+    kal->P[5] = result2[5] + kal->Q[5];
+    kal->P[6] = result2[6] + kal->Q[6];
+    kal->P[7] = result2[7] + kal->Q[7];
 
-    kal->P[8] = result2[8];
-    kal->P[9] = result2[9];
-    kal->P[10] = result2[10] + kal->Q[2];
-    kal->P[11] = result2[11];
+    kal->P[8] = result2[8] + kal->Q[8];
+    kal->P[9] = result2[9] + kal->Q[9];
+    kal->P[10] = result2[10] + kal->Q[10];
+    kal->P[11] = result2[11] + kal->Q[11];
 
-    kal->P[12] = result2[12];
-    kal->P[13] = result2[13];
-    kal->P[14] = result2[14];
-    kal->P[15] = result2[15] + kal->Q[3];
+    kal->P[12] = result2[12] + kal->Q[12];
+    kal->P[13] = result2[13] + kal->Q[13];
+    kal->P[14] = result2[14] + kal->Q[14];
+    kal->P[15] = result2[15] + kal->Q[15];
 }
 
 
@@ -569,6 +625,26 @@ void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restric
     out[11] = A[11];
 }
 
+void SPP_SERVICES_KALMAN_mat4x3Transpose(const float *restrict A, float *restrict out)
+{
+    // Row 1
+    out[0] = A[0];
+    out[1] = A[3];
+    out[2] = A[6];
+    out[3] = A[9];
+
+    // Row 2
+    out[4] = A[1];
+    out[5] = A[4];
+    out[6] = A[7];
+    out[7] = A[10];
+    // Row 3
+
+    out[8] = A[2];
+    out[9] = A[5];
+    out[10] = A[8];
+    out[11] = A[11];
+}
 
 void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out)
 {
