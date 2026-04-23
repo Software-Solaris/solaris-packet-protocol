@@ -21,21 +21,21 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
     kal->qy = 0.0f;
     kal->qz = 0.0f;
 
-    // kal->bx = 0.0f;
+    // kal->bx = 0.0f; // bias sigue comentado 
     // kal->by = 0.0f;
     // kal->bz = 0.0f;
 
-    kal->P[0] = Pinit;
-    kal->P[5] = Pinit;
+    kal->P[0] = Pinit;// NO añado redundancia a los negativos ya que las covarianzas de 
+    kal->P[5] = Pinit;// las datasheets deberian ser positivas todas
     kal->P[10] = Pinit;
     kal->P[15] = Pinit;
 
-    kal->Q[0] = Q[0];
+    kal->Q[0] = Q[0];//covarianza ruido proceso
     kal->Q[1] = Q[1];
     kal->Q[2] = Q[2];
     kal->Q[3] = Q[3];
 
-    kal->R[0] = R[0];
+    kal->R[0] = R[0];//covarianza ruido medida
     kal->R[1] = R[1];
     kal->R[2] = R[2];
 }
