@@ -8,6 +8,7 @@
 /* Suite factories declared in test_*.c files. */
 TestSuite *core_suite(void);
 TestSuite *SPP_SERVICES_SX1261_init(void);
+TestSuite *kalmanInit(void);
 TestSuite *serviceRegister(void);
 
 int main(int argc, char **argv)
@@ -16,7 +17,8 @@ int main(int argc, char **argv)
 
     // add_suite(suite, core_suite());
     // add_suite(suite, SPP_SERVICES_SX1261_init());
-    add_suite(suite, serviceRegister());
+    // add_suite(suite, serviceRegister());
+    add_suite(suite, kalmanInit());
 
     if (argc > 1)
     {

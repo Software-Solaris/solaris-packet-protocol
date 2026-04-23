@@ -11,6 +11,7 @@
 
 #include <cgreen/cgreen.h>
 #include "spp/services/kalman/kalman.h"
+#include "spp/core/returnTypes.h"
 
 
 /* ----------------------------------------------------------------
@@ -18,17 +19,17 @@
  * ---------------------------------------------------------------- */
 
 
-Describe(SPP_SERVICES_KALMAN_ekfInit);
-BeforeEach(SPP_SERVICES_KALMAN_ekfInit)
+Describe(kalmanInit);
+BeforeEach(kalmanInit)
 {
 }
-AfterEach(SPP_SERVICES_KALMAN_ekfInit)
+AfterEach(kalmanInit)
 {
 }
 
-Ensure()
+Ensure(kalmanInit, returns_ok_when_everything_goes_ok)
 {
-    assert_that();
+    assert_that(SPP_SERVICES_KALMAN_vladikTest(), is_equal_to(K_SPP_OK));
 }
 
 
@@ -47,11 +48,11 @@ Ensure()
  * ---------------------------------------------------------------- */
 
 
-TestSuite *our_tests()
+TestSuite *kalmanInit(void)
 {
-    TestSuite *suite = create_test_suite();
+    TestSuite *suite = create_named_test_suite("kalman init tests");
 
-    add_test_with_context(suite);
+    add_test_with_context(suite, kalmanInit, returns_ok_when_everything_goes_ok);
 
     return suite;
 }
