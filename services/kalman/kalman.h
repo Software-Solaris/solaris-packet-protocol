@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-#define g                (float)9.81f;
+#define g                (float)9.81f
 #define GYRO_X_NOISE_STD 0.00026f
 #define GYRO_Y_NOISE_STD 0.00026f
 #define GYRO_Z_NOISE_STD 0.00026f
@@ -44,6 +44,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *rest
                                       float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B,
                                       float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3diag(const float *restrict A, const float *restrict B,
+                                          float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B,
                                       float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B,
@@ -52,6 +54,7 @@ void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *rest
                                       float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x4Transpose(const float *restrict A, float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restrict out);
+void SPP_SERVICES_KALMAN_mat4x3Transpose(const float *restrict A, float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out);
 int SPP_SERVICES_KALMAN_mat3x3Inverse(const float *restrict in, float *restrict out);
 
