@@ -8,7 +8,15 @@
 
 void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R)
 {
-    kal->qw = 1.0f;
+
+    if (kal == NULL || Q == NULL || R == NULL)
+    {
+        return;//para cuando el puntero este vacio que no actúe ni escriba
+    }
+
+    emset(kal, 0, sizeof(kalman_state));  // todo el struct a cero 
+    
+    kal->qw = 1.0f;  //Suponemos cohete vertical y sin rotación
     kal->qx = 0.0f;
     kal->qy = 0.0f;
     kal->qz = 0.0f;
@@ -17,7 +25,6 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
     // kal->by = 0.0f;
     // kal->bz = 0.0f;
 
-    memset(kal->P, 0, sizeof(kal->P));
     kal->P[0] = Pinit;
     kal->P[5] = Pinit;
     kal->P[10] = Pinit;
