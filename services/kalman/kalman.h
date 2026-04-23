@@ -11,6 +11,8 @@
 #define GYRO_X_VAR (GYRO_X_NOISE_STD * GYRO_X_NOISE_STD)
 #define GYRO_Y_VAR (GYRO_Y_NOISE_STD * GYRO_Y_NOISE_STD)
 #define GYRO_Z_VAR (GYRO_Z_NOISE_STD * GYRO_Z_NOISE_STD)
+
+#define SENSOR_DATA_TOL 0.000001f
 typedef struct
 {
     float qw;
@@ -27,11 +29,29 @@ typedef struct
 
 } kalman_state;
 
+typedef struct
+{
+    float gyro_data[3];
+    float acc_data[3];
+    //float mag_data[3];
+
+    float gyro_old_data[3];
+    float acc_old_data[3];
+    float mag_old_data[3];
+
+    int gyro_new_data;
+    int acc_new_data;
+    //int mag_new_data;
+
+} sensor_data;
+
 
 void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R);
 void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T);
 void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2);
+void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T);
 
+void SPP_SERVICES_KALMAN_newDataCheck(sensor_data *data);
 void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
                                    float *restrict out);
 void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B,

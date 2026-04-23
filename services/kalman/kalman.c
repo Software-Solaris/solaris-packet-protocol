@@ -6,7 +6,8 @@
 #include "kalman.h"
 
 
-void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R)
+void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, sensor_data *data, float Pinit, float *Q,
+                                 float *R)
 {
     kal->qw = 1.0f;
     kal->qx = 0.0f;
@@ -32,6 +33,21 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
     kal->R[0] = R[0];
     kal->R[1] = R[1];
     kal->R[2] = R[2];
+
+    data->acc_old_data[0] = 0.0f;
+    data->acc_old_data[1] = 0.0f;
+    data->acc_old_data[2] = 0.0f;
+
+    data->gyro_old_data[0] = 0.0f;
+    data->gyro_old_data[1] = 0.0f;
+    data->gyro_old_data[2] = 0.0f;
+
+    data->acc_new_data = 0;
+    data->gyro_new_data = 0;
+
+    //data->mag_old_data[0] = 0.0f;
+    //data->mag_old_data[1] = 0.0f;
+    //data->mag_old_data[2] = 0.0f;
 }
 
 
@@ -314,7 +330,63 @@ void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 
     SPP_SERVICES_KALMAN_mat4x4Mul(part1, tmp_P, kal->P);
 }
+//TODO:Verify that the data reading was correct
+void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T)
+{
+    SPP_SERVICES_KALMAN_newDataCheck(data);
 
+    if (data->gyro_new_data == 1)
+    {
+        SPP_SERVICES_KALMAN_ekfPredict(kal, data->gyro_data, T);
+
+        data->gyro_old_data[0] = data->gyro_old_data[0];
+        data->gyro_old_data[1] = data->gyro_old_data[0];
+        data->gyro_old_data[2] = data->gyro_old_data[0];
+
+        data->gyro_new_data = 0;
+    }
+
+    if (data->acc_new_data == 1)
+    {
+        SPP_SERVICES_KALMAN_ekfUpdate(kal, data->acc_data);
+
+        data->acc_old_data[0] = data->acc_old_data[0];
+        data->acc_old_data[1] = data->acc_old_data[0];
+        data->acc_old_data[2] = data->acc_old_data[0];
+
+        data->acc_new_data = 0;
+    }
+
+
+    //data->mag_old_data[0] = data->mag_old_data[0];
+    //data->mag_old_data[1] = data->mag_old_data[0];
+    //data->mag_old_data[2] = data->mag_old_data[0];
+}
+
+
+void SPP_SERVICES_KALMAN_newDataCheck(sensor_data *data)
+{
+    if (fabsf(data->acc_data[0] - data->acc_old_data[0]) > SENSOR_DATA_TOL ||
+        fabsf(data->acc_data[1] - data->acc_old_data[1]) > SENSOR_DATA_TOL ||
+        fabsf(data->acc_data[2] - data->acc_old_data[2]) > SENSOR_DATA_TOL)
+    {
+        data->acc_new_data = 1;
+    }
+
+    if (fabsf(data->gyro_data[0] - data->gyro_old_data[0]) > SENSOR_DATA_TOL ||
+        fabsf(data->gyro_data[1] - data->gyro_old_data[1]) > SENSOR_DATA_TOL ||
+        fabsf(data->gyro_data[2] - data->gyro_old_data[2]) > SENSOR_DATA_TOL)
+    {
+        data->gyro_new_data = 1;
+    }
+
+    // if(fabsf(data->mag_data[0] - data->mag_old_data[0]) > SENSOR_DATA_TOL ||
+    //    fabsf(data->mag_data[1] - data->mag_old_data[1]) > SENSOR_DATA_TOL ||
+    //    fabsf(data->mag_data[2] - data->mag_old_data[2]) > SENSOR_DATA_TOL){
+    //
+    //     data->mag_new_data = 1;
+    // }
+}
 
 // borrar?
 void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
