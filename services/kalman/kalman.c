@@ -339,9 +339,9 @@ void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T)
     {
         SPP_SERVICES_KALMAN_ekfPredict(kal, data->gyro_data, T);
 
-        data->gyro_old_data[0] = data->gyro_old_data[0];
-        data->gyro_old_data[1] = data->gyro_old_data[0];
-        data->gyro_old_data[2] = data->gyro_old_data[0];
+        data->gyro_old_data[0] = data->gyro_data[0];
+        data->gyro_old_data[1] = data->gyro_data[0];
+        data->gyro_old_data[2] = data->gyro_data[0];
 
         data->gyro_new_data = 0;
     }
@@ -350,17 +350,17 @@ void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T)
     {
         SPP_SERVICES_KALMAN_ekfUpdate(kal, data->acc_data);
 
-        data->acc_old_data[0] = data->acc_old_data[0];
-        data->acc_old_data[1] = data->acc_old_data[0];
-        data->acc_old_data[2] = data->acc_old_data[0];
+        data->acc_old_data[0] = data->acc_data[0];
+        data->acc_old_data[1] = data->acc_data[1];
+        data->acc_old_data[2] = data->acc_data[2];
 
         data->acc_new_data = 0;
     }
 
 
-    //data->mag_old_data[0] = data->mag_old_data[0];
-    //data->mag_old_data[1] = data->mag_old_data[0];
-    //data->mag_old_data[2] = data->mag_old_data[0];
+    //data->mag_old_data[0] = data->mag_data[0];
+    //data->mag_old_data[1] = data->mag_data[0];
+    //data->mag_old_data[2] = data->mag_data[0];
 }
 
 

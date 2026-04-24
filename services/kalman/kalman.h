@@ -46,7 +46,8 @@ typedef struct
 } sensor_data;
 
 
-void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R);
+void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, sensor_data *data, float Pinit, float *Q,
+                                 float *R);
 void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T);
 void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2);
 void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T);
@@ -77,12 +78,5 @@ void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restric
 void SPP_SERVICES_KALMAN_mat4x3Transpose(const float *restrict A, float *restrict out);
 void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out);
 int SPP_SERVICES_KALMAN_mat3x3Inverse(const float *restrict in, float *restrict out);
-
-void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B,
-                                   float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
-                                   float *restrict out);
-void SPP_SERVICES_KALMAN_mat4x4Transpose(const float *restrict A, float *restrict out);
-
 
 #endif
