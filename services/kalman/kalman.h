@@ -12,6 +12,9 @@
 #define GYRO_Y_VAR (GYRO_Y_NOISE_STD * GYRO_Y_NOISE_STD)
 #define GYRO_Z_VAR (GYRO_Z_NOISE_STD * GYRO_Z_NOISE_STD)
 
+#define M_PI       3.14159265358979323846f
+#define DEG_TO_RAD (M_PI / 180.0f)
+
 #define SENSOR_DATA_TOL 0.000001f
 typedef struct
 {
