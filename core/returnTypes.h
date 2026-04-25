@@ -22,7 +22,7 @@
  */
 typedef enum
 {
-    K_SPP_OK,                        /**< Operation completed successfully. */
+    K_SPP_OK = 0,                    /**< Operation completed successfully. */
     K_SPP_ERROR,                     /**< Generic unspecified error. */
     K_SPP_NOT_ENOUGH_PACKETS,        /**< Packet pool exhausted. */
     K_SPP_NULL_PACKET,               /**< Packet pointer is NULL. */
@@ -32,7 +32,7 @@ typedef enum
     K_SPP_ERROR_INVALID_PARAMETER,   /**< An argument value is out of range. */
     K_SPP_ERROR_ON_SPI_TRANSACTION,  /**< SPI transaction failed. */
     K_SPP_ERROR_TIMEOUT,             /**< Operation timed out. */
-    K_SPP_ERROR_NO_PORT,             /**< No OSAL/HAL port has been registered. */
+    K_SPP_ERROR_NO_PORT,             /**< No HAL port has been registered. */
     K_SPP_ERROR_REGISTRY_FULL        /**< Service registry is full. */
 } SPP_RetVal_t;
 

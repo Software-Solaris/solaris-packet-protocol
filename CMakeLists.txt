@@ -15,9 +15,13 @@ option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
 # ----------------------------------------------------------------
 # Services — opt-in (all ON by default)
 # ----------------------------------------------------------------
-option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  ON)
-option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            ON)
-option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    ON)
+option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
+option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
+option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
+option(SPP_SERVICE_SX1261     "Compile sx1261 service"                  OFF)
+option(SPP_SERVICE_KALMAN     "Compile kalman service"                   ON)
+
+
 
 # ----------------------------------------------------------------
 # Core SPP library (platform-agnostic)
@@ -43,6 +47,12 @@ endif()
 if(SPP_SERVICE_DATALOGGER)
     list(APPEND SPP_CORE_SOURCES services/datalogger/datalogger.c)
 endif()
+if(SPP_SERVICE_SX1261)
+    list(APPEND SPP_CORE_SOURCES services/sx1261/sx1261.c)
+endif()
+if(SPP_SERVICE_KALMAN)
+    list(APPEND SPP_CORE_SOURCES services/kalman/kalman.c)
+endif()
 
 add_library(spp STATIC ${SPP_CORE_SOURCES})
 
@@ -66,17 +76,6 @@ if(SPP_PORT STREQUAL "posix")
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
     target_include_directories(spp_port PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
     target_link_libraries(spp_port PUBLIC spp pthread)
-
-elseif(SPP_PORT STREQUAL "freertos")
-    set(SPP_PORT_SOURCES
-        ports/hal/esp32/halEsp32.c
-    )
-    add_library(spp_port STATIC ${SPP_PORT_SOURCES})
-    target_include_directories(spp_port PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-        ${CMAKE_CURRENT_SOURCE_DIR}/ports/hal/esp32
-    )
-    target_link_libraries(spp_port PUBLIC spp)
 
 elseif(SPP_PORT STREQUAL "baremetal")
     set(SPP_PORT_SOURCES
@@ -105,18 +104,36 @@ if(SPP_BUILD_TESTS)
         --coverage -fprofile-arcs -ftest-coverage
     )
 
-    # Helper to define a test module as a shared library consumed by cgreen-runner.
-    function(spp_add_test_module name src)
-        add_library(${name} SHARED ${src})
-        target_include_directories(${name} PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/..
-            ${CGREEN_INCLUDE_DIRS}
-        )
-        target_link_libraries(${name} PRIVATE spp spp_port ${CGREEN_LIBRARIES} pthread)
-        target_compile_options(${name} PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
-        target_link_options(${name} PRIVATE --coverage)
-        add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
-    endfunction()
+    # spp without hal/dispatch.c — lets mocks.c provide HAL symbols without conflict.
+    set(SPP_TESTABLE_SOURCES ${SPP_CORE_SOURCES})
+    list(FILTER SPP_TESTABLE_SOURCES EXCLUDE REGEX "hal/dispatch\\.c$")
+    add_library(spp_testable STATIC ${SPP_TESTABLE_SOURCES})
+    set_property(TARGET spp_testable PROPERTY POSITION_INDEPENDENT_CODE ON)
+    target_include_directories(spp_testable PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+    target_compile_options(spp_testable PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
+    target_link_options(spp_testable PRIVATE --coverage)
 
-    spp_add_test_module(spp_test_core tests/core/test_core.c tests/mocks.c)
+    # Port stub linked against spp_testable (not spp) to avoid pulling dispatch.c.
+    add_library(spp_port_testable STATIC ports/hal/stub/halStub.c)
+    set_property(TARGET spp_port_testable PROPERTY POSITION_INDEPENDENT_CODE ON)
+    target_include_directories(spp_port_testable PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+    target_link_libraries(spp_port_testable PUBLIC spp_testable pthread)
+    target_compile_options(spp_port_testable PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
+    target_link_options(spp_port_testable PRIVATE --coverage)
+
+    add_executable(spp_tests
+        tests/run_all_tests.c
+        tests/core/test_core.c
+        tests/services/services_register_test.c
+        tests/services/kalman/test_kalman.c
+        tests/mocks.c
+    )
+    target_include_directories(spp_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CGREEN_INCLUDE_DIRS}
+    )
+    target_link_libraries(spp_tests PRIVATE spp_port_testable ${CGREEN_LIBRARIES} pthread)
+    target_compile_options(spp_tests PRIVATE ${SPP_TEST_COMPILE_OPTIONS})
+    target_link_options(spp_tests PRIVATE --coverage)
+    add_test(NAME spp_tests COMMAND spp_tests)
 endif()

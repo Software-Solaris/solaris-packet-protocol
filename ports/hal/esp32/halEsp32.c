@@ -121,7 +121,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t *p_data,
-                                             spp_uint8_t length)
+                                                    spp_uint8_t length)
 {
     if ((p_handle == NULL) || (p_data == NULL) || (length == 0U))
     {
@@ -173,7 +173,7 @@ static void IRAM_ATTR SPP_PORTS_HAL_ESP32_gpioIsr(void *p_arg)
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                                     spp_uint32_t pull)
+                                                            spp_uint32_t pull)
 {
     gpio_config_t ioCfg = {
         .pin_bit_mask = (1ULL << pin),
@@ -281,14 +281,14 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
  * ---------------------------------------------------------------- */
 
 const SPP_HalPort_t g_esp32HalPort = {
-    .spiBusInit          = SPP_PORTS_HAL_ESP32_spiBusInit,
-    .spiGetHandle        = SPP_PORTS_HAL_ESP32_spiGetHandle,
-    .spiDeviceInit       = SPP_PORTS_HAL_ESP32_spiDeviceInit,
-    .spiTransmit         = SPP_PORTS_HAL_ESP32_spiTransmit,
+    .spiBusInit = SPP_PORTS_HAL_ESP32_spiBusInit,
+    .spiGetHandle = SPP_PORTS_HAL_ESP32_spiGetHandle,
+    .spiDeviceInit = SPP_PORTS_HAL_ESP32_spiDeviceInit,
+    .spiTransmit = SPP_PORTS_HAL_ESP32_spiTransmit,
     .gpioConfigInterrupt = SPP_PORTS_HAL_ESP32_gpioConfigInterrupt,
-    .gpioRegisterIsr     = SPP_PORTS_HAL_ESP32_gpioRegisterIsr,
-    .storageMount        = SPP_PORTS_HAL_ESP32_storageMount,
-    .storageUnmount      = SPP_PORTS_HAL_ESP32_storageUnmount,
-    .getTimeMs           = SPP_PORTS_HAL_ESP32_getTimeMs,
-    .delayMs             = SPP_PORTS_HAL_ESP32_delayMs,
+    .gpioRegisterIsr = SPP_PORTS_HAL_ESP32_gpioRegisterIsr,
+    .storageMount = SPP_PORTS_HAL_ESP32_storageMount,
+    .storageUnmount = SPP_PORTS_HAL_ESP32_storageUnmount,
+    .getTimeMs = SPP_PORTS_HAL_ESP32_getTimeMs,
+    .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
