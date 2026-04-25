@@ -51,9 +51,9 @@ typedef struct
 
 void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, sensor_data *data, float Pinit, float *Q,
                                  float *R);
-void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T);
+void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, const float T);
 void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2);
-void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T);
+void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, const float T);
 
 void SPP_SERVICES_KALMAN_newDataCheck(sensor_data *data);
 void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
