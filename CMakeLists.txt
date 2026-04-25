@@ -19,6 +19,8 @@ option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
 option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
 option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
 option(SPP_SERVICE_SX1261     "Compile sx1261 service"                  OFF)
+option(SPP_SERVICE_KALMAN     "Compile kalman service"                   ON)
+
 
 
 # ----------------------------------------------------------------
@@ -47,6 +49,9 @@ if(SPP_SERVICE_DATALOGGER)
 endif()
 if(SPP_SERVICE_SX1261)
     list(APPEND SPP_CORE_SOURCES services/sx1261/sx1261.c)
+endif()
+if(SPP_SERVICE_KALMAN)
+    list(APPEND SPP_CORE_SOURCES services/kalman/kalman.c)
 endif()
 
 add_library(spp STATIC ${SPP_CORE_SOURCES})
@@ -120,6 +125,7 @@ if(SPP_BUILD_TESTS)
         tests/run_all_tests.c
         tests/core/test_core.c
         tests/services/services_register_test.c
+        tests/services/kalman/test_kalman.c
         tests/mocks.c
     )
     target_include_directories(spp_tests PRIVATE

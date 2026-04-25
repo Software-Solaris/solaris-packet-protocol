@@ -28,15 +28,15 @@
  * ---------------------------------------------------------------- */
 
 
-Describe(SPP_SERVICES_KALMAN_ekfUpdate);
-BeforeEach(SPP_SERVICES_KALMAN_ekfUpdate)
+Describe(kalmanInit);
+BeforeEach(kalmanInit)
 {
 }
-AfterEach(SPP_SERVICES_KALMAN_ekfUpdate)
+AfterEach(kalmanInit)
 {
 }
 
-Ensure(SPP_SERVICES_KALMAN_ekfUpdate, passes_trivial_test)
+Ensure(kalmanInit, passes_trivial_test)
 {
     assert_that(1 + 1, is_equal_to(2));
 }
@@ -51,17 +51,7 @@ TestSuite *kalman_suite()
 {
     TestSuite *suite = create_test_suite();
 
-    add_test_with_context(suite, SPP_SERVICES_KALMAN_ekfUpdate, passes_trivial_test);
-
-    return suite;
-}
-
-
-TestSuite *kalman_suite()
-{
-    TestSuite *suite = create_named_test_suite("kalman");
-
-    add_test_with_context(suite);
+    add_test_with_context(suite, kalmanInit, passes_trivial_test);
 
     return suite;
 }
