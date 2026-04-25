@@ -6,7 +6,8 @@
 #include "kalman.h"
 
 
-void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float *R)
+void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, sensor_data *data, float Pinit, float *Q,
+                                 float *R)
 {
     kal->qw = 1.0f;
     kal->qx = 0.0f;
@@ -23,18 +24,34 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, float Pinit, float *Q, float
     kal->P[10] = Pinit;
     kal->P[15] = Pinit;
 
+    memset(kal->Q, 0, sizeof(kal->Q));
     kal->Q[0] = Q[0];
-    kal->Q[1] = Q[1];
-    kal->Q[2] = Q[2];
-    kal->Q[3] = Q[3];
+    kal->Q[5] = Q[5];
+    kal->Q[10] = Q[10];
+    kal->Q[15] = Q[15];
 
     kal->R[0] = R[0];
     kal->R[1] = R[1];
     kal->R[2] = R[2];
+
+    data->acc_old_data[0] = 0.0f;
+    data->acc_old_data[1] = 0.0f;
+    data->acc_old_data[2] = 0.0f;
+
+    data->gyro_old_data[0] = 0.0f;
+    data->gyro_old_data[1] = 0.0f;
+    data->gyro_old_data[2] = 0.0f;
+
+    data->acc_new_data = 0;
+    data->gyro_new_data = 0;
+
+    //data->mag_old_data[0] = 0.0f;
+    //data->mag_old_data[1] = 0.0f;
+    //data->mag_old_data[2] = 0.0f;
 }
 
 
-void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T)
+void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, const float T)
 {
     /* Extract measurements */
     float p = gyr_rps[0];
@@ -83,25 +100,53 @@ void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, float T)
     SPP_SERVICES_KALMAN_mat4x4Mul(result1, F_trans, result2);
 
     // Fill updated covariance matrix P
-    kal->P[0] = result2[0] + kal->Q[0];
-    kal->P[1] = result2[1];
-    kal->P[2] = result2[2];
-    kal->P[3] = result2[3];
+    SPP_SERVICES_KALMAN_mat4x4Add(result2, kal->Q, kal->P);
 
-    kal->P[4] = result2[4];
-    kal->P[5] = result2[5] + kal->Q[1];
-    kal->P[6] = result2[6];
-    kal->P[7] = result2[7];
+    /* Update process noise covariance matrix Q */
 
-    kal->P[8] = result2[8];
-    kal->P[9] = result2[9];
-    kal->P[10] = result2[10] + kal->Q[2];
-    kal->P[11] = result2[11];
+    //Jacobian W_t
+    float W[12];
 
-    kal->P[12] = result2[12];
-    kal->P[13] = result2[13];
-    kal->P[14] = result2[14];
-    kal->P[15] = result2[15] + kal->Q[3];
+    //Precalculate common terms
+    float half_Tqw = half_T * qw_old;
+    float half_Tqx = half_T * qx_old;
+    float half_Tqy = half_T * qy_old;
+    float half_Tqz = half_T * qz_old;
+
+    //Row 1
+    W[0] = -half_Tqx;
+    W[1] = -half_Tqy;
+    W[2] = -half_Tqz;
+
+    //Row 2
+    W[3] = half_Tqw;
+    W[4] = -half_Tqz;
+    W[5] = half_Tqy;
+
+    //Row 3
+    W[6] = half_Tqz;
+    W[7] = half_Tqw;
+    W[8] = -half_Tqx;
+
+    //Row 4
+    W[9] = -half_Tqy;
+    W[10] = half_Tqx;
+    W[11] = half_Tqw;
+
+    //Sigma_w
+    float Sigma_w[3];
+    Sigma_w[0] = GYRO_X_VAR;
+    Sigma_w[1] = GYRO_Y_VAR;
+    Sigma_w[2] = GYRO_Z_VAR;
+
+    float result3[12];
+    SPP_SERVICES_KALMAN_mat4x3Mul3x3diag(W, Sigma_w, result3);
+
+    float W_trans[12];
+    SPP_SERVICES_KALMAN_mat4x3Transpose(W, W_trans);
+
+
+    SPP_SERVICES_KALMAN_mat4x3Mul3x4(result3, W_trans, kal->Q);
 }
 
 
@@ -149,7 +194,7 @@ void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 
     /* Calculate function h(x) = C' * g */
     float C_trans[9];
-    SPP_SERVICES_KALMAN_mat3x3Transpose(C, C_trans); // REVISAR DE AQUÍ PABAJO !!!
+    SPP_SERVICES_KALMAN_mat3x3Transpose(C, C_trans);
 
     float g_iner[3] = {0};
     g_iner[2] = g;
@@ -285,10 +330,67 @@ void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
 
     SPP_SERVICES_KALMAN_mat4x4Mul(part1, tmp_P, kal->P);
 }
+//TODO:Verify that the data reading was correct
+void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, const float T)
+{
+    SPP_SERVICES_KALMAN_newDataCheck(data);
+
+    if (data->gyro_new_data == 1)
+    {
+        SPP_SERVICES_KALMAN_ekfPredict(kal, data->gyro_data, T);
+
+        data->gyro_old_data[0] = data->gyro_data[0];
+        data->gyro_old_data[1] = data->gyro_data[0];
+        data->gyro_old_data[2] = data->gyro_data[0];
+
+        data->gyro_new_data = 0;
+    }
+
+    if (data->acc_new_data == 1)
+    {
+        SPP_SERVICES_KALMAN_ekfUpdate(kal, data->acc_data);
+
+        data->acc_old_data[0] = data->acc_data[0];
+        data->acc_old_data[1] = data->acc_data[1];
+        data->acc_old_data[2] = data->acc_data[2];
+
+        data->acc_new_data = 0;
+    }
 
 
-// borrar?
-void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B, float *restrict out)
+    //data->mag_old_data[0] = data->mag_data[0];
+    //data->mag_old_data[1] = data->mag_data[1];
+    //data->mag_old_data[2] = data->mag_data[2];
+}
+
+
+void SPP_SERVICES_KALMAN_newDataCheck(sensor_data *data)
+{
+    if (fabsf(data->acc_data[0] - data->acc_old_data[0]) > SENSOR_DATA_TOL ||
+        fabsf(data->acc_data[1] - data->acc_old_data[1]) > SENSOR_DATA_TOL ||
+        fabsf(data->acc_data[2] - data->acc_old_data[2]) > SENSOR_DATA_TOL)
+    {
+        data->acc_new_data = 1;
+    }
+
+    if (fabsf(data->gyro_data[0] - data->gyro_old_data[0]) > SENSOR_DATA_TOL ||
+        fabsf(data->gyro_data[1] - data->gyro_old_data[1]) > SENSOR_DATA_TOL ||
+        fabsf(data->gyro_data[2] - data->gyro_old_data[2]) > SENSOR_DATA_TOL)
+    {
+        data->gyro_new_data = 1;
+    }
+
+    // if(fabsf(data->mag_data[0] - data->mag_old_data[0]) > SENSOR_DATA_TOL ||
+    //    fabsf(data->mag_data[1] - data->mag_old_data[1]) > SENSOR_DATA_TOL ||
+    //    fabsf(data->mag_data[2] - data->mag_old_data[2]) > SENSOR_DATA_TOL){
+    //
+    //     data->mag_new_data = 1;
+    // }
+}
+
+
+void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     /* Row 1 */
     out[0] = A[0] + B[0];
@@ -316,7 +418,8 @@ void SPP_SERVICES_KALMAN_mat4x4Add(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     // Row 1
     out[0] = A[0] - B[0];
@@ -344,7 +447,8 @@ void SPP_SERVICES_KALMAN_mat4x4Sub(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restrict B,
+                                   float *restrict out)
 {
     /* restrict -> promise to compiler that aliasing will not occur -> makes it faster */
 
@@ -374,7 +478,8 @@ void SPP_SERVICES_KALMAN_mat4x4Mul(const float *restrict A, const float *restric
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
@@ -398,7 +503,8 @@ void SPP_SERVICES_KALMAN_mat4x4Mul4x3(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8];
@@ -426,7 +532,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x4(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6];
@@ -449,8 +556,33 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x3(const float *restrict A, const float *rest
     out[11] = A[9] * B[2] + A[10] * B[5] + A[11] * B[8];
 }
 
+void SPP_SERVICES_KALMAN_mat4x3Mul3x3diag(const float *restrict A, const float *restrict B,
+                                          float *restrict out)
+{
+    // Row 1
+    out[0] = A[0] * B[0];
+    out[1] = A[1] * B[1];
+    out[2] = A[2] * B[2];
 
-void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B, float *restrict out)
+    // Row 2
+    out[3] = A[3] * B[0];
+    out[4] = A[4] * B[1];
+    out[5] = A[5] * B[2];
+
+    // Row 3
+    out[6] = A[6] * B[0];
+    out[7] = A[7] * B[1];
+    out[8] = A[8] * B[2];
+
+    // Row 4
+    out[9] = A[9] * B[0];
+    out[10] = A[10] * B[1];
+    out[11] = A[11] * B[2];
+}
+
+
+void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[1] + A[2] * B[2];
@@ -466,7 +598,8 @@ void SPP_SERVICES_KALMAN_mat4x3Mul3x1(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8] + A[3] * B[12];
@@ -488,7 +621,8 @@ void SPP_SERVICES_KALMAN_mat3x4Mul4x4(const float *restrict A, const float *rest
 }
 
 
-void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B, float *restrict out)
+void SPP_SERVICES_KALMAN_mat3x4Mul4x3(const float *restrict A, const float *restrict B,
+                                      float *restrict out)
 {
     // Row 1
     out[0] = A[0] * B[0] + A[1] * B[3] + A[2] * B[6] + A[3] * B[9];
@@ -558,6 +692,26 @@ void SPP_SERVICES_KALMAN_mat3x4Transpose(const float *restrict A, float *restric
     out[11] = A[11];
 }
 
+void SPP_SERVICES_KALMAN_mat4x3Transpose(const float *restrict A, float *restrict out)
+{
+    // Row 1
+    out[0] = A[0];
+    out[1] = A[3];
+    out[2] = A[6];
+    out[3] = A[9];
+
+    // Row 2
+    out[4] = A[1];
+    out[5] = A[4];
+    out[6] = A[7];
+    out[7] = A[10];
+    // Row 3
+
+    out[8] = A[2];
+    out[9] = A[5];
+    out[10] = A[8];
+    out[11] = A[11];
+}
 
 void SPP_SERVICES_KALMAN_mat3x3Transpose(const float *restrict A, float *restrict out)
 {
