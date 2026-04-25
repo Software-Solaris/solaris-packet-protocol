@@ -359,8 +359,8 @@ void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, float T)
 
 
     //data->mag_old_data[0] = data->mag_data[0];
-    //data->mag_old_data[1] = data->mag_data[0];
-    //data->mag_old_data[2] = data->mag_data[0];
+    //data->mag_old_data[1] = data->mag_data[1];
+    //data->mag_old_data[2] = data->mag_data[2];
 }
 
 
