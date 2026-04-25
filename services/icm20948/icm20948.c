@@ -1467,7 +1467,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_getMeasurements(ICM20948_ServiceCtx_t *p_ctx,
 
     if (p_spi == NULL)
     {
-        return;
+        return K_SPP_ERROR;
     }
 
     txRxData[0] = K_READ_OP | K_ICM20948_REG_INT_STATUS;
