@@ -51,12 +51,12 @@ void SPP_SERVICES_KALMAN_ekfInit(kalman_state *kal, sensor_data *data, float Pin
 }
 
 
-void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, const float T)
+void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, sensor_data *data, const float T)
 {
     /* Extract measurements */
-    float p = gyr_rps[0];
-    float q = gyr_rps[1];
-    float r = gyr_rps[2];
+    float p = data->gyro_data[0];
+    float q = data->gyro_data[1];
+    float r = data->gyro_data[2];
 
     /* Save old coefficients */
     float qw_old = kal->qw;
@@ -150,12 +150,12 @@ void SPP_SERVICES_KALMAN_ekfPredict(kalman_state *kal, float *gyr_rps, const flo
 }
 
 
-void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, float *acc_ms2)
+void SPP_SERVICES_KALMAN_ekfUpdate(kalman_state *kal, sensor_data *data)
 {
     /* Extract measurements (this will be vector z)*/
-    float ax = acc_ms2[0];
-    float ay = acc_ms2[1];
-    float az = acc_ms2[2];
+    float ax = data->acc_data[0];
+    float ay = data->acc_data[1];
+    float az = data->acc_data[2];
 
     /* Extract previous quaternion */
     float qw = kal->qw;
@@ -337,18 +337,18 @@ void SPP_SERVICES_KALMAN_run(kalman_state *kal, sensor_data *data, const float T
 
     if (data->gyro_new_data == 1)
     {
-        SPP_SERVICES_KALMAN_ekfPredict(kal, data->gyro_data, T);
+        SPP_SERVICES_KALMAN_ekfPredict(kal, data, T);
 
         data->gyro_old_data[0] = data->gyro_data[0];
-        data->gyro_old_data[1] = data->gyro_data[0];
-        data->gyro_old_data[2] = data->gyro_data[0];
+        data->gyro_old_data[1] = data->gyro_data[1];
+        data->gyro_old_data[2] = data->gyro_data[2];
 
         data->gyro_new_data = 0;
     }
 
     if (data->acc_new_data == 1)
     {
-        SPP_SERVICES_KALMAN_ekfUpdate(kal, data->acc_data);
+        SPP_SERVICES_KALMAN_ekfUpdate(kal, data);
 
         data->acc_old_data[0] = data->acc_data[0];
         data->acc_old_data[1] = data->acc_data[1];
