@@ -31,11 +31,12 @@
 /** @brief SPI write marker (zero). */
 #define K_WRITE_OP 0x00U
 
+
 #define K_ICM20948_BASE_SAMPLE_RATE      1125L
 #define K_ICM20948_DMP_RUNNING_RATE      225L
 #define K_ICM20948_DMP_DIVIDER           (K_ICM20948_BASE_SAMPLE_RATE / K_ICM20948_DMP_RUNNING_RATE)
 #define K_ICM20948_WHO_AM_I_VALUE        0xEAU
-#define K_ICM20948_DMP_PACKET_SIZE_BYTES 42U
+#define K_ICM20948_DMP_PACKET_SIZE_BYTES 24U
 #define K_ICM20948_FIFO_RESET_THRESHOLD  512U
 #define K_ICM20948_DMP_START_ADDR_MSB    0x10U
 #define K_ICM20948_DMP_START_ADDR_LSB    0x00U
@@ -71,8 +72,11 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_writeReg(void *p_spi, spp_uint8_t reg,
 
 static SPP_RetVal_t SPP_SERVICES_ICM20948_readReg(void *p_spi, spp_uint8_t reg, spp_uint8_t *p_value)
 {
-    spp_uint8_t txRxBuffer[2] = {K_READ_OP | reg, K_WRITE_OP};
-    SPP_RetVal_t ret = SPP_HAL_spiTransmit(p_spi, txRxBuffer, 2U);
+    /* HAL always issues a 3-byte SPI frame for reads (addr + 2 data bytes);
+     * ICM-20948 has no dummy byte so data lands at buf[1]. buf[2] absorbs the
+     * extra byte clocked out — must exist in the array to avoid a stack write. */
+    spp_uint8_t txRxBuffer[3] = {K_READ_OP | reg, K_WRITE_OP, K_WRITE_OP};
+    SPP_RetVal_t ret = SPP_HAL_spiTransmit(p_spi, txRxBuffer, 3U);
 
     if (p_value != NULL)
     {
@@ -80,6 +84,34 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_readReg(void *p_spi, spp_uint8_t reg, 
     }
 
     return ret;
+}
+
+/* Read `count` bytes from FIFO_R_W.  The HAL always issues 3-byte read frames
+ * (address + 2 data bytes), so each frame yields 2 FIFO bytes.  count must be
+ * even (K_ICM20948_DMP_PACKET_SIZE_BYTES = 40 satisfies this). */
+static SPP_RetVal_t readFifoBurst(void *p_spi, spp_uint8_t *p_dst, spp_uint8_t count)
+{
+    spp_uint8_t frame[3];
+    spp_uint8_t i = 0U;
+    while (i < count)
+    {
+        frame[0] = K_READ_OP | K_ICM20948_REG_FIFO_R_W;
+        frame[1] = 0U;
+        frame[2] = 0U;
+        SPP_RetVal_t ret = SPP_HAL_spiTransmit(p_spi, frame, 3U);
+        if (ret != K_SPP_OK)
+        {
+            return ret;
+        }
+        p_dst[i] = frame[1];
+        i++;
+        if (i < count)
+        {
+            p_dst[i] = frame[2];
+            i++;
+        }
+    }
+    return K_SPP_OK;
 }
 
 static SPP_RetVal_t SPP_SERVICES_ICM20948_setBank(void *p_spi, ICM20948_RegBank_t regBank)
@@ -259,10 +291,11 @@ static SPP_RetVal_t ICM20948_dmpWriteOutputConfig(void *p_data, spp_uint16_t out
 SPP_RetVal_t SPP_SERVICES_ICM20948_loadDmp(void *p_data)
 {
     void *p_spi = p_data;
-    SPP_RetVal_t ret;
-    spp_uint16_t firmwareSize = (spp_uint16_t)sizeof(s_dmp3Image);
-    spp_uint16_t addr = K_ICM20948_DMP_LOAD_START;
     const spp_uint8_t *p_firmware = s_dmp3Image;
+    spp_uint16_t firmwareSize = (spp_uint16_t)sizeof(s_dmp3Image);
+    spp_uint16_t done;
+    spp_uint16_t loadAddr;
+    SPP_RetVal_t ret;
 
     if (p_spi == NULL)
     {
@@ -275,56 +308,48 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_loadDmp(void *p_data)
         return ret;
     }
 
-    for (spp_uint16_t i = 0U; i < firmwareSize; i++, addr++)
+    /* ---- Write: byte-by-byte, MEM_BANK_SEL only on change ---- */
+    spp_uint8_t lastBank = 0xFFU;
+
+    done     = 0U;
+    loadAddr = K_ICM20948_DMP_LOAD_START;
+    while (done < firmwareSize)
     {
-        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_BANK_SEL, (spp_uint8_t)(addr >> 8));
+        spp_uint8_t bank   = (spp_uint8_t)(loadAddr >> 8);
+        spp_uint8_t offset = (spp_uint8_t)(loadAddr & 0xFFU);
+
+        if (bank != lastBank)
+        {
+            ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_BANK_SEL, bank);
+            if (ret != K_SPP_OK)
+            {
+                return ret;
+            }
+            lastBank = bank;
+        }
+
+        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_START_ADDR, offset);
+        if (ret != K_SPP_OK)
+        {
+            return ret;
+        }
+        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_R_W, p_firmware[done]);
         if (ret != K_SPP_OK)
         {
             return ret;
         }
 
-        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_START_ADDR, (spp_uint8_t)(addr & 0xFFU));
-        if (ret != K_SPP_OK)
-        {
-            return ret;
-        }
-
-        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_R_W, p_firmware[i]);
-        if (ret != K_SPP_OK)
-        {
-            return ret;
-        }
+        done++;
+        loadAddr = (spp_uint16_t)(loadAddr + 1U);
     }
 
-    /* Verify */
-    addr = K_ICM20948_DMP_LOAD_START;
-
-    for (spp_uint16_t i = 0U; i < firmwareSize; i++, addr++)
+    /* Prime the SRAM read path — the DMP memory controller needs one read transaction
+     * after the write burst before verify reads return correct values. */
     {
-        spp_uint8_t readValue;
-
-        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_BANK_SEL, (spp_uint8_t)(addr >> 8));
-        if (ret != K_SPP_OK)
-        {
-            return ret;
-        }
-
-        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_START_ADDR, (spp_uint8_t)(addr & 0xFFU));
-        if (ret != K_SPP_OK)
-        {
-            return ret;
-        }
-
-        ret = SPP_SERVICES_ICM20948_readReg(p_spi, K_ICM20948_REG_MEM_R_W, &readValue);
-        if (ret != K_SPP_OK)
-        {
-            return ret;
-        }
-
-        if (readValue != p_firmware[i])
-        {
-            return K_SPP_ERROR;
-        }
+        spp_uint8_t primeVal = 0U;
+        (void)SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_BANK_SEL, 0x00U);
+        (void)SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_MEM_START_ADDR, 0x91U);
+        (void)SPP_SERVICES_ICM20948_readReg(p_spi, K_ICM20948_REG_MEM_R_W, &primeVal);
     }
 
     return K_SPP_OK;
@@ -382,6 +407,17 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
         ICM20948_RegPwrMgmt2_t pwrMgmt2Reg = {.value = 0U};
         ICM20948_RegLpConf_t lpConfReg = {.value = 0U};
 
+        /* Software reset — chip returns to POR state. */
+        pwrMgmt1Reg.bits.deviceReset = 1U;
+        ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_PWR_MGMT_1, pwrMgmt1Reg.value);
+        if (ret != K_SPP_OK)
+        {
+            return ret;
+        }
+        SPP_HAL_delayMs(50U);
+
+        /* Wake up, auto clock, LP_EN=0 — required before DMP SRAM is writable. */
+        pwrMgmt1Reg.value = 0U;
         pwrMgmt1Reg.bits.clkSel = K_ICM20948_CLK_AUTO;
         ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_PWR_MGMT_1, pwrMgmt1Reg.value);
         if (ret != K_SPP_OK)
@@ -968,8 +1004,8 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
         }
         else
         {
+            /* 0xD0 = DMP_EN + FIFO_EN + I2C_IF_DIS; I2C master not yet enabled here. */
             userCtrlReg.bits.i2cIfDis = 1U;
-            userCtrlReg.bits.i2cMstEn = 1U;
             userCtrlReg.bits.fifoEn = 1U;
             userCtrlReg.bits.dmpEn = 1U;
         }
@@ -987,9 +1023,9 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
             return ret;
         }
 
+        /* Second write: same 0xD0 value. */
         userCtrlReg.value = 0U;
         userCtrlReg.bits.i2cIfDis = 1U;
-        userCtrlReg.bits.i2cMstEn = 1U;
         userCtrlReg.bits.fifoEn = 1U;
         userCtrlReg.bits.dmpEn = 1U;
         ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_USER_CTRL, userCtrlReg.value);
@@ -1052,7 +1088,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
     }
 
     SPP_LOGI(K_ICM20948_LOG_TAG, "Phase: final output config + mag start");
-    ret = ICM20948_dmpWriteOutputConfig(p_data, 0xE400U, 0x0048U);
+    ret = ICM20948_dmpWriteOutputConfig(p_data, 0x8400U, 0x03C0U);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -1265,6 +1301,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
         ICM20948_RegPwrMgmt1_t pwrMgmt1Reg = {.value = 0U};
 
         pwrMgmt1Reg.bits.clkSel = K_ICM20948_CLK_AUTO;
+        pwrMgmt1Reg.bits.lpEn = 1U;
         ret = SPP_SERVICES_ICM20948_writeReg(p_spi, K_ICM20948_REG_PWR_MGMT_1, pwrMgmt1Reg.value);
         if (ret != K_SPP_OK)
         {
@@ -1272,7 +1309,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
         }
     }
 
-    ret = ICM20948_dmpWriteOutputConfig(p_data, 0xE400U, 0x0048U);
+    ret = ICM20948_dmpWriteOutputConfig(p_data, 0x8400U, 0x03C0U);
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -1306,8 +1343,9 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx)
 
     txRxData[0] = K_READ_OP | K_ICM20948_REG_INT_STATUS;
     txRxData[1] = K_WRITE_OP;
+    txRxData[2] = K_WRITE_OP;
 
-    ret = SPP_HAL_spiTransmit(p_spi, txRxData, 2U);
+    ret = SPP_HAL_spiTransmit(p_spi, txRxData, 3U);
     if (ret != K_SPP_OK)
     {
         return;
@@ -1318,8 +1356,9 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx)
 
         txRxData[0] = K_READ_OP | K_ICM20948_REG_DMP_INT_STATUS;
         txRxData[1] = K_WRITE_OP;
+        txRxData[2] = K_WRITE_OP;
 
-        ret = SPP_HAL_spiTransmit(p_spi, txRxData, 2U);
+        ret = SPP_HAL_spiTransmit(p_spi, txRxData, 3U);
         if (ret != K_SPP_OK)
         {
             return;
@@ -1340,6 +1379,16 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx)
             {
                 spp_uint16_t fifoCount = ((spp_uint16_t)txRxData[1] << 8) | txRxData[2];
 
+                {
+                    static spp_bool_t s_logged = false;
+                    if (!s_logged)
+                    {
+                        SPP_LOGI(K_ICM20948_LOG_TAG, "FIFO first count=%u pktsz=%u",
+                                 (unsigned)fifoCount, K_ICM20948_DMP_PACKET_SIZE_BYTES);
+                        s_logged = true;
+                    }
+                }
+
                 if (fifoCount > K_ICM20948_FIFO_RESET_THRESHOLD)
                 {
                     (void)SPP_SERVICES_ICM20948_resetFifo(p_spi);
@@ -1351,81 +1400,75 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx)
 
                     for (spp_uint16_t i = 0U; i < numPackets; i++)
                     {
-                        spp_uint8_t fifoBuffer[K_ICM20948_DMP_PACKET_SIZE_BYTES + 1U] = {0U};
+                        /* fifoBuffer[0..23]: DMP packet (DATA_OUT_CTL1=0x8400).
+                         * [0-1]=header1, [2-7]=accel, [8-21]=quat9, [22-23]=footer. */
+                        spp_uint8_t fifoBuffer[K_ICM20948_DMP_PACKET_SIZE_BYTES] = {0U};
 
-                        fifoBuffer[0] = K_READ_OP | K_ICM20948_REG_FIFO_R_W;
-                        ret = SPP_HAL_spiTransmit(p_spi, fifoBuffer,
-                                                  K_ICM20948_DMP_PACKET_SIZE_BYTES + 1U);
+                        ret = readFifoBurst(p_spi, fifoBuffer, K_ICM20948_DMP_PACKET_SIZE_BYTES);
                         if (ret != K_SPP_OK)
                         {
                             return;
                         }
 
+                        if (i == 0U)
                         {
+                            static spp_bool_t s_hdrLogged = false;
+                            if (!s_hdrLogged)
+                            {
+                                SPP_LOGI(K_ICM20948_LOG_TAG,
+                                         "DMP hdr=%02X%02X accel=%02X%02X quat=%02X%02X",
+                                         fifoBuffer[0], fifoBuffer[1],
+                                         fifoBuffer[2], fifoBuffer[3],
+                                         fifoBuffer[8], fifoBuffer[9]);
+                                s_hdrLogged = true;
+                            }
+                        }
+
+                        {
+                            /* Packet layout (DATA_OUT_CTL1=0x8400, footer always present):
+                             * [0:1]=header1, [2:7]=accel, [8:21]=quat9(Q1,Q2,Q3,acc),
+                             * [22:23]=footer(gyro count, ignored). */
                             int16_t accelX =
-                                (int16_t)(((uint16_t)fifoBuffer[3] << 8) | fifoBuffer[4]);
+                                (int16_t)(((uint16_t)fifoBuffer[2] << 8) | fifoBuffer[3]);
                             int16_t accelY =
-                                (int16_t)(((uint16_t)fifoBuffer[5] << 8) | fifoBuffer[6]);
+                                (int16_t)(((uint16_t)fifoBuffer[4] << 8) | fifoBuffer[5]);
                             int16_t accelZ =
-                                (int16_t)(((uint16_t)fifoBuffer[7] << 8) | fifoBuffer[8]);
-                            int16_t gyroX =
-                                (int16_t)(((uint16_t)fifoBuffer[9] << 8) | fifoBuffer[10]);
-                            int16_t gyroY =
-                                (int16_t)(((uint16_t)fifoBuffer[11] << 8) | fifoBuffer[12]);
-                            int16_t gyroZ =
-                                (int16_t)(((uint16_t)fifoBuffer[13] << 8) | fifoBuffer[14]);
-                            int16_t magX =
-                                (int16_t)(((uint16_t)fifoBuffer[21] << 8) | fifoBuffer[22]);
-                            int16_t magY =
-                                (int16_t)(((uint16_t)fifoBuffer[23] << 8) | fifoBuffer[24]);
-                            int16_t magZ =
-                                (int16_t)(((uint16_t)fifoBuffer[25] << 8) | fifoBuffer[26]);
+                                (int16_t)(((uint16_t)fifoBuffer[6] << 8) | fifoBuffer[7]);
 
                             int32_t q1Raw =
-                                ((int32_t)fifoBuffer[27] << 24) | ((int32_t)fifoBuffer[28] << 16) |
-                                ((int32_t)fifoBuffer[29] << 8) | (int32_t)fifoBuffer[30];
+                                ((int32_t)fifoBuffer[8]  << 24) | ((int32_t)fifoBuffer[9]  << 16) |
+                                ((int32_t)fifoBuffer[10] << 8)  |  (int32_t)fifoBuffer[11];
                             int32_t q2Raw =
-                                ((int32_t)fifoBuffer[31] << 24) | ((int32_t)fifoBuffer[32] << 16) |
-                                ((int32_t)fifoBuffer[33] << 8) | (int32_t)fifoBuffer[34];
+                                ((int32_t)fifoBuffer[12] << 24) | ((int32_t)fifoBuffer[13] << 16) |
+                                ((int32_t)fifoBuffer[14] << 8)  |  (int32_t)fifoBuffer[15];
                             int32_t q3Raw =
-                                ((int32_t)fifoBuffer[35] << 24) | ((int32_t)fifoBuffer[36] << 16) |
-                                ((int32_t)fifoBuffer[37] << 8) | (int32_t)fifoBuffer[38];
-
+                                ((int32_t)fifoBuffer[16] << 24) | ((int32_t)fifoBuffer[17] << 16) |
+                                ((int32_t)fifoBuffer[18] << 8)  |  (int32_t)fifoBuffer[19];
                             int16_t accuracy =
-                                (int16_t)(((uint16_t)fifoBuffer[39] << 8) | fifoBuffer[40]);
+                                (int16_t)(((uint16_t)fifoBuffer[20] << 8) | fifoBuffer[21]);
 
                             float ax = accelX / 8192.0f;
                             float ay = accelY / 8192.0f;
                             float az = accelZ / 8192.0f;
-                            float gx = gyroX / 16.4f;
-                            float gy = gyroY / 16.4f;
-                            float gz = gyroZ / 16.4f;
-                            float mx = magX * 0.15f;
-                            float my = magY * 0.15f;
-                            float mz = magZ * 0.15f;
                             float qx = q1Raw / 1073741824.0f;
                             float qy = q2Raw / 1073741824.0f;
                             float qz = q3Raw / 1073741824.0f;
                             float qwSq = 1.0f - (qx * qx) - (qy * qy) - (qz * qz);
                             float qw = (qwSq > 0.0f) ? sqrtf(qwSq) : 0.0f;
 
-                            SPP_LOGI(
-                                K_ICM20948_LOG_TAG,
-                                "A:[%.2f %.2f %.2f]g G:[%.1f %.1f %.1f]dps M:[%.1f %.1f %.1f]uT",
-                                ax, ay, az, gx, gy, gz, mx, my, mz);
-
-                            SPP_LOGI(K_ICM20948_LOG_TAG, "Q:[w=%.4f x=%.4f y=%.4f z=%.4f] acc:%d",
-                                     qw, qx, qy, qz, accuracy);
+                            SPP_LOGI(K_ICM20948_LOG_TAG,
+                                     "A:[%.2f %.2f %.2f]g Q:[w=%.4f x=%.4f y=%.4f z=%.4f] acc:%d",
+                                     ax, ay, az, qw, qx, qy, qz, accuracy);
 
                             p_ctx->lastData.ax        = ax;
                             p_ctx->lastData.ay        = ay;
                             p_ctx->lastData.az        = az;
-                            p_ctx->lastData.gx        = gx;
-                            p_ctx->lastData.gy        = gy;
-                            p_ctx->lastData.gz        = gz;
-                            p_ctx->lastData.mx        = mx;
-                            p_ctx->lastData.my        = my;
-                            p_ctx->lastData.mz        = mz;
+                            p_ctx->lastData.gx        = 0.0f;
+                            p_ctx->lastData.gy        = 0.0f;
+                            p_ctx->lastData.gz        = 0.0f;
+                            p_ctx->lastData.mx        = 0.0f;
+                            p_ctx->lastData.my        = 0.0f;
+                            p_ctx->lastData.mz        = 0.0f;
                             p_ctx->lastData.dataReady = true;
                         }
                     }

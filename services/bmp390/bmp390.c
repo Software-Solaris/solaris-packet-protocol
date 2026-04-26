@@ -539,6 +539,8 @@ void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx)
         return;
     }
 
+    SPP_LOGI(k_svcTag, "alt=%.1fm P=%.1fhPa T=%.2fC", altitude, pressure / 100.0f, temperature);
+
     float payload[3] = {altitude, pressure, temperature};
     ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP_SERVICE_APID_DBG, p_ctx->seq++,
                                    payload, (spp_uint16_t)sizeof(payload));
