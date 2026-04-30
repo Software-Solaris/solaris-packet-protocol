@@ -22,33 +22,27 @@ static const char *const k_tag = "DATALOGGER";
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
-                         const char *p_file_path)
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger)
 {
-    SPP_RetVal_t ret;
-
-    memset(p_logger, 0, sizeof(Datalogger_t));
-    p_logger->p_storage_cfg = p_storage_cfg;
-
-    ret = SPP_HAL_storageMount(p_storage_cfg);
+    SPP_RetVal_t ret = SPP_HAL_storageMount(p_logger->p_storageCfg);
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_tag, "Storage mount failed");
         return ret;
     }
 
-    p_logger->p_file = fopen(p_file_path, "w");
+    p_logger->p_file = fopen(p_logger->p_filePath, "w");
     if (p_logger->p_file == NULL)
     {
-        SPP_LOGE(k_tag, "Failed to open file: %s", p_file_path);
-        (void)SPP_HAL_storageUnmount(p_storage_cfg);
+        SPP_LOGE(k_tag, "Failed to open file: %s", p_logger->p_filePath);
+        (void)SPP_HAL_storageUnmount(p_logger->p_storageCfg);
         return K_SPP_ERROR;
     }
 
     p_logger->is_initialized = 1U;
     p_logger->logged_packets = 0U;
 
-    SPP_LOGI(k_tag, "Init OK file=%s", p_file_path);
+    SPP_LOGI(k_tag, "Init OK file=%s", p_logger->p_filePath);
     return K_SPP_OK;
 }
 
@@ -147,20 +141,20 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger)
         p_logger->p_file = NULL;
     }
 
-    if (p_logger->p_storage_cfg != NULL)
+    if (p_logger->p_storageCfg != NULL)
     {
-        ret = SPP_HAL_storageUnmount(p_logger->p_storage_cfg);
+        ret = SPP_HAL_storageUnmount(p_logger->p_storageCfg);
         if (ret != K_SPP_OK)
         {
             SPP_LOGE(k_tag, "Storage unmount failed");
             p_logger->is_initialized = 0U;
-            p_logger->p_storage_cfg = NULL;
+            p_logger->p_storageCfg = NULL;
             return ret;
         }
     }
 
     p_logger->is_initialized = 0U;
-    p_logger->p_storage_cfg = NULL;
+    p_logger->p_storageCfg = NULL;
 
     SPP_LOGI(k_tag, "Deinit OK");
     return K_SPP_OK;
@@ -183,26 +177,24 @@ static void sdLoggerOnPacket(const SPP_Packet_t *p_packet, void *p_ctx)
     }
 }
 
-static SPP_RetVal_t sdLoggerServiceInit(void *p_ctx, const void *p_cfg)
+static SPP_RetVal_t sdLoggerInit(void *p_ctx)
 {
-    const Datalogger_Cfg_t *cfg = (const Datalogger_Cfg_t *)p_cfg;
-    return SPP_SERVICES_DATALOGGER_init((Datalogger_t *)p_ctx,
-                                         cfg->p_storageCfg, cfg->p_filePath);
+    return SPP_SERVICES_DATALOGGER_init((Datalogger_t *)p_ctx);
 }
 
-static SPP_RetVal_t sdLoggerServiceStart(void *p_ctx)
+static SPP_RetVal_t sdLoggerStart(void *p_ctx)
 {
     (void)p_ctx;
     SPP_LOGI(k_tag, "Service ready — logging all packets");
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t sdLoggerServiceStop(void *p_ctx)
+static SPP_RetVal_t sdLoggerStop(void *p_ctx)
 {
     return SPP_SERVICES_DATALOGGER_flush((Datalogger_t *)p_ctx);
 }
 
-static SPP_RetVal_t sdLoggerServiceDeinit(void *p_ctx)
+static SPP_RetVal_t sdLoggerDeinit(void *p_ctx)
 {
     return SPP_SERVICES_DATALOGGER_deinit((Datalogger_t *)p_ctx);
 }
@@ -211,10 +203,10 @@ const SPP_Module_t g_sdLoggerModule = {
     .p_name       = "sd_logger",
     .apid         = K_SPP_APID_NONE,
     .ctxSize      = sizeof(Datalogger_t),
-    .init         = sdLoggerServiceInit,
-    .start        = sdLoggerServiceStart,
-    .stop         = sdLoggerServiceStop,
-    .deinit       = sdLoggerServiceDeinit,
+    .init         = sdLoggerInit,
+    .start        = sdLoggerStart,
+    .stop         = sdLoggerStop,
+    .deinit       = sdLoggerDeinit,
     .serviceTask  = NULL,
     .consumesApid = K_SPP_APID_ALL,
     .onPacket     = sdLoggerOnPacket,
