@@ -1,8 +1,8 @@
 # services/icm20948/
 
-ICM20948 9-axis IMU service (3-axis accelerometer + 3-axis gyroscope + 3-axis magnetometer via AK09916). Reads the DMP FIFO on a data-ready interrupt and publishes a 9-float sensor packet via pub/sub.
+ICM20948 9-axis IMU service (3-axis accelerometer + 3-axis gyroscope + 3-axis magnetometer via AK09916). Reads the DMP FIFO on a data-ready interrupt and publishes a sensor packet via pub/sub.
 
-APID: `0x0201`
+APID: `K_ICM20948_SERVICE_APID` (`0x0002`)
 
 ---
 
@@ -10,7 +10,7 @@ APID: `0x0201`
 
 | File | Description |
 |---|---|
-| `icm20948.h` | Public API, register map, config structs |
+| `icm20948.h` | Public API, register map, `ICM20948_t` context struct |
 | `icm20948.c` | Driver implementation, DMP loading, service task |
 | `dmpImage.h` | DMP firmware binary image (do not edit) |
 
@@ -20,11 +20,18 @@ APID: `0x0201`
 
 ```c
 typedef struct {
-    spp_uint8_t  spiDevIdx;   // SPI device index (0 = ICM20948 on ESP32 port)
-    spp_uint8_t  intPin;      // Data-ready interrupt GPIO
-    spp_uint32_t intIntrType; // Interrupt trigger type (rising edge = 1)
-    spp_uint32_t intPull;     // Pull resistor: 0=none 1=up 2=down
-} ICM20948_ServiceCfg_t;
+    /* Config — set at declaration */
+    spp_uint8_t  spiDevIdx;    // SPI device index (0 = ICM20948 on ESP32 port)
+    spp_uint32_t intPin;       // Data-ready interrupt GPIO
+    spp_uint32_t intIntrType;  // Interrupt trigger type (rising edge = 1)
+    spp_uint32_t intPull;      // Pull resistor: 0=none 1=up 2=down
+
+    /* Runtime — filled by init, do not set manually */
+    void                  *p_spi;
+    ICM20948_Data_t        icmData;    // drdyFlag + ISR context
+    ICM20948_SensorData_t  lastData;
+    spp_uint16_t           seq;
+} ICM20948_t;
 
 typedef struct {
     float      ax, ay, az;   // Accelerometer (g)
@@ -32,21 +39,6 @@ typedef struct {
     float      mx, my, mz;   // Magnetometer (µT)
     spp_bool_t dataReady;
 } ICM20948_SensorData_t;
-
-typedef struct {
-    volatile spp_bool_t drdyFlag;   // Set by GPIO ISR, cleared by ServiceTask
-    SPP_GpioIsrCtx_t    isr_ctx;
-    spp_uint8_t         intPin;
-    spp_uint32_t        intIntrType;
-    spp_uint32_t        intPull;
-} ICM20948_Data_t;
-
-typedef struct {
-    void                  *p_spi;
-    ICM20948_Data_t        icmData;
-    ICM20948_SensorData_t  lastData;
-    spp_uint16_t           seq;
-} ICM20948_ServiceCtx_t;
 ```
 
 ---
@@ -59,9 +51,9 @@ The ICM20948 has four register banks (0–3) selected via register `0x7F`. The d
 
 ## DMP support
 
-The DMP firmware (`dmpImage.h`) is loaded into the sensor's RAM at init time. When DMP is enabled:
-- Outputs: rotation quaternion (Q30 fixed-point), step count, activity classification
-- DMP runs independently on the sensor — the host only reads results
+The DMP firmware (`dmpImage.h`) is loaded into the sensor's RAM at init time. Current config:
+- **DATA_OUT_CTL1 = 0x8400** → Accel + Quat9 only
+- **Packet size = 24 bytes**: Header(2) + Accel(6) + Quat9(14) + Footer(2)
 
 Disable DMP at build time with `-DSPP_ICM20948_NO_DMP=1` to save ~14 KB of flash.
 
@@ -70,52 +62,36 @@ Disable DMP at build time with `-DSPP_ICM20948_NO_DMP=1` to save ~14 KB of flash
 ## Registration
 
 ```c
-extern const SPP_ServiceDesc_t g_icm20948ServiceDesc;
+extern const SPP_Module_t g_icm20948Module;
 
-static ICM20948_ServiceCtx_t s_icmCtx;
-static ICM20948_ServiceCfg_t s_icmCfg = {
+static ICM20948_t s_icm = {
     .spiDevIdx   = 0U,
-    .intPin      = 4U,
+    .intPin      = 10U,
     .intIntrType = 1U,   // rising edge
     .intPull     = 0U,   // no pull
 };
 
-SPP_SERVICES_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
+SPP_SERVICES_register(&g_icm20948Module, &s_icm);
 ```
+
+`register()` calls `init` (loads DMP firmware, installs ISR) and `start` immediately.
 
 ---
 
-## Superloop integration
-
-```c
-// In the application superloop:
-if (s_icmCtx.icmData.drdyFlag)
-{
-    SPP_SERVICES_ICM20948_serviceTask(&s_icmCtx);
-}
-```
-
-`SPP_SERVICES_ICM20948_serviceTask()` clears `drdyFlag`, drains the DMP FIFO, calls `SPP_SERVICES_DATABANK_getPacket()` → `SPP_SERVICES_DATABANK_packetData()` → `SPP_SERVICES_PUBSUB_publish()`.
-
----
-
-## Packet payload layout (36 bytes)
+## Packet payload layout (24 bytes — Accel + Quat9)
 
 | Offset | Type | Field |
 |---|---|---|
 | 0  | `float` | Accel X (g) |
 | 4  | `float` | Accel Y (g) |
 | 8  | `float` | Accel Z (g) |
-| 12 | `float` | Gyro X (dps) |
-| 16 | `float` | Gyro Y (dps) |
-| 20 | `float` | Gyro Z (dps) |
-| 24 | `float` | Mag X (µT) |
-| 28 | `float` | Mag Y (µT) |
-| 32 | `float` | Mag Z (µT) |
+| 12 | `float` | Quat9 Q1 |
+| 16 | `float` | Quat9 Q2 |
+| 20 | `float` | Quat9 Q3 |
 
 ---
 
 ## Hardware configuration (ESP32-S3)
 
 - SPI device index: 0 (CS GPIO 21, 1 MHz, MODE0)
-- INT pin: 4 (configured via `ICM20948_ServiceCfg_t`)
+- INT pin: 10 (configured via `ICM20948_t`)
