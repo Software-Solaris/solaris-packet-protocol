@@ -7,7 +7,8 @@
  *
  * To use the SPP service registry, allocate a @ref ICM20948_ServiceCtx_t and
  * a @ref ICM20948_ServiceCfg_t, then call SPP_SERVICES_register() with
- * @ref g_icm20948Module.
+ * @ref g_icm20948Module.  Declare one static @ref ICM20948_t with the hardware
+ * pin fields filled in and pass its address to SPP_SERVICES_register().
  *
  * Naming conventions used in this file:
  * - Constants/macros:  K_ICM20948_*
@@ -457,26 +458,34 @@ typedef struct
 } ICM20948_Data_t;
 
 /**
- * @brief Configuration for the ICM20948 service instance.
+ * @brief ICM20948 sensor instance.
+ *
+ * Declare one static instance with the hardware pin fields filled in, then
+ * pass its address to SPP_SERVICES_register().
+ *
+ * @code
+ * static ICM20948_t s_icm = {
+ *     .spiDevIdx   = 0U,
+ *     .intPin      = 10U,
+ *     .intIntrType = 1U,
+ *     .intPull     = 0U,
+ * };
+ * @endcode
  */
 typedef struct
 {
-    spp_uint8_t  spiDevIdx;   /**< SPI device handle index (ICM = 0). */
+    /* Hardware configuration — set at declaration */
+    spp_uint8_t  spiDevIdx;   /**< SPI device handle index.            */
     spp_uint32_t intPin;      /**< GPIO interrupt pin number.          */
     spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising).     */
     spp_uint32_t intPull;     /**< Pull resistor (0=none, 1=up).       */
-} ICM20948_ServiceCfg_t;
 
-/**
- * @brief Runtime context for the ICM20948 service instance.
- */
-typedef struct
-{
-    void                  *p_spi;    /**< SPI device handle.              */
-    ICM20948_Data_t        icmData;  /**< Interrupt flag and ISR context. */
-    ICM20948_SensorData_t  lastData; /**< Last parsed FIFO sample.        */
-    spp_uint16_t           seq;      /**< Packet sequence counter.        */
-} ICM20948_ServiceCtx_t;
+    /* Runtime state — filled in by init, do not set manually */
+    void                 *p_spi;    /**< SPI device handle.              */
+    ICM20948_Data_t       icmData;  /**< Interrupt flag and ISR context. */
+    ICM20948_SensorData_t lastData; /**< Last parsed FIFO sample.        */
+    spp_uint16_t          seq;      /**< Packet sequence counter.        */
+} ICM20948_t;
 
 /**
  * @brief ICM20948 module descriptor — pass to SPP_SERVICES_register().
@@ -494,7 +503,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_loadDmp(void *p_data);
 SPP_RetVal_t SPP_SERVICES_ICM20948_dmpStart(void *p_data);
 SPP_RetVal_t SPP_SERVICES_ICM20948_readSensors(void *p_data);
 void     SPP_SERVICES_ICM20948_getSensorsData(void *p_data);
-void     SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
+void     SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx);
 
 /**
  * @brief Initialise the ICM20948 interrupt context and register the GPIO ISR.
@@ -503,15 +512,6 @@ void     SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
  */
 void SPP_SERVICES_ICM20948_init(ICM20948_Data_t *p_icm);
 
-/**
- * @brief Producer task — called by SPP_SERVICES_pollAll() each superloop iteration.
- *
- * Returns immediately when drdyFlag is not set.  When set, reads the DMP FIFO
- * and publishes a packet via SPP_SERVICES_PUBSUB_publish().
- *
- * @param[in] p_ctx  Pointer to the ICM20948_ServiceCtx_t (passed as void *).
- */
-void SPP_SERVICES_ICM20948_serviceTask(void *p_ctx);
 
 #ifdef __cplusplus
 }
