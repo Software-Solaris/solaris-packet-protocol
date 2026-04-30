@@ -1,6 +1,0 @@
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/spp.dir
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/spp_port.dir
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/spp_test_core.dir
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/test.dir
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/edit_cache.dir
-/home/user/Documents/solaris-software/solaris-v1/spp/build/CMakeFiles/rebuild_cache.dir

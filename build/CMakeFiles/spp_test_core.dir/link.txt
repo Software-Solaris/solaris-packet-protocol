@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -g --coverage -shared -Wl,-soname,libspp_test_core.so -o libspp_test_core.so CMakeFiles/spp_test_core.dir/tests/core/test_core.c.o  libspp.a libspp_port.a -lcgreen -lpthread libspp.a
