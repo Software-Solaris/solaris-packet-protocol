@@ -120,6 +120,6 @@ SPP_RetVal_t SPP_CORE_boot(const SPP_HalPort_t *p_port)
         return ret;
     }
 
-    SPP_SERVICES_LOG_registerOutput(coreLogOutput);
+    SPP_SERVICES_LOG_setOutput(coreLogOutput);
     return K_SPP_OK;
 }
