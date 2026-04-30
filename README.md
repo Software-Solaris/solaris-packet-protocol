@@ -26,7 +26,7 @@ SPP is a small, portable C11 library for packaging and routing sensor data as st
   └──────────────────────────────────────────────────────────┘
 ```
 
-There is no OSAL layer. Sensor services run in a bare-metal superloop: an ISR sets a `volatile` flag, `pollAll()` calls each module's service task, which builds a packet and publishes it. CRITICAL subscribers are called synchronously inside `publish()`; other subscribers are deferred and dispatched one-per-call via `tick()`.
+There is no OSAL layer. Sensor services run in a bare-metal superloop: an ISR sets a `volatile` flag, `callProducers()` calls each module's `produce` callback, which builds a packet and publishes it. SYNC subscribers are called synchronously inside `publish()`; other subscribers are deferred and dispatched one-per-call via `callConsumers()`.
 
 ---
 
@@ -93,7 +93,7 @@ extern const SPP_HalPort_t g_esp32HalPort;
 
 void app_main(void)
 {
-    // Registers HAL port, inits databank + pub/sub, wires log output to printf + pub/sub
+    // Registers HAL port, inits databank + pub/sub, wires log output to pub/sub
     SPP_CORE_boot(&g_esp32HalPort);
 }
 ```
@@ -114,12 +114,11 @@ SPP_SERVICES_register(&g_bmp390Module,   &s_bmp);
 ```c
 for (;;)
 {
-    // Calls each module's serviceTask in registration order
-    // Each serviceTask checks its own DRDY flag and returns immediately if not set
-    SPP_SERVICES_pollAll();
+    // Calls each module's produce callback; each checks its own DRDY flag and returns immediately if not set
+    SPP_SERVICES_callProducers();
 
-    // Dispatches one deferred (non-CRITICAL) pub/sub subscriber per call
-    SPP_SERVICES_PUBSUB_tick();
+    // Dispatches one deferred subscriber per call
+    SPP_SERVICES_callConsumers();
 }
 ```
 
@@ -127,12 +126,12 @@ for (;;)
 
 ```
 ISR sets drdyFlag
-  → SPP_SERVICES_pollAll() → module->serviceTask(ctx)
+  → SPP_SERVICES_callProducers() → module->produce(ctx)
       → SPP_SERVICES_DATABANK_getPacket()
       → SPP_SERVICES_DATABANK_packetData()   fills headers + computes CRC
       → SPP_SERVICES_PUBSUB_publish()
-            → CRITICAL subscribers called synchronously
-            → rest enqueued for SPP_SERVICES_PUBSUB_tick()
+            → SYNC subscribers called synchronously
+            → rest enqueued for SPP_SERVICES_callConsumers()
 ```
 
 ---
@@ -197,7 +196,7 @@ idf.py build \
 1. Create `services/myservice/myservice.h` and `myservice.c`
 2. Define a single `MyService_t` struct with config fields (set at declaration) + runtime fields (filled by `init`)
 3. Implement `init`, `start`, `stop`, `deinit` as static callbacks; `init` reads config from the struct directly
-4. Implement `serviceTask(void *ctx)` if the module is a sensor producer
+4. Implement `produce(void *ctx)` if the module is a sensor producer
 5. Declare `const SPP_Module_t g_myModule = { ... }` with all fields
 6. Add the source to `CMakeLists.txt`
 7. In `app_main()`: `static MyService_t s_ctx = { /* config */ }; SPP_SERVICES_register(&g_myModule, &s_ctx);`

@@ -32,7 +32,7 @@ typedef struct {
 } BMP390_t;
 ```
 
-`BMP390_Data_t` contains a `volatile spp_bool_t drdyFlag` that the GPIO ISR sets. `SPP_SERVICES_pollAll()` calls `serviceTask` which checks the flag internally.
+`BMP390_Data_t` contains a `volatile spp_bool_t drdyFlag` that the GPIO ISR sets. `SPP_SERVICES_callProducers()` calls `produce` which checks the flag internally.
 
 ---
 

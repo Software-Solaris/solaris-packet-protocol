@@ -1,6 +1,6 @@
 # services/log/
 
-Level-filtered logging service. Provides `SPP_LOG*` macros that route output through a registered callback function. The default callback prints to stdout. On embedded targets, replace it with a custom output function — no recompilation needed.
+Level-filtered logging service. Provides `SPP_LOG*` macros that route output through a swappable callback function. No default output is set — call `SPP_SERVICES_LOG_setOutput()` to wire up a handler, or use `SPP_CORE_boot()` which automatically bridges log output to the pub/sub bus.
 
 ---
 
@@ -34,7 +34,7 @@ Messages with a level **higher** than the current filter are suppressed.
 SPP_RetVal_t    SPP_SERVICES_LOG_init(void);
 void            SPP_SERVICES_LOG_setLevel(SPP_LogLevel_t level);
 SPP_LogLevel_t  SPP_SERVICES_LOG_getLevel(void);
-void            SPP_SERVICES_LOG_registerOutput(SPP_LogOutputFn_t fn);
+void            SPP_SERVICES_LOG_setOutput(SPP_LogOutputFn_t fn);
 ```
 
 ---
@@ -60,42 +60,9 @@ SPP_LOGI(k_tag, "altitude = %.2f m", altitude);
 
 ## Log → pub/sub bridge
 
-On the bare-metal target, every `SPP_LOG*` call can be forwarded into the pub/sub system as a `K_SPP_APID_LOG` packet. This lets the SD card logger capture log messages alongside sensor data — one line per message.
+`SPP_CORE_boot()` automatically installs a log output function that formats each `SPP_LOG*` call as a `K_SPP_APID_LOG` packet and publishes it on the bus. This lets the SD card logger capture log messages alongside sensor data without any extra setup.
 
-```c
-static spp_bool_t s_logBusy = false;   // reentrancy guard
-
-static void logPubSubOutput(const char *p_tag, SPP_LogLevel_t level,
-                             const char *p_message)
-{
-    static const char k_lvl[] = "?EWID V";
-    char lvlChar = k_lvl[(unsigned)level < sizeof(k_lvl) ? (unsigned)level : 0U];
-
-    printf("[%c] %s: %s\n", lvlChar, p_tag, p_message);
-
-    if (s_logBusy) { return; }     // prevent infinite loop
-    s_logBusy = true;
-
-    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
-    if (p_pkt != NULL)
-    {
-        char buf[K_SPP_PKT_PAYLOAD_MAX];
-        int n = snprintf(buf, sizeof(buf), "[%c] %s: %s", lvlChar, p_tag, p_message);
-        spp_uint16_t len = (n > 0 && n < (int)sizeof(buf))
-                           ? (spp_uint16_t)(n + 1U)
-                           : (spp_uint16_t)sizeof(buf);
-        (void)SPP_SERVICES_DATABANK_packetData(p_pkt, K_SPP_APID_LOG, s_logSeq++, buf, len);
-        (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
-    }
-
-    s_logBusy = false;
-}
-
-// Register before any SPP_LOG* calls:
-SPP_SERVICES_LOG_registerOutput(logPubSubOutput);
-```
-
-The `s_logBusy` guard prevents recursion: if a subscriber calls `SPP_LOGE()`, the bridge skips publishing that nested message to avoid an infinite loop.
+A reentrancy guard (`s_logBusy`) prevents infinite recursion: if a subscriber itself calls `SPP_LOGE()`, the nested call is silently dropped.
 
 ---
 
@@ -110,7 +77,7 @@ static void uartLogOutput(const char *p_tag, SPP_LogLevel_t level,
     uart_write_bytes(UART_NUM_0, "\n", 1);
 }
 
-SPP_SERVICES_LOG_registerOutput(uartLogOutput);
+SPP_SERVICES_LOG_setOutput(uartLogOutput);
 ```
 
-Pass NULL to restore the default stdout output.
+Pass NULL to disable log output.

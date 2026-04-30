@@ -65,7 +65,7 @@ All SPP functions return `SPP_RetVal_t`. Always check the return value.
 
 ```c
 // Single call: registers the HAL port, initialises databank + pub/sub,
-// and wires SPP_LOG* output to print via printf and publish K_SPP_APID_LOG packets.
+// and wires SPP_LOG* output to publish K_SPP_APID_LOG packets on the bus.
 SPP_CORE_boot(&g_myHalPort);
 
 // Then register application services
@@ -78,7 +78,7 @@ If you need finer control, the lower-level functions are still available:
 ```c
 SPP_CORE_setHalPort(&g_myHalPort);
 SPP_CORE_init();
-SPP_SERVICES_LOG_registerOutput(myCustomOutput);
+SPP_SERVICES_LOG_setOutput(myCustomOutput);
 ```
 
 ---
