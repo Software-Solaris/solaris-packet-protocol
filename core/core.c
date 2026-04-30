@@ -83,8 +83,6 @@ static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p
     static const char k_lvl[] = "?EWID V";
     char lvlChar = k_lvl[(unsigned)level < sizeof(k_lvl) ? (unsigned)level : 0U];
 
-    printf("[%c] %s: %s\n", lvlChar, p_tag, p_message);
-
     if (s_logBusy)
     {
         return;
