@@ -51,9 +51,9 @@ typedef struct
     const char *p_filePath;   /**< Absolute path of the file to write.      */
 
     /* Runtime state — filled in by init, do not set manually */
-    FILE    *p_file;          /**< Open file handle, or NULL if not open.   */
-    uint8_t  is_initialized;  /**< 1 when mounted and file is open.         */
-    uint32_t logged_packets;  /**< Number of packets written so far.        */
+    FILE       *p_file;          /**< Open file handle, or NULL if not open. */
+    spp_bool_t  is_open;         /**< true once mounted and file is open.    */
+    uint32_t    logged_packets;  /**< Number of packets written so far.      */
 } Datalogger_t;
 
 /**
