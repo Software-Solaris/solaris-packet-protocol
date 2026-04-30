@@ -12,9 +12,8 @@
  * 2. Wait for the data-ready interrupt (SPP_SERVICES_BMP390_waitDrdy).
  * 3. Read compensated altitude/pressure/temperature (SPP_SERVICES_BMP390_getAltitude).
  *
- * To use the SPP service registry, allocate a @ref BMP390_ServiceCtx_t and a
- * @ref BMP390_ServiceCfg_t, then call SPP_SERVICES_register() with
- * @ref g_bmp390Module.
+ * To use the SPP service registry, declare a @ref BMP390_t with the hardware
+ * pin fields filled in, then call SPP_SERVICES_register() with @ref g_bmp390Module.
  *
  * Naming conventions used in this file:
  * - Constants/macros:  K_BMP390_*
@@ -167,35 +166,38 @@ typedef struct
 #define K_BMP390_INT_CTRL_LEVEL      0x02
 
 /* ============================================================================
- * Service types
+ * Sensor instance
  * ========================================================================= */
 
 /**
- * @brief Configuration for the BMP390 service instance.
+ * @brief BMP390 sensor instance.
  *
- * Passed by the caller to SPP_SERVICES_register() and stored by reference in
- * the context.  Must remain valid for the lifetime of the service.
+ * Declare one static instance with the hardware pin fields filled in, then
+ * pass its address to SPP_SERVICES_register().  All other fields are
+ * zero-initialised by the compiler and filled in by the init callback.
+ *
+ * @code
+ * static BMP390_t s_bmp = {
+ *     .spiDevIdx   = 1U,
+ *     .intPin      = 17U,
+ *     .intIntrType = 1U,
+ *     .intPull     = 0U,
+ * };
+ * @endcode
  */
 typedef struct
 {
+    /* Hardware configuration — set at declaration */
     spp_uint8_t  spiDevIdx;   /**< SPI device handle index.        */
     spp_uint32_t intPin;      /**< GPIO pin for DRDY interrupt.    */
     spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising). */
     spp_uint32_t intPull;     /**< Pull resistor (0=none,1=up).    */
-} BMP390_ServiceCfg_t;
 
-/**
- * @brief Runtime context for the BMP390 service instance.
- *
- * Allocated statically by the caller; size equals sizeof(BMP390_ServiceCtx_t).
- */
-typedef struct
-{
-    void                      *p_spi;   /**< SPI device handle.                */
-    BMP390_Data_t              bmpData; /**< Sensor driver context.            */
-    spp_uint16_t               seq;     /**< Packet sequence counter.          */
-    const BMP390_ServiceCfg_t *p_cfg;   /**< Back-pointer to config struct.    */
-} BMP390_ServiceCtx_t;
+    /* Runtime state — filled in by init, do not set manually */
+    void         *p_spi;      /**< SPI device handle.              */
+    BMP390_Data_t bmpData;    /**< Driver context (ISR flag, etc). */
+    spp_uint16_t  seq;        /**< Packet sequence counter.        */
+} BMP390_t;
 
 /** @brief APID produced by the BMP390 module (single bit, bitmask scheme). */
 #define K_BMP390_SERVICE_APID (0x0004U)
@@ -204,17 +206,6 @@ typedef struct
  * @brief BMP390 module descriptor — pass to SPP_SERVICES_register().
  */
 extern const SPP_Module_t g_bmp390Module;
-
-/**
- * @brief Producer task — called by SPP_SERVICES_pollAll() each superloop iteration.
- *
- * Returns immediately when drdyFlag is not set.  When the flag is set, reads
- * altitude/pressure/temperature and publishes a packet via
- * SPP_SERVICES_PUBSUB_publish().
- *
- * @param[in,out] p_ctx  Pointer to the BMP390_ServiceCtx_t (passed as void *).
- */
-void SPP_SERVICES_BMP390_serviceTask(void *p_ctx);
 
 /* ============================================================================
  * Driver API (low-level — used internally and for testing)
