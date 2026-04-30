@@ -7,7 +7,7 @@
  *
  * To use the SPP service registry, allocate a @ref ICM20948_ServiceCtx_t and
  * a @ref ICM20948_ServiceCfg_t, then call SPP_SERVICES_register() with
- * @ref g_icm20948ServiceDesc.
+ * @ref g_icm20948Module.
  *
  * Naming conventions used in this file:
  * - Constants/macros:  K_ICM20948_*
@@ -424,8 +424,8 @@ typedef union
  * Service types
  * ---------------------------------------------------------------- */
 
-/** @brief APID used by the ICM20948 service. */
-#define K_ICM20948_SERVICE_APID (0x0201U)
+/** @brief APID produced by the ICM20948 module (single bit, bitmask scheme). */
+#define K_ICM20948_SERVICE_APID (0x0002U)
 
 /**
  * @brief Parsed sensor sample from the DMP FIFO.
@@ -479,9 +479,9 @@ typedef struct
 } ICM20948_ServiceCtx_t;
 
 /**
- * @brief ICM20948 service descriptor — pass to SPP_SERVICES_register().
+ * @brief ICM20948 module descriptor — pass to SPP_SERVICES_register().
  */
-extern const SPP_ServiceDesc_t g_icm20948ServiceDesc;
+extern const SPP_Module_t g_icm20948Module;
 
 /* ----------------------------------------------------------------
  * Public driver API
@@ -504,11 +504,12 @@ void     SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx);
 void SPP_SERVICES_ICM20948_init(ICM20948_Data_t *p_icm);
 
 /**
- * @brief Read the DMP FIFO, package sensor data and publish via pub/sub.
+ * @brief Producer task — called by SPP_SERVICES_pollAll() each superloop iteration.
  *
- * Call from the superloop when @c icmData.drdyFlag is set.
+ * Returns immediately when drdyFlag is not set.  When set, reads the DMP FIFO
+ * and publishes a packet via SPP_SERVICES_PUBSUB_publish().
  *
- * @param[in] p_ctx  Pointer to the ICM20948 service context.
+ * @param[in] p_ctx  Pointer to the ICM20948_ServiceCtx_t (passed as void *).
  */
 void SPP_SERVICES_ICM20948_serviceTask(void *p_ctx);
 
