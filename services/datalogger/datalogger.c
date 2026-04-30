@@ -165,3 +165,58 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger)
     SPP_LOGI(k_tag, "Deinit OK");
     return K_SPP_OK;
 }
+
+/* ----------------------------------------------------------------
+ * Module callbacks and descriptor
+ * ---------------------------------------------------------------- */
+
+#define K_DATALOGGER_FLUSH_EVERY (20U)
+
+static void sdLoggerOnPacket(const SPP_Packet_t *p_packet, void *p_ctx)
+{
+    Datalogger_t *p_logger = (Datalogger_t *)p_ctx;
+    (void)SPP_SERVICES_DATALOGGER_logPacket(p_logger, p_packet);
+
+    if ((p_logger->logged_packets % K_DATALOGGER_FLUSH_EVERY) == 0U)
+    {
+        (void)SPP_SERVICES_DATALOGGER_flush(p_logger);
+    }
+}
+
+static SPP_RetVal_t sdLoggerServiceInit(void *p_ctx, const void *p_cfg)
+{
+    const Datalogger_Cfg_t *cfg = (const Datalogger_Cfg_t *)p_cfg;
+    return SPP_SERVICES_DATALOGGER_init((Datalogger_t *)p_ctx,
+                                         cfg->p_storageCfg, cfg->p_filePath);
+}
+
+static SPP_RetVal_t sdLoggerServiceStart(void *p_ctx)
+{
+    (void)p_ctx;
+    SPP_LOGI(k_tag, "Service ready — logging all packets");
+    return K_SPP_OK;
+}
+
+static SPP_RetVal_t sdLoggerServiceStop(void *p_ctx)
+{
+    return SPP_SERVICES_DATALOGGER_flush((Datalogger_t *)p_ctx);
+}
+
+static SPP_RetVal_t sdLoggerServiceDeinit(void *p_ctx)
+{
+    return SPP_SERVICES_DATALOGGER_deinit((Datalogger_t *)p_ctx);
+}
+
+const SPP_Module_t g_sdLoggerModule = {
+    .p_name       = "sd_logger",
+    .apid         = K_SPP_APID_NONE,
+    .ctxSize      = sizeof(Datalogger_t),
+    .init         = sdLoggerServiceInit,
+    .start        = sdLoggerServiceStart,
+    .stop         = sdLoggerServiceStop,
+    .deinit       = sdLoggerServiceDeinit,
+    .serviceTask  = NULL,
+    .consumesApid = K_SPP_APID_ALL,
+    .onPacket     = sdLoggerOnPacket,
+    .onPacketPrio = K_SPP_PUBSUB_PRIO_LOW,
+};

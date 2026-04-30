@@ -18,6 +18,7 @@
 #include "spp/core/returnTypes.h"
 #include "spp/core/packet.h"
 #include "spp/services/service.h"
+#include "spp/util/macros.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -38,11 +39,31 @@ extern "C" {
  */
 typedef struct
 {
-    void    *p_storage_cfg; /**< Storage config pointer (owned by caller). */
-    FILE    *p_file;        /**< Open file handle, or NULL if not open.    */
-    uint8_t  is_initialized; /**< 1 when mounted and file is open.         */
-    uint32_t logged_packets; /**< Number of packets written so far.        */
+    void    *p_storage_cfg;  /**< Storage config pointer (owned by caller). */
+    FILE    *p_file;         /**< Open file handle, or NULL if not open.    */
+    uint8_t  is_initialized; /**< 1 when mounted and file is open.          */
+    uint32_t logged_packets; /**< Number of packets written so far.         */
 } Datalogger_t;
+
+/**
+ * @brief Configuration for the SD logger service module.
+ *
+ * Passed by the caller to SPP_SERVICES_register() as the @c p_cfg argument.
+ * Must remain valid for the lifetime of the module.
+ */
+typedef struct
+{
+    void       *p_storageCfg; /**< Pointer to SPP_StorageInitCfg_t. */
+    const char *p_filePath;   /**< Absolute path of the file to create/overwrite. */
+} Datalogger_Cfg_t;
+
+/**
+ * @brief SD card logger module descriptor — pass to SPP_SERVICES_register().
+ *
+ * Subscribes to K_SPP_APID_ALL at K_SPP_PUBSUB_PRIO_LOW; every published
+ * packet is appended to the log file.
+ */
+extern const SPP_Module_t g_sdLoggerModule;
 
 /* ----------------------------------------------------------------
  * API
