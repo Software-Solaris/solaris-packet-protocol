@@ -1330,7 +1330,7 @@ SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
     return K_SPP_OK;
 }
 
-void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_ServiceCtx_t *p_ctx)
+void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
 {
     void *p_spi = p_ctx->p_spi;
     spp_uint8_t txRxData[3] = {0U};
@@ -1494,9 +1494,9 @@ void SPP_SERVICES_ICM20948_init(ICM20948_Data_t *p_icm)
  * Service task (call from superloop when drdyFlag is set)
  * ---------------------------------------------------------------- */
 
-void SPP_SERVICES_ICM20948_serviceTask(void *p_arg)
+static void icm20948Task(void *p_arg)
 {
-    ICM20948_ServiceCtx_t *ctx = (ICM20948_ServiceCtx_t *)p_arg;
+    ICM20948_t *ctx = (ICM20948_t *)p_arg;
 
     if (!ctx->icmData.drdyFlag) return;
     ctx->icmData.drdyFlag      = false;
@@ -1571,53 +1571,36 @@ void SPP_SERVICES_ICM20948_getSensorsData(void *p_data)
  * Service callbacks
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceInit(void *p_ctx, const void *p_cfg)
+static SPP_RetVal_t icm20948Init(void *p_ctx)
 {
-    ICM20948_ServiceCtx_t *ctx = p_ctx;
-    const ICM20948_ServiceCfg_t *cfg = p_cfg;
+    ICM20948_t *ctx = (ICM20948_t *)p_ctx;
 
-    ctx->p_spi = SPP_HAL_spiGetHandle(cfg->spiDevIdx);
+    ctx->p_spi = SPP_HAL_spiGetHandle(ctx->spiDevIdx);
     ctx->seq   = 0U;
 
-    ctx->icmData.intPin      = cfg->intPin;
-    ctx->icmData.intIntrType = cfg->intIntrType;
-    ctx->icmData.intPull     = cfg->intPull;
+    ctx->icmData.intPin      = ctx->intPin;
+    ctx->icmData.intIntrType = ctx->intIntrType;
+    ctx->icmData.intPull     = ctx->intPull;
 
     SPP_SERVICES_ICM20948_init(&ctx->icmData);
 
-    SPP_LOGI(K_ICM20948_LOG_TAG, "Service init (spiDevIdx=%u intPin=%u)",
-             cfg->spiDevIdx, cfg->intPin);
+    SPP_LOGI(K_ICM20948_LOG_TAG, "Init (spiDevIdx=%u intPin=%u)", ctx->spiDevIdx, ctx->intPin);
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceStart(void *p_ctx)
+static SPP_RetVal_t icm20948Start(void *p_ctx)
 {
-    ICM20948_ServiceCtx_t *ctx = p_ctx;
-    SPP_RetVal_t ret;
-
-    SPP_LOGI(K_ICM20948_LOG_TAG, "Service start — running configDmpInit");
-
-    ret = SPP_SERVICES_ICM20948_configDmpInit(ctx->p_spi);
+    ICM20948_t  *ctx = (ICM20948_t *)p_ctx;
+    SPP_RetVal_t ret = SPP_SERVICES_ICM20948_configDmpInit(ctx->p_spi);
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(K_ICM20948_LOG_TAG, "configDmpInit failed ret=%d", (int)ret);
-        return ret;
     }
-
-    return K_SPP_OK;
+    return ret;
 }
 
-static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceStop(void *p_ctx)
-{
-    (void)p_ctx;
-    return K_SPP_OK;
-}
-
-static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceDeinit(void *p_ctx)
-{
-    (void)p_ctx;
-    return K_SPP_OK;
-}
+static SPP_RetVal_t icm20948Stop(void *p_ctx)   { (void)p_ctx; return K_SPP_OK; }
+static SPP_RetVal_t icm20948Deinit(void *p_ctx) { (void)p_ctx; return K_SPP_OK; }
 
 /* ----------------------------------------------------------------
  * Service descriptor
@@ -1626,12 +1609,12 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceDeinit(void *p_ctx)
 const SPP_Module_t g_icm20948Module = {
     .p_name       = "icm20948",
     .apid         = K_ICM20948_SERVICE_APID,
-    .ctxSize      = sizeof(ICM20948_ServiceCtx_t),
-    .init         = SPP_SERVICES_ICM20948_serviceInit,
-    .start        = SPP_SERVICES_ICM20948_serviceStart,
-    .stop         = SPP_SERVICES_ICM20948_serviceStop,
-    .deinit       = SPP_SERVICES_ICM20948_serviceDeinit,
-    .serviceTask  = SPP_SERVICES_ICM20948_serviceTask,
+    .ctxSize      = sizeof(ICM20948_t),
+    .init         = icm20948Init,
+    .start        = icm20948Start,
+    .stop         = icm20948Stop,
+    .deinit       = icm20948Deinit,
+    .serviceTask  = icm20948Task,
     .consumesApid = K_SPP_APID_NONE,
     .onPacket     = NULL,
     .onPacketPrio = 0U,
