@@ -26,7 +26,7 @@ SPP is a small, portable C11 library for packaging and routing sensor data as st
   └──────────────────────────────────────────────────────────┘
 ```
 
-There is no OSAL layer. Sensor services run in a bare-metal superloop: an ISR sets a `volatile` flag, the superloop detects the flag and calls the service task, which builds a packet and publishes it. Subscribers (SD logger, antenna encoder, …) register once at startup and are called synchronously during publish.
+There is no OSAL layer. Sensor services run in a bare-metal superloop: an ISR sets a `volatile` flag, `pollAll()` calls each module's service task, which builds a packet and publishes it. CRITICAL subscribers are called synchronously inside `publish()`; other subscribers are deferred and dispatched one-per-call via `tick()`.
 
 ---
 
@@ -84,60 +84,55 @@ Or include everything via the umbrella header:
 
 ## Quick start
 
-### 1. Register HAL port and initialise
+### 1. Boot
 
 ```c
 #include "spp/spp.h"
 
-extern const SPP_HalPort_t g_esp32BaremetalHalPort;
+extern const SPP_HalPort_t g_esp32HalPort;
 
 void app_main(void)
 {
-    SPP_CORE_setHalPort(&g_esp32BaremetalHalPort);
-    SPP_CORE_init();   // calls SPP_SERVICES_DATABANK_init + SPP_SERVICES_PUBSUB_init internally
+    // Registers HAL port, inits databank + pub/sub, wires log output to printf + pub/sub
+    SPP_CORE_boot(&g_esp32HalPort);
 }
 ```
 
-### 2. Subscribe consumers before starting services
+### 2. Register services
 
 ```c
-// SD card logger subscribes to ALL packets (sensor data + log messages)
-SPP_SERVICES_PUBSUB_subscribe(K_SPP_APID_ALL, sdLogHandler, &s_logger);
+static ICM20948_t s_icm = { .spiDevIdx=0U, .intPin=10U, .intIntrType=1U, .intPull=0U };
+static BMP390_t   s_bmp = { .spiDevIdx=1U, .intPin=17U, .intIntrType=1U, .intPull=0U };
+
+// register() calls init + start immediately; auto-subscribes if the module has an onPacket handler
+SPP_SERVICES_register(&g_icm20948Module, &s_icm);
+SPP_SERVICES_register(&g_bmp390Module,   &s_bmp);
 ```
 
-### 3. Register and start services
-
-```c
-SPP_SERVICES_register(&g_bmp390ServiceDesc,   &s_bmpCtx, &s_bmpCfg);
-SPP_SERVICES_register(&g_icm20948ServiceDesc, &s_icmCtx, &s_icmCfg);
-SPP_SERVICES_initAll();
-SPP_SERVICES_startAll();
-```
-
-### 4. Superloop
+### 3. Superloop
 
 ```c
 for (;;)
 {
-    if (s_bmpCtx.bmpData.drdyFlag)
-        SPP_SERVICES_BMP390_serviceTask(&s_bmpCtx);
+    // Calls each module's serviceTask in registration order
+    // Each serviceTask checks its own DRDY flag and returns immediately if not set
+    SPP_SERVICES_pollAll();
 
-    if (s_icmCtx.icmData.drdyFlag)
-        SPP_SERVICES_ICM20948_serviceTask(&s_icmCtx);
-
-    // SD card is passive — handled through pub/sub callbacks
+    // Dispatches one deferred (non-CRITICAL) pub/sub subscriber per call
+    SPP_SERVICES_PUBSUB_tick();
 }
 ```
 
-### 5. Typical sensor service data flow
+### 4. Sensor service data flow
 
 ```
 ISR sets drdyFlag
-  → superloop detects flag
-    → ServiceTask reads sensor
+  → SPP_SERVICES_pollAll() → module->serviceTask(ctx)
       → SPP_SERVICES_DATABANK_getPacket()
       → SPP_SERVICES_DATABANK_packetData()   fills headers + computes CRC
-      → SPP_SERVICES_PUBSUB_publish()        dispatches to all subscribers, then returns packet
+      → SPP_SERVICES_PUBSUB_publish()
+            → CRITICAL subscribers called synchronously
+            → rest enqueued for SPP_SERVICES_PUBSUB_tick()
 ```
 
 ---
@@ -161,12 +156,15 @@ Every piece of data in SPP is carried in an `SPP_Packet_t`:
 
 ## Reserved APIDs
 
-| APID | Owner |
-|---|---|
-| `0x0001` (`K_SPP_APID_LOG`) | SPP log message packets |
-| `0x0101` | BMP390 service |
-| `0x0201` | ICM20948 service |
-| `0xFFFF` (`K_SPP_APID_ALL`) | Pub/sub wildcard (subscribe to every packet) |
+APIDs are single-bit bitmasks. Subscribers combine bits to match multiple sources.
+
+| APID | Hex | Owner |
+|---|---|---|
+| `K_SPP_APID_LOG` | `0x0001` | SPP log message packets |
+| `K_ICM20948_SERVICE_APID` | `0x0002` | ICM20948 sensor packets |
+| `K_BMP390_SERVICE_APID` | `0x0004` | BMP390 sensor packets |
+| `K_SPP_APID_NONE` | `0x0000` | No APID |
+| `K_SPP_APID_ALL` | `0xFFFF` | Pub/sub wildcard (matches every packet) |
 
 ---
 
@@ -197,10 +195,12 @@ idf.py build \
 ## Adding a new service
 
 1. Create `services/myservice/myservice.h` and `myservice.c`
-2. Implement the four lifecycle callbacks: `init`, `start`, `stop`, `deinit`
-3. Declare a `const SPP_ServiceDesc_t g_myServiceDesc` with your APID and callbacks
-4. In `ServiceTask()`: `getPacket()` → `packetData()` → `publish()`
-5. Add the source to `CMakeLists.txt`
+2. Define a single `MyService_t` struct with config fields (set at declaration) + runtime fields (filled by `init`)
+3. Implement `init`, `start`, `stop`, `deinit` as static callbacks; `init` reads config from the struct directly
+4. Implement `serviceTask(void *ctx)` if the module is a sensor producer
+5. Declare `const SPP_Module_t g_myModule = { ... }` with all fields
+6. Add the source to `CMakeLists.txt`
+7. In `app_main()`: `static MyService_t s_ctx = { /* config */ }; SPP_SERVICES_register(&g_myModule, &s_ctx);`
 
 See [`services/README.md`](services/README.md) for a full walkthrough.
 
@@ -208,7 +208,7 @@ See [`services/README.md`](services/README.md) for a full walkthrough.
 
 ## Porting to a new platform
 
-Implement `SPP_HalPort_t` (hardware drivers), place the files under `ports/hal/<target>/`, then register at boot with `SPP_CORE_setHalPort()`.
+Implement `SPP_HalPort_t` (hardware drivers), place the files under `ports/hal/<target>/`, then pass your port to `SPP_CORE_boot()`.
 
 See [`ports/README.md`](ports/README.md) for a step-by-step guide.
 

@@ -13,8 +13,8 @@ Foundation layer of SPP. Defines the packet format, portable types, error codes,
 | `packet.h` | `SPP_Packet_t` — the on-wire packet layout (primary header + secondary header + 48 B payload + CRC) |
 | `version.h` | `K_SPP_VERSION_MAJOR / MINOR / PATCH` compile-time constants |
 | `error.h` | Extended error context (error code + optional string message) |
-| `core.h` | `SPP_CORE_setHalPort()`, `SPP_CORE_init()` |
-| `core.c` | Implementation of port registration and startup |
+| `core.h` | `SPP_CORE_boot()` — single-call startup; lower-level `SPP_CORE_setHalPort()` / `SPP_CORE_init()` also available |
+| `core.c` | Implementation of port registration, startup, and the log→pub/sub bridge |
 | `error.c` | Implementation of error context helpers |
 
 ---
@@ -33,7 +33,7 @@ Foundation layer of SPP. Defines the packet format, portable types, error codes,
  └───────────────────────────────────────┘
 ```
 
-- **apid** — Application Process ID. Each service has a unique APID (e.g. BMP390 = `0x0101`, ICM20948 = `0x0201`). `K_SPP_APID_LOG` (`0x0001`) is reserved for log message packets. Subscribers use APID to filter packets.
+- **apid** — Application Process ID. Each service has a unique APID bitmask (e.g. BMP390 = `K_BMP390_SERVICE_APID`, ICM20948 = `K_ICM20948_SERVICE_APID`). `K_SPP_APID_LOG` (`0x0001`) is reserved for log message packets. Subscribers use APID to filter packets.
 - **seq** — Monotonically increasing counter per service. Gaps indicate dropped packets.
 - **payloadLen** — Number of valid bytes in `payload`. Must be ≤ `K_SPP_PKT_PAYLOAD_MAX` (48).
 - **crc** — CRC-16/CCITT computed over the full packet minus the CRC field. Computed automatically by `SPP_SERVICES_DATABANK_packetData()`. Set to 0 if not used.
@@ -64,19 +64,21 @@ All SPP functions return `SPP_RetVal_t`. Always check the return value.
 ## Startup sequence
 
 ```c
-// 1. Register HAL port (mandatory before SPP_CORE_init)
+// Single call: registers the HAL port, initialises databank + pub/sub,
+// and wires SPP_LOG* output to print via printf and publish K_SPP_APID_LOG packets.
+SPP_CORE_boot(&g_myHalPort);
+
+// Then register application services
+SPP_SERVICES_register(&g_bmp390Module, &s_bmp);
+SPP_SERVICES_register(&g_icm20948Module, &s_icm);
+```
+
+If you need finer control, the lower-level functions are still available:
+
+```c
 SPP_CORE_setHalPort(&g_myHalPort);
-
-// 2. Initialise core (calls SPP_SERVICES_DATABANK_init + SPP_SERVICES_PUBSUB_init internally)
 SPP_CORE_init();
-
-// 3. Subscribe consumers
-SPP_SERVICES_PUBSUB_subscribe(K_SPP_APID_ALL, myHandler, &myCtx);
-
-// 4. Register and start application services
-SPP_SERVICES_register(&g_bmp390ServiceDesc, &s_ctx, &s_cfg);
-SPP_SERVICES_initAll();
-SPP_SERVICES_startAll();
+SPP_SERVICES_LOG_registerOutput(myCustomOutput);
 ```
 
 ---

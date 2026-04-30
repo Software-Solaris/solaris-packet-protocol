@@ -32,9 +32,9 @@ Every module describes itself with a static `SPP_Module_t`:
 typedef struct {
     const char   *p_name;        // Human-readable name for logging
     uint16_t      apid;          // APID bitmask produced by this module (single bit, or K_SPP_APID_NONE)
-    size_t        ctxSize;       // sizeof(module-private context struct)
+    size_t        ctxSize;       // sizeof(module context struct)
 
-    SPP_RetVal_t (*init)       (void *ctx, const void *cfg);
+    SPP_RetVal_t (*init)       (void *ctx);
     SPP_RetVal_t (*start)      (void *ctx);
     SPP_RetVal_t (*stop)       (void *ctx);
     SPP_RetVal_t (*deinit)     (void *ctx);
@@ -49,16 +49,15 @@ typedef struct {
 Registration pattern in `app_main()`:
 
 ```c
-static BMP390_ServiceCtx_t  s_bmpCtx;
-static BMP390_ServiceCfg_t  s_bmpCfg = { .spiDevIdx = 1U, .intPin = 17U };
+static BMP390_t s_bmp = {
+    .spiDevIdx = 1U, .intPin = 17U, .intIntrType = 1U, .intPull = 0U,
+};
 
-// Registration auto-subscribes the module if onPacket != NULL
-SPP_SERVICES_register(&g_bmp390Module, &s_bmpCtx, &s_bmpCfg);
-SPP_SERVICES_initAll();
-SPP_SERVICES_startAll();
+// register() calls init() immediately and auto-subscribes if onPacket != NULL
+SPP_SERVICES_register(&g_bmp390Module, &s_bmp);
 ```
 
-The registry calls `init` and `start` on each module in registration order. `stop` and `deinit` are called in reverse order on shutdown. No memory is allocated by the registry — all context buffers are caller-managed.
+No `initAll()` or `startAll()` calls needed. The registry calls `init` and `start` inside `register()`, in registration order. `stop` and `deinit` are called in reverse order on shutdown. No memory is allocated by the registry — all context buffers are caller-managed.
 
 ---
 
@@ -130,9 +129,10 @@ APIDs are single-bit bitmasks. Subscribers combine bits to match multiple source
 ## Adding a new module
 
 1. Create `services/mymodule/mymodule.h` and `mymodule.c`
-2. Implement `init`, `start`, `stop`, `deinit` callbacks
-3. Implement `serviceTask(void *ctx)` if the module is a sensor producer (check DRDY at the top, return immediately if not set)
-4. Set `onPacket` and `consumesApid` if the module consumes packets
-5. Declare `const SPP_Module_t g_myModule = { ... }` with all fields
-6. Add `services/mymodule/mymodule.c` to `CMakeLists.txt`
-7. In `app_main()`: call `SPP_SERVICES_register(&g_myModule, &ctx, &cfg)` before `SPP_SERVICES_initAll()`
+2. Define a single context struct (e.g. `MyModule_t`) with config fields set at declaration and runtime fields filled by `init`
+3. Implement `init`, `start`, `stop`, `deinit` as static functions; `init` reads config from the context struct directly
+4. Implement `serviceTask(void *ctx)` if the module is a sensor producer (check DRDY at the top, return immediately if not set)
+5. Set `onPacket` and `consumesApid` if the module consumes packets
+6. Declare `const SPP_Module_t g_myModule = { ... }` with all fields
+7. Add `services/mymodule/mymodule.c` to `CMakeLists.txt`
+8. In `app_main()`: declare `static MyModule_t s_ctx = { /* config fields */ }` and call `SPP_SERVICES_register(&g_myModule, &s_ctx)`
