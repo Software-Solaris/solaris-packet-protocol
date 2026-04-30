@@ -28,7 +28,6 @@
 /** @brief SPI write marker (zero — write when MSB clear). */
 #define K_BMP390_SPI_WRITE 0x00U
 
-#define K_BMP_SERVICE_APID_DBG        (0x0101U)
 #define K_BMP_SERVICE_TASK_PRIO       (5U)
 #define K_BMP_SERVICE_TASK_DELAY_MS   (200U)
 #define K_BMP_SERVICE_TASK_STACK_SIZE (4096U)
@@ -515,13 +514,15 @@ SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi)
  * Service — acquisition task
  * ---------------------------------------------------------------- */
 
-void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx)
+void SPP_SERVICES_BMP390_serviceTask(void *p_ctx)
 {
+    BMP390_ServiceCtx_t *ctx = (BMP390_ServiceCtx_t *)p_ctx;
     float altitude    = 0.0f;
     float pressure    = 0.0f;
     float temperature = 0.0f;
 
-    p_ctx->bmpData.drdyFlag = false;
+    if (!ctx->bmpData.drdyFlag) return;
+    ctx->bmpData.drdyFlag = false;
 
     SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
     if (p_packet == NULL)
@@ -530,7 +531,7 @@ void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx)
         return;
     }
 
-    SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(p_ctx->p_spi, &p_ctx->bmpData,
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(ctx->p_spi, &ctx->bmpData,
                                            &altitude, &pressure, &temperature);
     if (ret != K_SPP_OK)
     {
@@ -542,7 +543,7 @@ void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx)
     SPP_LOGI(k_svcTag, "alt=%.1fm P=%.1fhPa T=%.2fC", altitude, pressure / 100.0f, temperature);
 
     float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP_SERVICE_APID_DBG, p_ctx->seq++,
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++,
                                    payload, (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
@@ -610,15 +611,19 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_serviceDeinit(void *p_ctx)
 }
 
 /* ----------------------------------------------------------------
- * Service descriptor
+ * Module descriptor
  * ---------------------------------------------------------------- */
 
-const SPP_ServiceDesc_t g_bmp390ServiceDesc = {
-    .p_name = "bmp390",
-    .apid = K_BMP_SERVICE_APID_DBG,
-    .ctxSize = sizeof(BMP390_ServiceCtx_t),
-    .init = SPP_SERVICES_BMP390_serviceInit,
-    .start = SPP_SERVICES_BMP390_serviceStart,
-    .stop = SPP_SERVICES_BMP390_serviceStop,
-    .deinit = SPP_SERVICES_BMP390_serviceDeinit,
+const SPP_Module_t g_bmp390Module = {
+    .p_name       = "bmp390",
+    .apid         = K_BMP390_SERVICE_APID,
+    .ctxSize      = sizeof(BMP390_ServiceCtx_t),
+    .init         = SPP_SERVICES_BMP390_serviceInit,
+    .start        = SPP_SERVICES_BMP390_serviceStart,
+    .stop         = SPP_SERVICES_BMP390_serviceStop,
+    .deinit       = SPP_SERVICES_BMP390_serviceDeinit,
+    .serviceTask  = SPP_SERVICES_BMP390_serviceTask,
+    .consumesApid = K_SPP_APID_NONE,
+    .onPacket     = NULL,
+    .onPacketPrio = 0U,
 };

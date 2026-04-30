@@ -14,7 +14,7 @@
  *
  * To use the SPP service registry, allocate a @ref BMP390_ServiceCtx_t and a
  * @ref BMP390_ServiceCfg_t, then call SPP_SERVICES_register() with
- * @ref g_bmp390ServiceDesc.
+ * @ref g_bmp390Module.
  *
  * Naming conventions used in this file:
  * - Constants/macros:  K_BMP390_*
@@ -197,20 +197,24 @@ typedef struct
     const BMP390_ServiceCfg_t *p_cfg;   /**< Back-pointer to config struct.    */
 } BMP390_ServiceCtx_t;
 
-/**
- * @brief BMP390 service descriptor — pass to SPP_SERVICES_register().
- */
-extern const SPP_ServiceDesc_t g_bmp390ServiceDesc;
+/** @brief APID produced by the BMP390 module (single bit, bitmask scheme). */
+#define K_BMP390_SERVICE_APID (0x0004U)
 
 /**
- * @brief Service task — call from the superloop when drdyFlag is set.
- *
- * Clears drdyFlag, reads altitude/pressure/temperature, and publishes
- * a packet via SPP_SERVICES_PUBSUB_publish().
- *
- * @param[in,out] p_ctx  Pointer to the service context.
+ * @brief BMP390 module descriptor — pass to SPP_SERVICES_register().
  */
-void SPP_SERVICES_BMP390_serviceTask(BMP390_ServiceCtx_t *p_ctx);
+extern const SPP_Module_t g_bmp390Module;
+
+/**
+ * @brief Producer task — called by SPP_SERVICES_pollAll() each superloop iteration.
+ *
+ * Returns immediately when drdyFlag is not set.  When the flag is set, reads
+ * altitude/pressure/temperature and publishes a packet via
+ * SPP_SERVICES_PUBSUB_publish().
+ *
+ * @param[in,out] p_ctx  Pointer to the BMP390_ServiceCtx_t (passed as void *).
+ */
+void SPP_SERVICES_BMP390_serviceTask(void *p_ctx);
 
 /* ============================================================================
  * Driver API (low-level — used internally and for testing)
