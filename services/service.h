@@ -168,6 +168,14 @@ SPP_RetVal_t SPP_SERVICES_stopAll(void);
 SPP_RetVal_t SPP_SERVICES_callProducers(void);
 
 /**
+ * @brief Dispatch the next pending deferred subscriber.
+ *
+ * Thin wrapper around @ref SPP_SERVICES_PUBSUB_callConsumers().  Call once per
+ * superloop iteration alongside @ref SPP_SERVICES_callProducers().
+ */
+void SPP_SERVICES_callConsumers(void);
+
+/**
  * @brief Return the number of currently registered modules.
  *
  * @return Module count.
