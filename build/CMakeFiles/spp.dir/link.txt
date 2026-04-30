@@ -1,2 +1,0 @@
-/usr/bin/ar qc libspp.a CMakeFiles/spp.dir/core/core.c.o CMakeFiles/spp.dir/core/error.c.o CMakeFiles/spp.dir/hal/dispatch.c.o CMakeFiles/spp.dir/services/service.c.o CMakeFiles/spp.dir/services/databank/databank.c.o CMakeFiles/spp.dir/services/pubsub/pubsub.c.o CMakeFiles/spp.dir/services/log/log.c.o CMakeFiles/spp.dir/util/crc.c.o CMakeFiles/spp.dir/services/bmp390/bmp390.c.o CMakeFiles/spp.dir/services/icm20948/icm20948.c.o CMakeFiles/spp.dir/services/datalogger/datalogger.c.o
-/usr/bin/ranlib libspp.a
