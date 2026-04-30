@@ -1456,10 +1456,6 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             float qwSq = 1.0f - (qx * qx) - (qy * qy) - (qz * qz);
                             float qw = (qwSq > 0.0f) ? sqrtf(qwSq) : 0.0f;
 
-                            SPP_LOGI(K_ICM20948_LOG_TAG,
-                                     "A:[%.2f %.2f %.2f]g Q:[w=%.4f x=%.4f y=%.4f z=%.4f] acc:%d",
-                                     ax, ay, az, qw, qx, qy, qz, accuracy);
-
                             p_ctx->lastData.ax        = ax;
                             p_ctx->lastData.ay        = ay;
                             p_ctx->lastData.az        = az;

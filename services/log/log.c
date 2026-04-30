@@ -14,25 +14,13 @@ static SPP_LogLevel_t    s_level = K_SPP_LOG_VERBOSE;
 static SPP_LogOutputFn_t s_outFn = NULL;
 
 /* ----------------------------------------------------------------
- * Default output: print to stdout
- * ---------------------------------------------------------------- */
-
-static void defaultOutput(const char *p_tag, SPP_LogLevel_t level,
-                           const char *p_message)
-{
-    static const char k_lvl[] = "?EWID V";
-    char c = k_lvl[(unsigned)level < sizeof(k_lvl) ? (unsigned)level : 0U];
-    printf("[%c] %s: %s\n", c, p_tag, p_message);
-}
-
-/* ----------------------------------------------------------------
  * Public API
  * ---------------------------------------------------------------- */
 
 SPP_RetVal_t SPP_SERVICES_LOG_init(void)
 {
     s_level = K_SPP_LOG_VERBOSE;
-    s_outFn = defaultOutput;
+    s_outFn = NULL;
     return K_SPP_OK;
 }
 
