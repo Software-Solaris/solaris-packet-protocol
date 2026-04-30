@@ -59,7 +59,7 @@ extern "C" {
  *
  * For CRITICAL subscribers, called synchronously inside
  * @ref SPP_SERVICES_PUBSUB_publish().  For all other priorities, called from
- * @ref SPP_SERVICES_PUBSUB_tick().  The packet pointer is valid only for the
+ * @ref SPP_SERVICES_PUBSUB_callConsumers().  The packet pointer is valid only for the
  * duration of the call — do not store it.
  *
  * @param[in] p_packet  Published packet (read-only).
@@ -88,7 +88,7 @@ void SPP_SERVICES_PUBSUB_init(void);
  * @param[in] apid     Bitmask of APIDs to subscribe to.  A packet matches
  *                     when (apid & packet.apid) != 0.  Use @ref K_SPP_APID_ALL
  *                     to receive every packet, or @ref K_SPP_APID_NONE for none.
- * @param[in] prio     Dispatch priority (@ref K_SPP_PUBSUB_PRIO_CRITICAL …
+ * @param[in] prio     Dispatch priority (@ref K_SPP_PUBSUB_PRIO_SYNC …
  *                     @ref K_SPP_PUBSUB_PRIO_LOW).
  * @param[in] handler  Callback invoked on each matching publish.
  * @param[in] p_ctx    Context pointer forwarded unchanged to the callback.
@@ -102,7 +102,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_subscribe(spp_uint16_t apid, spp_uint8_t prio,
  * @brief Publish a filled packet to all matching subscribers.
  *
  * CRITICAL subscribers are called synchronously before this function returns.
- * All other matching subscribers are enqueued; call @ref SPP_SERVICES_PUBSUB_tick()
+ * All other matching subscribers are enqueued; call @ref SPP_SERVICES_PUBSUB_callConsumers()
  * repeatedly to drain them.  The packet is returned to the databank only when
  * all deferred subscribers have been dispatched.
  *
