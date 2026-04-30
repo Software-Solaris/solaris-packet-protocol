@@ -1,0 +1,23 @@
+Start testing: Apr 30 18:22 UTC
+----------------------------------------------------------
+1/1 Testing: spp_test_core
+1/1 Test: spp_test_core
+Command: "/usr/local/bin/cgreen-runner" "/home/user/Documents/solaris-software/solaris-v1/spp/build/libspp_test_core.so"
+Directory: /home/user/Documents/solaris-software/solaris-v1/spp/build
+"spp_test_core" start time: Apr 30 18:22 UTC
+Output:
+----------------------------------------------------------
+Running "libspp_test_core" (5 tests)...
+  "SPP_CORE_setHalPort": 3 passes in 1ms.
+[I] SPP_CORE: SPP core initialised (v2.0.0)
+  "SPP_CORE_init": 2 passes in 1ms.
+Completed "libspp_test_core": 5 passes in 2ms.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"spp_test_core" end time: Apr 30 18:22 UTC
+"spp_test_core" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Apr 30 18:22 UTC

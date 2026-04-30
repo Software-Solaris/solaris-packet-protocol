@@ -1,0 +1,2 @@
+/usr/bin/ar qc libspp_port.a CMakeFiles/spp_port.dir/ports/hal/stub/halStub.c.o
+/usr/bin/ranlib libspp_port.a

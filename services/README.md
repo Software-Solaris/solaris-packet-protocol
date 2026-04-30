@@ -11,7 +11,7 @@ SPP's service layer. Provides the packet lifecycle infrastructure (databank, pub
 | Directory | Description |
 |---|---|
 | `databank/` | Static packet pool — allocates and recycles `SPP_Packet_t` objects |
-| `pubsub/` | Priority-aware publish-subscribe router with deferred dispatch via `tick()` |
+| `pubsub/` | Priority-aware publish-subscribe router with deferred dispatch via `callConsumers()` |
 | `log/` | Level-filtered logging with a swappable output callback |
 
 ### Sensor/logger modules (opt-in at build time)
@@ -38,11 +38,11 @@ typedef struct {
     SPP_RetVal_t (*start)      (void *ctx);
     SPP_RetVal_t (*stop)       (void *ctx);
     SPP_RetVal_t (*deinit)     (void *ctx);
-    void         (*serviceTask)(void *ctx);  // called by pollAll() each superloop iteration
+    void         (*produce)    (void *ctx);  // called by callProducers() each superloop iteration
 
     uint16_t             consumesApid;    // APID bitmask this module subscribes to
     SPP_PubSub_Handler_t onPacket;        // auto-registered on SPP_SERVICES_register()
-    uint8_t              onPacketPrio;    // K_SPP_PUBSUB_PRIO_CRITICAL … K_SPP_PUBSUB_PRIO_LOW
+    uint8_t              onPacketPrio;    // K_SPP_PUBSUB_PRIO_SYNC … K_SPP_PUBSUB_PRIO_LOW
 } SPP_Module_t;
 ```
 
@@ -53,7 +53,7 @@ static BMP390_t s_bmp = {
     .spiDevIdx = 1U, .intPin = 17U, .intIntrType = 1U, .intPull = 0U,
 };
 
-// register() calls init() immediately and auto-subscribes if onPacket != NULL
+// register() calls init() + start() immediately and auto-subscribes if onPacket != NULL
 SPP_SERVICES_register(&g_bmp390Module, &s_bmp);
 ```
 
@@ -66,18 +66,18 @@ No `initAll()` or `startAll()` calls needed. The registry calls `init` and `star
 ```
 ISR (sets drdyFlag)
   │
-  └─► SPP_SERVICES_pollAll()
+  └─► SPP_SERVICES_callProducers()
         │
-        └─► module->serviceTask(ctx)   [checks DRDY, returns if not set]
+        └─► module->produce(ctx)   [checks DRDY, returns if not set]
               │
               ├─ SPP_SERVICES_DATABANK_getPacket()
               ├─ SPP_SERVICES_DATABANK_packetData(pkt, apid, seq, data, len)
               └─ SPP_SERVICES_PUBSUB_publish(pkt)
                     │
-                    ├─► CRITICAL subscribers — called synchronously
-                    └─► enqueued for deferred dispatch via tick()
+                    ├─► SYNC subscribers — called synchronously
+                    └─► enqueued for deferred dispatch via callConsumers()
 
-SPP_SERVICES_PUBSUB_tick()   [call once per superloop iteration]
+SPP_SERVICES_callConsumers()   [call once per superloop iteration]
   └─► dispatches one deferred subscriber (e.g. SD card logger)
 ```
 
@@ -95,7 +95,7 @@ SPP_SERVICES_PUBSUB_subscribe(K_BMP390_SERVICE_APID, K_SPP_PUBSUB_PRIO_NORMAL, m
 SPP_SERVICES_PUBSUB_publish(p_pkt);
 
 // Drain one deferred subscriber per call (call from superloop)
-SPP_SERVICES_PUBSUB_tick();
+SPP_SERVICES_callConsumers();
 
 // Read per-APID overflow counter (incremented on queue-full drops)
 SPP_SERVICES_PUBSUB_overflowCount(K_ICM20948_SERVICE_APID);
@@ -105,10 +105,10 @@ SPP_SERVICES_PUBSUB_overflowCount(K_ICM20948_SERVICE_APID);
 
 | Constant | Value | Dispatch |
 |---|---|---|
-| `K_SPP_PUBSUB_PRIO_CRITICAL` | 0 | Synchronous inside `publish()` |
-| `K_SPP_PUBSUB_PRIO_HIGH` | 1 | Deferred via `tick()`, first |
-| `K_SPP_PUBSUB_PRIO_NORMAL` | 2 | Deferred via `tick()` |
-| `K_SPP_PUBSUB_PRIO_LOW` | 3 | Deferred via `tick()`, last |
+| `K_SPP_PUBSUB_PRIO_SYNC`   | 0 | Synchronous inside `publish()` |
+| `K_SPP_PUBSUB_PRIO_HIGH`   | 1 | Deferred via `callConsumers()`, first |
+| `K_SPP_PUBSUB_PRIO_NORMAL` | 2 | Deferred via `callConsumers()` |
+| `K_SPP_PUBSUB_PRIO_LOW`    | 3 | Deferred via `callConsumers()`, last |
 
 ---
 
@@ -131,7 +131,7 @@ APIDs are single-bit bitmasks. Subscribers combine bits to match multiple source
 1. Create `services/mymodule/mymodule.h` and `mymodule.c`
 2. Define a single context struct (e.g. `MyModule_t`) with config fields set at declaration and runtime fields filled by `init`
 3. Implement `init`, `start`, `stop`, `deinit` as static functions; `init` reads config from the context struct directly
-4. Implement `serviceTask(void *ctx)` if the module is a sensor producer (check DRDY at the top, return immediately if not set)
+4. Implement `produce(void *ctx)` if the module is a sensor producer (check DRDY at the top, return immediately if not set)
 5. Set `onPacket` and `consumesApid` if the module consumes packets
 6. Declare `const SPP_Module_t g_myModule = { ... }` with all fields
 7. Add `services/mymodule/mymodule.c` to `CMakeLists.txt`

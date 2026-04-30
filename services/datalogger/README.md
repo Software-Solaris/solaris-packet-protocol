@@ -22,9 +22,9 @@ typedef struct {
     const char *p_filePath;    // Absolute path of the file to create/overwrite
 
     /* Runtime — filled by init, do not set manually */
-    FILE    *p_file;
-    uint8_t  is_initialized;
-    uint32_t logged_packets;
+    FILE       *p_file;
+    spp_bool_t  is_open;
+    uint32_t    logged_packets;
 } Datalogger_t;
 ```
 

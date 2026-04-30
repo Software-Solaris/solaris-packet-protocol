@@ -252,3 +252,8 @@ spp_uint8_t SPP_SERVICES_PUBSUB_subscriberCount(void)
 {
     return s_count;
 }
+
+spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void)
+{
+    return s_qCount;
+}
