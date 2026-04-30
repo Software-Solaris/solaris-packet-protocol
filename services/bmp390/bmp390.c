@@ -17,6 +17,9 @@
 
 #include <string.h>
 #include <math.h>
+#ifdef SPP_DEBUG_PRINT
+#include <stdio.h>
+#endif
 
 /* ----------------------------------------------------------------
  * Private constants
@@ -540,7 +543,9 @@ static void bmp390Task(void *p_ctx)
         return;
     }
 
-    SPP_LOGI(k_svcTag, "alt=%.1fm P=%.1fhPa T=%.2fC", altitude, pressure / 100.0f, temperature);
+#ifdef SPP_DEBUG_PRINT
+    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+#endif
 
     float payload[3] = {altitude, pressure, temperature};
     ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++,

@@ -20,6 +20,9 @@
 
 #include <string.h>
 #include <math.h>
+#ifdef SPP_DEBUG_PRINT
+#include <stdio.h>
+#endif
 
 /* ----------------------------------------------------------------
  * Private constants
@@ -1455,6 +1458,11 @@ void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             float qz = q3Raw / 1073741824.0f;
                             float qwSq = 1.0f - (qx * qx) - (qy * qy) - (qz * qz);
                             float qw = (qwSq > 0.0f) ? sqrtf(qwSq) : 0.0f;
+
+#ifdef SPP_DEBUG_PRINT
+                            printf("[ICM] A:[%.2f %.2f %.2f]g Q:[w=%.3f x=%.3f y=%.3f z=%.3f]\n",
+                                   ax, ay, az, qw, qx, qy, qz);
+#endif
 
                             p_ctx->lastData.ax        = ax;
                             p_ctx->lastData.ay        = ay;
