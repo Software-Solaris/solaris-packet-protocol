@@ -57,4 +57,27 @@
 #define K_SPP_MAX_SERVICES (16U)
 #endif
 
+/* ----------------------------------------------------------------
+ * Pub/sub constants
+ * ---------------------------------------------------------------- */
+
+/** @brief APID bitmask meaning "no APID — module neither produces nor consumes". */
+#ifndef K_SPP_APID_NONE
+#define K_SPP_APID_NONE (0x0000U)
+#endif
+
+/** @brief Deferred dispatch ring-buffer size.  Must be a power of 2. */
+#ifndef K_SPP_PUBSUB_QUEUE_SIZE
+#define K_SPP_PUBSUB_QUEUE_SIZE (16U)
+#endif
+
+/** @brief Subscriber is called synchronously inside publish(). */
+#define K_SPP_PUBSUB_PRIO_CRITICAL (0U)
+/** @brief Subscriber is dispatched via tick(), before NORMAL. */
+#define K_SPP_PUBSUB_PRIO_HIGH     (1U)
+/** @brief Subscriber is dispatched via tick(). */
+#define K_SPP_PUBSUB_PRIO_NORMAL   (2U)
+/** @brief Subscriber is dispatched via tick(), after NORMAL. */
+#define K_SPP_PUBSUB_PRIO_LOW      (3U)
+
 #endif /* SPP_MACROS_H */
