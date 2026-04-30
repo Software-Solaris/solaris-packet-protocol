@@ -24,7 +24,7 @@
 /**
  * @brief Register the HAL port, initialise core subsystems, and wire log output.
  *
- * Single call that replaces the old setHalPort() + init() + registerOutput()
+ * Single call that replaces the old setHalPort() + init() + setOutput()
  * sequence.  After this returns, SPP_LOG* macros print to stdout and also
  * publish K_SPP_APID_LOG packets through pub/sub.
  *
