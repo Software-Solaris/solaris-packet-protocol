@@ -146,6 +146,16 @@ spp_uint16_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid);
  */
 spp_uint8_t SPP_SERVICES_PUBSUB_subscriberCount(void);
 
+/**
+ * @brief Return the number of packets currently sitting in the deferred queue.
+ *
+ * Useful for debug: if this grows without bound, callConsumers() is not keeping
+ * up with publish() — either increase call rate or reduce publish rate.
+ *
+ * @return Deferred queue depth (0 … K_SPP_PUBSUB_QUEUE_SIZE).
+ */
+spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
+
 #ifdef __cplusplus
 }
 #endif
