@@ -161,7 +161,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet)
      *    first non-CRITICAL entry. */
     for (i = 0U; i < s_count; i++)
     {
-        if (s_subs[i].prio != K_SPP_PUBSUB_PRIO_CRITICAL) break;
+        if (s_subs[i].prio != K_SPP_PUBSUB_PRIO_SYNC) break;
         if (apidMatches(s_subs[i].apid, p_packet->primaryHeader.apid))
         {
             s_subs[i].handler(p_packet, s_subs[i].p_ctx);
@@ -171,7 +171,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet)
     /* 2. Check whether any deferred (non-CRITICAL) subscriber matches. */
     for (i = 0U; i < s_count; i++)
     {
-        if (s_subs[i].prio == K_SPP_PUBSUB_PRIO_CRITICAL) continue;
+        if (s_subs[i].prio == K_SPP_PUBSUB_PRIO_SYNC) continue;
         if (apidMatches(s_subs[i].apid, p_packet->primaryHeader.apid))
         {
             hasDeferred = true;
@@ -202,7 +202,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet)
     return K_SPP_OK;
 }
 
-void SPP_SERVICES_PUBSUB_tick(void)
+void SPP_SERVICES_PUBSUB_callConsumers(void)
 {
     QueueEntry_t *p_entry;
     spp_uint8_t   i;
@@ -217,7 +217,7 @@ void SPP_SERVICES_PUBSUB_tick(void)
      * matches this packet's APID, call it, and save progress. */
     for (i = p_entry->nextSubIdx; i < s_count; i++)
     {
-        if (s_subs[i].prio == K_SPP_PUBSUB_PRIO_CRITICAL) continue;
+        if (s_subs[i].prio == K_SPP_PUBSUB_PRIO_SYNC) continue;
         if (apidMatches(s_subs[i].apid, pktApid))
         {
             s_subs[i].handler(p_entry->p_pkt, s_subs[i].p_ctx);

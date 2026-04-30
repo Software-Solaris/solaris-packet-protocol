@@ -104,14 +104,14 @@ SPP_RetVal_t SPP_SERVICES_stopAll(void)
     return result;
 }
 
-SPP_RetVal_t SPP_SERVICES_pollAll(void)
+SPP_RetVal_t SPP_SERVICES_callProducers(void)
 {
     for (spp_uint32_t i = 0U; i < s_count; i++)
     {
         const ServiceEntry_t *p_entry = &s_registry[i];
-        if (p_entry->p_module->serviceTask != NULL)
+        if (p_entry->p_module->produce != NULL)
         {
-            p_entry->p_module->serviceTask(p_entry->p_ctx);
+            p_entry->p_module->produce(p_entry->p_ctx);
         }
     }
     return K_SPP_OK;

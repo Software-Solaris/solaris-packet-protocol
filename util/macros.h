@@ -71,13 +71,6 @@
 #define K_SPP_PUBSUB_QUEUE_SIZE (16U)
 #endif
 
-/** @brief Subscriber is called synchronously inside publish(). */
-#define K_SPP_PUBSUB_PRIO_CRITICAL (0U)
-/** @brief Subscriber is dispatched via tick(), before NORMAL. */
-#define K_SPP_PUBSUB_PRIO_HIGH     (1U)
-/** @brief Subscriber is dispatched via tick(). */
-#define K_SPP_PUBSUB_PRIO_NORMAL   (2U)
-/** @brief Subscriber is dispatched via tick(), after NORMAL. */
-#define K_SPP_PUBSUB_PRIO_LOW      (3U)
+/* Subscriber dispatch priorities — defined in pubsub.h */
 
 #endif /* SPP_MACROS_H */

@@ -11,8 +11,8 @@
  * sets @c onPacket != NULL, @ref SPP_SERVICES_register() calls
  * @ref SPP_SERVICES_PUBSUB_subscribe() with @c consumesApid and @c onPacketPrio.
  *
- * @ref SPP_SERVICES_pollAll() iterates every registered module and calls its
- * @c serviceTask, replacing the per-sensor DRDY checks in the superloop.
+ * @ref SPP_SERVICES_callProducers() iterates every registered module and calls its
+ * @c produce, replacing the per-sensor DRDY checks in the superloop.
  *
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_*
@@ -49,7 +49,7 @@
  *     .start        = SPP_SERVICES_BMP390_serviceStart,
  *     .stop         = SPP_SERVICES_BMP390_serviceStop,
  *     .deinit       = SPP_SERVICES_BMP390_serviceDeinit,
- *     .serviceTask  = SPP_SERVICES_BMP390_serviceTask,
+ *     .produce  = SPP_SERVICES_BMP390_produce,
  *     .consumesApid = K_SPP_APID_NONE,
  *     .onPacket     = NULL,
  *     .onPacketPrio = 0U,
@@ -91,14 +91,14 @@ typedef struct
     SPP_RetVal_t (*deinit)(void *p_ctx);
 
     /**
-     * @brief Per-iteration producer task — called by @ref SPP_SERVICES_pollAll().
+     * @brief Per-iteration producer task — called by @ref SPP_SERVICES_callProducers().
      *
      * For sensor modules: check the DRDY flag and, if set, read the sensor
      * and call publish().  Must return quickly when no data is ready.
      *
      * @param[in] p_ctx  Module context.
      */
-    void (*serviceTask)(void *p_ctx);
+    void (*produce)(void *p_ctx);
 
     /**
      * @brief APID bitmask this module subscribes to.
@@ -119,7 +119,7 @@ typedef struct
      */
     SPP_PubSub_Handler_t onPacket;
 
-    /** @brief Dispatch priority for @c onPacket (@ref K_SPP_PUBSUB_PRIO_CRITICAL … @ref K_SPP_PUBSUB_PRIO_LOW). */
+    /** @brief Dispatch priority for @c onPacket (@ref K_SPP_PUBSUB_PRIO_SYNC … @ref K_SPP_PUBSUB_PRIO_LOW). */
     spp_uint8_t onPacketPrio;
 
 } SPP_Module_t;
@@ -157,15 +157,15 @@ SPP_RetVal_t SPP_SERVICES_startAll(void);
 SPP_RetVal_t SPP_SERVICES_stopAll(void);
 
 /**
- * @brief Call @c serviceTask on every registered module that has one.
+ * @brief Call @c produce on every registered module that has one.
  *
- * Replaces per-sensor DRDY checks in the superloop.  Each module's serviceTask
+ * Replaces per-sensor DRDY checks in the superloop.  Each module's produce
  * is responsible for checking its own DRDY flag and returning immediately when
  * no data is ready.
  *
  * @return K_SPP_OK always.
  */
-SPP_RetVal_t SPP_SERVICES_pollAll(void);
+SPP_RetVal_t SPP_SERVICES_callProducers(void);
 
 /**
  * @brief Return the number of currently registered modules.
