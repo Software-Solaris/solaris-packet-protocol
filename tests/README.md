@@ -69,7 +69,7 @@ BeforeEach(SPP_SERVICES_PUBSUB_subscribe) { SPP_SERVICES_PUBSUB_init(); }
 AfterEach(SPP_SERVICES_PUBSUB_subscribe)  { /* teardown */ }
 
 Ensure(SPP_SERVICES_PUBSUB_subscribe, rejects_null_handler) {
-    assert_that(SPP_SERVICES_PUBSUB_subscribe(0x0101U, NULL, NULL),
+    assert_that(SPP_SERVICES_PUBSUB_subscribe(0x0001U, K_SPP_PUBSUB_PRIO_NORMAL, NULL, NULL),
                 is_equal_to(K_SPP_ERROR_NULL_POINTER));
 }
 ```
