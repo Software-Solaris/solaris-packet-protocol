@@ -117,6 +117,11 @@ SPP_RetVal_t SPP_SERVICES_callProducers(void)
     return K_SPP_OK;
 }
 
+void SPP_SERVICES_callConsumers(void)
+{
+    SPP_SERVICES_PUBSUB_callConsumers();
+}
+
 spp_uint32_t SPP_SERVICES_count(void)
 {
     return s_count;
