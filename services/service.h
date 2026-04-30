@@ -46,10 +46,10 @@
  *     .apid         = K_BMP390_SERVICE_APID,
  *     .ctxSize      = sizeof(BMP390_t),
  *     .init         = bmp390Init,
- *     .start        = SPP_SERVICES_BMP390_serviceStart,
- *     .stop         = SPP_SERVICES_BMP390_serviceStop,
- *     .deinit       = SPP_SERVICES_BMP390_serviceDeinit,
- *     .produce  = SPP_SERVICES_BMP390_produce,
+ *     .start        = bmp390Start,
+ *     .stop         = bmp390Stop,
+ *     .deinit       = bmp390Deinit,
+ *     .produce      = bmp390Task,
  *     .consumesApid = K_SPP_APID_NONE,
  *     .onPacket     = NULL,
  *     .onPacketPrio = 0U,
@@ -129,32 +129,14 @@ typedef struct
  * ---------------------------------------------------------------- */
 
 /**
- * @brief Register a module, initialise it, and wire up its pub/sub subscription.
- *
- * Calls @c p_module->init(p_ctx) immediately.  If @c p_module->onPacket != NULL,
- * also calls @ref SPP_SERVICES_PUBSUB_subscribe() automatically.
+ * @brief Register a module: runs init(), runs start(), and wires up pub/sub.
  *
  * @param[in] p_module  Pointer to the static module descriptor.
- * @param[in] p_ctx     Pointer to the caller-allocated context buffer
- *                      (at least @c p_module->ctxSize bytes).
+ * @param[in] p_ctx     Pointer to the caller-allocated context buffer.
  *
  * @return K_SPP_OK on success, K_SPP_ERROR_REGISTRY_FULL if the registry is full.
  */
 SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module, void *p_ctx);
-
-/**
- * @brief Call @c start on all registered modules in registration order.
- *
- * @return K_SPP_OK if all succeeded.
- */
-SPP_RetVal_t SPP_SERVICES_startAll(void);
-
-/**
- * @brief Call @c stop on all registered modules in reverse order.
- *
- * @return K_SPP_OK if all succeeded.
- */
-SPP_RetVal_t SPP_SERVICES_stopAll(void);
 
 /**
  * @brief Call @c produce on every registered module that has one.
