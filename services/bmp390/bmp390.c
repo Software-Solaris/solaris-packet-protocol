@@ -514,9 +514,9 @@ SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi)
  * Service — acquisition task
  * ---------------------------------------------------------------- */
 
-void SPP_SERVICES_BMP390_serviceTask(void *p_ctx)
+static void bmp390Task(void *p_ctx)
 {
-    BMP390_ServiceCtx_t *ctx = (BMP390_ServiceCtx_t *)p_ctx;
+    BMP390_t *ctx = (BMP390_t *)p_ctx;
     float altitude    = 0.0f;
     float pressure    = 0.0f;
     float temperature = 0.0f;
@@ -532,10 +532,10 @@ void SPP_SERVICES_BMP390_serviceTask(void *p_ctx)
     }
 
     SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(ctx->p_spi, &ctx->bmpData,
-                                           &altitude, &pressure, &temperature);
+                                                        &altitude, &pressure, &temperature);
     if (ret != K_SPP_OK)
     {
-        SPP_LOGE(k_svcTag, "SPP_SERVICES_BMP390_getAltitude failed ret=%d", (int)ret);
+        SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
         (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
         return;
     }
@@ -544,7 +544,7 @@ void SPP_SERVICES_BMP390_serviceTask(void *p_ctx)
 
     float payload[3] = {altitude, pressure, temperature};
     ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++,
-                                   payload, (spp_uint16_t)sizeof(payload));
+                                           payload, (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
@@ -559,56 +559,38 @@ void SPP_SERVICES_BMP390_serviceTask(void *p_ctx)
  * Service — callbacks
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t SPP_SERVICES_BMP390_serviceInit(void *p_ctx, const void *p_cfg)
+static SPP_RetVal_t bmp390Init(void *p_ctx)
 {
-    BMP390_ServiceCtx_t *ctx = (BMP390_ServiceCtx_t *)p_ctx;
-    const BMP390_ServiceCfg_t *cfg = (const BMP390_ServiceCfg_t *)p_cfg;
+    BMP390_t    *ctx = (BMP390_t *)p_ctx;
     SPP_RetVal_t ret;
 
-    ctx->p_spi = SPP_HAL_spiGetHandle(cfg->spiDevIdx);
-    ctx->seq = 0U;
-    ctx->p_cfg = cfg;
+    ctx->p_spi = SPP_HAL_spiGetHandle(ctx->spiDevIdx);
+    ctx->seq   = 0U;
 
-    ctx->bmpData.intPin = cfg->intPin;
-    ctx->bmpData.intIntrType = cfg->intIntrType;
-    ctx->bmpData.intPull = cfg->intPull;
+    ctx->bmpData.intPin      = ctx->intPin;
+    ctx->bmpData.intIntrType = ctx->intIntrType;
+    ctx->bmpData.intPull     = ctx->intPull;
 
     SPP_SERVICES_BMP390_init(&ctx->bmpData);
 
     ret = SPP_SERVICES_BMP390_auxConfig(ctx->p_spi);
-    if (ret != K_SPP_OK)
-    {
-        return ret;
-    }
+    if (ret != K_SPP_OK) return ret;
 
     ret = SPP_SERVICES_BMP390_prepareMeasure(ctx->p_spi);
-    if (ret != K_SPP_OK)
-    {
-        return ret;
-    }
+    if (ret != K_SPP_OK) return ret;
 
-    ret = SPP_SERVICES_BMP390_intEnableDrdy(ctx->p_spi);
-    return ret;
+    return SPP_SERVICES_BMP390_intEnableDrdy(ctx->p_spi);
 }
 
-static SPP_RetVal_t SPP_SERVICES_BMP390_serviceStart(void *p_ctx)
+static SPP_RetVal_t bmp390Start(void *p_ctx)
 {
     (void)p_ctx;
-    SPP_LOGI(k_svcTag, "Service ready (baremetal — call SPP_SERVICES_BMP390_serviceTask from superloop)");
+    SPP_LOGI(k_svcTag, "Ready");
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_BMP390_serviceStop(void *p_ctx)
-{
-    (void)p_ctx;
-    return K_SPP_OK;
-}
-
-static SPP_RetVal_t SPP_SERVICES_BMP390_serviceDeinit(void *p_ctx)
-{
-    (void)p_ctx;
-    return K_SPP_OK;
-}
+static SPP_RetVal_t bmp390Stop(void *p_ctx)   { (void)p_ctx; return K_SPP_OK; }
+static SPP_RetVal_t bmp390Deinit(void *p_ctx) { (void)p_ctx; return K_SPP_OK; }
 
 /* ----------------------------------------------------------------
  * Module descriptor
@@ -617,12 +599,12 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_serviceDeinit(void *p_ctx)
 const SPP_Module_t g_bmp390Module = {
     .p_name       = "bmp390",
     .apid         = K_BMP390_SERVICE_APID,
-    .ctxSize      = sizeof(BMP390_ServiceCtx_t),
-    .init         = SPP_SERVICES_BMP390_serviceInit,
-    .start        = SPP_SERVICES_BMP390_serviceStart,
-    .stop         = SPP_SERVICES_BMP390_serviceStop,
-    .deinit       = SPP_SERVICES_BMP390_serviceDeinit,
-    .serviceTask  = SPP_SERVICES_BMP390_serviceTask,
+    .ctxSize      = sizeof(BMP390_t),
+    .init         = bmp390Init,
+    .start        = bmp390Start,
+    .stop         = bmp390Stop,
+    .deinit       = bmp390Deinit,
+    .serviceTask  = bmp390Task,
     .consumesApid = K_SPP_APID_NONE,
     .onPacket     = NULL,
     .onPacketPrio = 0U,
