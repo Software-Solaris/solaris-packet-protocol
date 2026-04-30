@@ -54,6 +54,17 @@ SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module, void *p_ctx)
         }
     }
 
+    if (p_module->start != NULL)
+    {
+        SPP_RetVal_t ret = p_module->start(p_ctx);
+        if (ret != K_SPP_OK)
+        {
+            SPP_LOGE(k_tag, "Module '%s' start failed (%d)", p_module->p_name, (int)ret);
+            s_count--;
+            SPP_ERR_RETURN(ret);
+        }
+    }
+
     if (p_module->onPacket != NULL)
     {
         (void)SPP_SERVICES_PUBSUB_subscribe(p_module->consumesApid, p_module->onPacketPrio,
@@ -62,46 +73,6 @@ SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module, void *p_ctx)
 
     SPP_LOGI(k_tag, "Registered '%s' (apid=0x%04X)", p_module->p_name, p_module->apid);
     return K_SPP_OK;
-}
-
-SPP_RetVal_t SPP_SERVICES_startAll(void)
-{
-    SPP_RetVal_t result = K_SPP_OK;
-
-    for (spp_uint32_t i = 0U; i < s_count; i++)
-    {
-        const ServiceEntry_t *p_entry = &s_registry[i];
-        if (p_entry->p_module->start == NULL) continue;
-
-        SPP_RetVal_t ret = p_entry->p_module->start(p_entry->p_ctx);
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_tag, "Module '%s' start failed (%d)",
-                     p_entry->p_module->p_name, (int)ret);
-            result = ret;
-        }
-    }
-    return result;
-}
-
-SPP_RetVal_t SPP_SERVICES_stopAll(void)
-{
-    SPP_RetVal_t result = K_SPP_OK;
-
-    for (spp_uint32_t i = s_count; i > 0U; i--)
-    {
-        const ServiceEntry_t *p_entry = &s_registry[i - 1U];
-        if (p_entry->p_module->stop == NULL) continue;
-
-        SPP_RetVal_t ret = p_entry->p_module->stop(p_entry->p_ctx);
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_tag, "Module '%s' stop failed (%d)",
-                     p_entry->p_module->p_name, (int)ret);
-            result = ret;
-        }
-    }
-    return result;
 }
 
 SPP_RetVal_t SPP_SERVICES_callProducers(void)

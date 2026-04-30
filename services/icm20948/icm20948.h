@@ -5,10 +5,8 @@
  * Provides SPI register access, DMP firmware loading and sensor data
  * acquisition for the TDK InvenSense ICM20948 IMU.
  *
- * To use the SPP service registry, allocate a @ref ICM20948_ServiceCtx_t and
- * a @ref ICM20948_ServiceCfg_t, then call SPP_SERVICES_register() with
- * @ref g_icm20948Module.  Declare one static @ref ICM20948_t with the hardware
- * pin fields filled in and pass its address to SPP_SERVICES_register().
+ * To use: declare a static @ref ICM20948_t with the hardware pin fields filled
+ * in and pass its address to SPP_SERVICES_register() with @ref g_icm20948Module.
  *
  * Naming conventions used in this file:
  * - Constants/macros:  K_ICM20948_*
