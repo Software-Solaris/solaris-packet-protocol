@@ -44,8 +44,8 @@
  * const SPP_Module_t g_bmp390Module = {
  *     .p_name       = "bmp390",
  *     .apid         = K_BMP390_SERVICE_APID,
- *     .ctxSize      = sizeof(BMP390_ServiceCtx_t),
- *     .init         = SPP_SERVICES_BMP390_serviceInit,
+ *     .ctxSize      = sizeof(BMP390_t),
+ *     .init         = bmp390Init,
  *     .start        = SPP_SERVICES_BMP390_serviceStart,
  *     .stop         = SPP_SERVICES_BMP390_serviceStop,
  *     .deinit       = SPP_SERVICES_BMP390_serviceDeinit,
@@ -65,10 +65,9 @@ typedef struct
     /**
      * @brief Initialise the module.
      * @param[out] p_ctx  Module's opaque context buffer.
-     * @param[in]  p_cfg  Module configuration struct.
      * @return K_SPP_OK on success.
      */
-    SPP_RetVal_t (*init)(void *p_ctx, const void *p_cfg);
+    SPP_RetVal_t (*init)(void *p_ctx);
 
     /**
      * @brief Start the module.
@@ -130,30 +129,18 @@ typedef struct
  * ---------------------------------------------------------------- */
 
 /**
- * @brief Register a module with the SPP service registry.
+ * @brief Register a module, initialise it, and wire up its pub/sub subscription.
  *
- * Stores the descriptor pointer and caller-provided context and configuration
- * pointers.  If @c p_module->onPacket != NULL, automatically calls
- * @ref SPP_SERVICES_PUBSUB_subscribe() with @c consumesApid, @c onPacketPrio,
- * @c onPacket, and @c p_ctx.
+ * Calls @c p_module->init(p_ctx) immediately.  If @c p_module->onPacket != NULL,
+ * also calls @ref SPP_SERVICES_PUBSUB_subscribe() automatically.
  *
  * @param[in] p_module  Pointer to the static module descriptor.
  * @param[in] p_ctx     Pointer to the caller-allocated context buffer
  *                      (at least @c p_module->ctxSize bytes).
- * @param[in] p_cfg     Pointer to the caller-allocated configuration struct.
  *
  * @return K_SPP_OK on success, K_SPP_ERROR_REGISTRY_FULL if the registry is full.
  */
-SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module,
-                                    void *p_ctx, const void *p_cfg);
-
-/**
- * @brief Call @c init on all registered modules in registration order.
- *
- * @return K_SPP_OK if all succeeded; the first error code otherwise
- *         (remaining modules are still attempted).
- */
-SPP_RetVal_t SPP_SERVICES_initAll(void);
+SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module, void *p_ctx);
 
 /**
  * @brief Call @c start on all registered modules in registration order.
