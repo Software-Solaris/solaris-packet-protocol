@@ -1498,6 +1498,7 @@ void SPP_SERVICES_ICM20948_serviceTask(void *p_arg)
 {
     ICM20948_ServiceCtx_t *ctx = (ICM20948_ServiceCtx_t *)p_arg;
 
+    if (!ctx->icmData.drdyFlag) return;
     ctx->icmData.drdyFlag      = false;
     ctx->lastData.dataReady    = false;
 
@@ -1622,12 +1623,16 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_serviceDeinit(void *p_ctx)
  * Service descriptor
  * ---------------------------------------------------------------- */
 
-const SPP_ServiceDesc_t g_icm20948ServiceDesc = {
-    .p_name = "icm20948",
-    .apid = 0x0201U,
-    .ctxSize = sizeof(ICM20948_ServiceCtx_t),
-    .init = SPP_SERVICES_ICM20948_serviceInit,
-    .start = SPP_SERVICES_ICM20948_serviceStart,
-    .stop = SPP_SERVICES_ICM20948_serviceStop,
-    .deinit = SPP_SERVICES_ICM20948_serviceDeinit,
+const SPP_Module_t g_icm20948Module = {
+    .p_name       = "icm20948",
+    .apid         = K_ICM20948_SERVICE_APID,
+    .ctxSize      = sizeof(ICM20948_ServiceCtx_t),
+    .init         = SPP_SERVICES_ICM20948_serviceInit,
+    .start        = SPP_SERVICES_ICM20948_serviceStart,
+    .stop         = SPP_SERVICES_ICM20948_serviceStop,
+    .deinit       = SPP_SERVICES_ICM20948_serviceDeinit,
+    .serviceTask  = SPP_SERVICES_ICM20948_serviceTask,
+    .consumesApid = K_SPP_APID_NONE,
+    .onPacket     = NULL,
+    .onPacketPrio = 0U,
 };
