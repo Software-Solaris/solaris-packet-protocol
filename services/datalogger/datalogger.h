@@ -32,30 +32,29 @@ extern "C" {
  * ---------------------------------------------------------------- */
 
 /**
- * @brief Datalogger instance context.
+ * @brief SD logger instance.
  *
- * Caller allocates this on the stack or as a static variable and passes a
- * pointer to all DATALOGGER_* calls.
+ * Declare one static instance with the storage config fields filled in, then
+ * pass its address to SPP_SERVICES_register().
+ *
+ * @code
+ * static Datalogger_t s_logger = {
+ *     .p_storageCfg = &s_storageCfg,
+ *     .p_filePath   = "/sdcard/log.txt",
+ * };
+ * @endcode
  */
 typedef struct
 {
-    void    *p_storage_cfg;  /**< Storage config pointer (owned by caller). */
-    FILE    *p_file;         /**< Open file handle, or NULL if not open.    */
-    uint8_t  is_initialized; /**< 1 when mounted and file is open.          */
-    uint32_t logged_packets; /**< Number of packets written so far.         */
-} Datalogger_t;
+    /* Configuration — set at declaration */
+    void       *p_storageCfg; /**< Pointer to SPP_StorageInitCfg_t.         */
+    const char *p_filePath;   /**< Absolute path of the file to write.      */
 
-/**
- * @brief Configuration for the SD logger service module.
- *
- * Passed by the caller to SPP_SERVICES_register() as the @c p_cfg argument.
- * Must remain valid for the lifetime of the module.
- */
-typedef struct
-{
-    void       *p_storageCfg; /**< Pointer to SPP_StorageInitCfg_t. */
-    const char *p_filePath;   /**< Absolute path of the file to create/overwrite. */
-} Datalogger_Cfg_t;
+    /* Runtime state — filled in by init, do not set manually */
+    FILE    *p_file;          /**< Open file handle, or NULL if not open.   */
+    uint8_t  is_initialized;  /**< 1 when mounted and file is open.         */
+    uint32_t logged_packets;  /**< Number of packets written so far.        */
+} Datalogger_t;
 
 /**
  * @brief SD card logger module descriptor — pass to SPP_SERVICES_register().
@@ -79,8 +78,7 @@ extern const SPP_Module_t g_sdLoggerModule;
  *
  * @return K_SPP_OK on success, or an error code otherwise.
  */
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger, void *p_storage_cfg,
-                         const char *p_file_path);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger);
 
 /**
  * @brief Write a formatted record for @p p_packet to the log file.
