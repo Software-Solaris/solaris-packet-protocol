@@ -1,22 +1,16 @@
 /**
  * @file pubsub.h
- * @brief Priority-aware publish-subscribe packet router with deferred dispatch.
+ * @brief Publish-subscribe packet router.
  *
- * Producers call @ref SPP_SERVICES_PUBSUB_publish() after filling a packet.
- * CRITICAL subscribers (@ref K_SPP_PUBSUB_PRIO_CRITICAL) are dispatched
- * synchronously inside publish().  All other subscribers are enqueued and
- * dispatched one-at-a-time by calls to @ref SPP_SERVICES_PUBSUB_tick() from
- * the superloop.
+ * How it works:
+ *   1. A producer calls publish(packet).
+ *   2. SYNC subscribers (prio = K_SPP_PUBSUB_PRIO_SYNC) run immediately inside
+ *      publish() before it returns — use this only for very fast operations.
+ *   3. All other subscribers are queued and dispatched one-per-call by
+ *      SPP_SERVICES_PUBSUB_callConsumers() from the superloop.
  *
- * APID matching uses a bitmask: a subscriber receives a packet when
- * (subscriber.apid & packet.apid) != 0, or when subscriber.apid ==
- * @ref K_SPP_APID_ALL.  Use @ref K_SPP_APID_NONE to indicate no subscription.
- *
- * Naming conventions used in this file:
- * - Constants/macros:  K_SPP_*
- * - Types:             SPP_PubSub*_t
- * - Public functions:  SPP_SERVICES_PUBSUB_*()
- * - Pointer params:    p_*
+ * A subscriber receives a packet when (subscriber.apid & packet.apid) != 0,
+ * or when subscriber.apid == K_SPP_APID_ALL (receives everything).
  */
 
 #ifndef SPP_PUBSUB_H
@@ -30,6 +24,24 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* ----------------------------------------------------------------
+ * Subscriber dispatch priorities
+ * ---------------------------------------------------------------- */
+
+/** @brief Run inside publish() — blocks the producer until the handler returns.
+ *  Only use for very fast operations (e.g. copying a value to a buffer). */
+#define K_SPP_PUBSUB_PRIO_SYNC   (0U)
+
+/** @brief Deferred — dispatched by callConsumers(), before NORMAL. */
+#define K_SPP_PUBSUB_PRIO_HIGH   (1U)
+
+/** @brief Deferred — dispatched by callConsumers(). */
+#define K_SPP_PUBSUB_PRIO_NORMAL (2U)
+
+/** @brief Deferred — dispatched by callConsumers(), last. Good for slow operations
+ *  like SD card writes that must not delay sensor reads. */
+#define K_SPP_PUBSUB_PRIO_LOW    (3U)
 
 /* ----------------------------------------------------------------
  * Constants
@@ -106,11 +118,14 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet);
 /**
  * @brief Dispatch the next pending deferred subscriber.
  *
- * Processes exactly one subscriber from the deferred queue per call.  Call
- * this once per superloop iteration to drain the queue without monopolising
- * the loop.  Returns immediately when the queue is empty.
+ * Processes exactly one subscriber from the deferred queue per call.
+ * Call this once per superloop iteration — it returns immediately when
+ * the queue is empty.
+ *
+ * One-per-call is intentional: slow consumers (SD card writes) are spread
+ * across loop iterations so they never block sensor reads.
  */
-void SPP_SERVICES_PUBSUB_tick(void);
+void SPP_SERVICES_PUBSUB_callConsumers(void);
 
 /**
  * @brief Return the accumulated overflow count for a given APID bitmask.
