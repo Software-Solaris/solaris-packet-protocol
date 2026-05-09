@@ -212,17 +212,3 @@ Implement `SPP_HalPort_t` (hardware drivers), place the files under `ports/hal/<
 See [`ports/README.md`](ports/README.md) for a step-by-step guide.
 
 ---
-
-## Running unit tests
-
-```bash
-# From the spp/ directory
-cmake -S . -B build -DSPP_BUILD_TESTS=ON -DSPP_PORT=posix
-cmake --build build
-ctest --test-dir build --output-on-failure
-
-# Or from the devcontainer terminal:
-run_tests solaris-v1/spp
-```
-
-See [`tests/README.md`](tests/README.md) for details.
