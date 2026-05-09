@@ -3,6 +3,7 @@ project(spp C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ----------------------------------------------------------------
 # Feature flags
@@ -106,8 +107,8 @@ if(SPP_BUILD_TESTS)
     )
 
     # Helper to define a test module as a shared library consumed by cgreen-runner.
-    function(spp_add_test_module name src)
-        add_library(${name} SHARED ${src})
+    function(spp_add_test_module name)
+        add_library(${name} SHARED ${ARGN})
         target_include_directories(${name} PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/..
             ${CGREEN_INCLUDE_DIRS}
@@ -118,5 +119,6 @@ if(SPP_BUILD_TESTS)
         add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
     endfunction()
 
-    spp_add_test_module(spp_test_core tests/core/test_core.c tests/mocks.c)
+    spp_add_test_module(spp_test_core tests/core/test_core_boot.c tests/mocks.c)
+    # spp_add_test_module(spp_test_core_api tests/core/test_core.c tests/mocks.c)
 endif()

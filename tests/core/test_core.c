@@ -19,8 +19,12 @@ extern const SPP_HalPort_t g_stubHalPort;
  * ---------------------------------------------------------------- */
 
 Describe(SPP_CORE_setHalPort);
-BeforeEach(SPP_CORE_setHalPort) {}
-AfterEach(SPP_CORE_setHalPort)  {}
+BeforeEach(SPP_CORE_setHalPort)
+{
+}
+AfterEach(SPP_CORE_setHalPort)
+{
+}
 
 Ensure(SPP_CORE_setHalPort, rejects_null_pointer)
 {
@@ -47,7 +51,9 @@ BeforeEach(SPP_CORE_init)
 {
     SPP_CORE_setHalPort(&g_stubHalPort);
 }
-AfterEach(SPP_CORE_init) {}
+AfterEach(SPP_CORE_init)
+{
+}
 
 Ensure(SPP_CORE_init, fails_when_hal_port_missing)
 {
@@ -62,22 +68,4 @@ Ensure(SPP_CORE_init, succeeds_with_hal_port_registered)
 {
     SPP_RetVal_t ret = SPP_CORE_init();
     assert_that(ret, is_equal_to(K_SPP_OK));
-}
-
-/* ----------------------------------------------------------------
- * Test suite factory
- * ---------------------------------------------------------------- */
-
-TestSuite *core_suite(void)
-{
-    TestSuite *suite = create_named_test_suite("core");
-
-    add_test_with_context(suite, SPP_CORE_setHalPort, rejects_null_pointer);
-    add_test_with_context(suite, SPP_CORE_setHalPort, accepts_valid_port);
-    add_test_with_context(suite, SPP_CORE_setHalPort, getHalPort_returns_registered_port);
-
-    add_test_with_context(suite, SPP_CORE_init, fails_when_hal_port_missing);
-    add_test_with_context(suite, SPP_CORE_init, succeeds_with_hal_port_registered);
-
-    return suite;
 }
