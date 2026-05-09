@@ -121,4 +121,5 @@ if(SPP_BUILD_TESTS)
 
     spp_add_test_module(spp_test_core tests/core/test_core_boot.c tests/mocks.c)
     # spp_add_test_module(spp_test_core_api tests/core/test_core.c tests/mocks.c)
+    spp_add_test_module(spp_test_crc tests/util/test_crc.c)
 endif()
