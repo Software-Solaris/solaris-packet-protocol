@@ -69,3 +69,28 @@ Ensure(SPP_CORE_init, succeeds_with_hal_port_registered)
     SPP_RetVal_t ret = SPP_CORE_init();
     assert_that(ret, is_equal_to(K_SPP_OK));
 }
+
+/* ----------------------------------------------------------------
+ * Describe: SPP_CORE_boot
+ * ---------------------------------------------------------------- */
+
+Describe(SPP_CORE_boot);
+BeforeEach(SPP_CORE_boot)
+{
+    //SPP_CORE_setHalPort(&g_stubHalPort); // not necessary bcs SPP_CORE_boot call SPP_CORE_setHalPort internally
+}
+AfterEach(SPP_CORE_boot)
+{
+}
+
+Ensure(SPP_CORE_boot, rejects_null_pointer)
+{
+    SPP_RetVal_t ret = SPP_CORE_boot(NULL);
+    assert_that(ret, is_equal_to(K_SPP_ERROR_NULL_POINTER));
+}
+
+Ensure(SPP_CORE_boot, succeeds_with_hal_port_registered)
+{
+    SPP_RetVal_t ret = SPP_CORE_boot(&g_stubHalPort);
+    assert_that(ret, is_equal_to(K_SPP_OK));
+}
