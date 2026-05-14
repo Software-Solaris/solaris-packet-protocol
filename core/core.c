@@ -76,7 +76,7 @@ SPP_RetVal_t SPP_CORE_init(void)
  * ---------------------------------------------------------------- */
 
 static spp_uint16_t s_logSeq = 0U;
-static spp_bool_t s_logBusy = false;
+static spp_bool_t   s_logBusy = false;
 
 static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p_message)
 {
