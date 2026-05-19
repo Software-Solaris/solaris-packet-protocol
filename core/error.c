@@ -21,56 +21,50 @@
  * Thread-local (or global) state
  * ---------------------------------------------------------------- */
 
-static SPP_THREAD_LOCAL SPP_RetVal_t    s_lastErr = K_SPP_OK;
-static SPP_THREAD_LOCAL SPP_ErrCtx_t s_lastCtx =
-{
-    .code   = K_SPP_OK,
+static SPP_THREAD_LOCAL SPP_RetVal_t s_lastErr = K_SPP_OK;
+static SPP_THREAD_LOCAL SPP_ErrCtx_t s_lastCtx = {
+    .code = K_SPP_OK,
     .p_file = NULL,
-    .line   = 0,
+    .line = 0,
 };
 
 /* ----------------------------------------------------------------
  * Last-error get / set
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t
-SPP_CORE_errGet(void)
+SPP_RetVal_t SPP_CORE_errGet(void)
 {
     return s_lastErr;
 }
 
-void
-SPP_CORE_errSet(SPP_RetVal_t err)
+void SPP_CORE_errSet(SPP_RetVal_t err)
 {
-    s_lastErr       = err;
-    s_lastCtx.code  = err;
+    s_lastErr = err;
+    s_lastCtx.code = err;
 }
 
 /* ----------------------------------------------------------------
  * Extended context get / set
  * ---------------------------------------------------------------- */
 
-SPP_ErrCtx_t
-SPP_CORE_errGetCtx(void)
+SPP_ErrCtx_t SPP_CORE_errGetCtx(void)
 {
     return s_lastCtx;
 }
 
-void
-SPP_CORE_errSetCtx(SPP_RetVal_t code, const char *p_file, int line)
+void SPP_CORE_errSetCtx(SPP_RetVal_t code, const char *p_file, int line)
 {
-    s_lastErr       = code;
-    s_lastCtx.code  = code;
+    s_lastErr = code;
+    s_lastCtx.code = code;
     s_lastCtx.p_file = p_file;
-    s_lastCtx.line  = line;
+    s_lastCtx.line = line;
 }
 
 /* ----------------------------------------------------------------
  * String conversion
  * ---------------------------------------------------------------- */
 
-const char *
-SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen)
+const char *SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen)
 {
     static SPP_THREAD_LOCAL char s_buf[ERR_STR_SIZE];
 
