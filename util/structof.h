@@ -31,7 +31,6 @@
  * MyItem_t *p_item = SPP_STRUCTOF(p_node, MyItem_t, node);
  * @endcode
  */
-#define SPP_STRUCTOF(p_member, type, member) \
-    ((type *)((char *)(p_member) - offsetof(type, member)))
+#define SPP_STRUCTOF(p_member, type, member) ((type *)((char *)(p_member) - offsetof(type, member)))
 
 #endif /* SPP_STRUCTOF_H */

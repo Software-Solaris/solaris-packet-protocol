@@ -38,8 +38,8 @@ SPP_RetVal_t SPP_CORE_boot(const SPP_HalPort_t *p_port);
  * Lower-level API (available if you need finer control)
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t         SPP_CORE_setHalPort(const SPP_HalPort_t *p_port);
-SPP_RetVal_t         SPP_CORE_init(void);
+SPP_RetVal_t SPP_CORE_setHalPort(const SPP_HalPort_t *p_port);
+SPP_RetVal_t SPP_CORE_init(void);
 const SPP_HalPort_t *SPP_CORE_getHalPort(void);
 
 #endif /* SPP_CORE_H */

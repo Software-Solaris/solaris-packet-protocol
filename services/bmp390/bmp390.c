@@ -258,7 +258,7 @@ float SPP_SERVICES_BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_te
 }
 
 SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
-                               spp_uint32_t *raw_temp, float *comp_temp)
+                                            spp_uint32_t *raw_temp, float *comp_temp)
 {
     SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawTemp(p_spi, raw_temp);
     if (ret != K_SPP_OK)
@@ -266,7 +266,8 @@ SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi, const BMP390_temp_param
         return ret;
     }
 
-    *comp_temp = SPP_SERVICES_BMP390_compensateTemperature(*raw_temp, (BMP390_temp_params_t *)temp_params);
+    *comp_temp =
+        SPP_SERVICES_BMP390_compensateTemperature(*raw_temp, (BMP390_temp_params_t *)temp_params);
 
     return ret;
 }
@@ -405,7 +406,8 @@ SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_pre
     return ret;
 }
 
-float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin, BMP390_press_params_t *p)
+float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin,
+                                             BMP390_press_params_t *p)
 {
     s_pd1 = p->PAR_P6 * t_lin;
     s_pd2 = p->PAR_P7 * (t_lin * t_lin);
@@ -427,8 +429,9 @@ float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin
     return s_compPress;
 }
 
-SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params, float t_lin,
-                                spp_uint32_t *raw_press, float *comp_press)
+SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params,
+                                             float t_lin, spp_uint32_t *raw_press,
+                                             float *comp_press)
 {
     SPP_RetVal_t ret = SPP_SERVICES_BMP390_readRawPress(p_spi, raw_press);
     if (ret != K_SPP_OK)
@@ -436,8 +439,8 @@ SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_par
         return ret;
     }
 
-    *comp_press =
-        SPP_SERVICES_BMP390_compensatePressure(*raw_press, t_lin, (BMP390_press_params_t *)press_params);
+    *comp_press = SPP_SERVICES_BMP390_compensatePressure(*raw_press, t_lin,
+                                                         (BMP390_press_params_t *)press_params);
 
     return ret;
 }
@@ -447,7 +450,7 @@ SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_par
  * ---------------------------------------------------------------- */
 
 SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
-                                float *pressure_pa, float *temperature_c)
+                                             float *pressure_pa, float *temperature_c)
 {
     (void)p_bmp; /* DRDY wait is handled by the caller */
 
@@ -520,11 +523,12 @@ SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi)
 static void bmp390Task(void *p_ctx)
 {
     BMP390_t *ctx = (BMP390_t *)p_ctx;
-    float altitude    = 0.0f;
-    float pressure    = 0.0f;
+    float altitude = 0.0f;
+    float pressure = 0.0f;
     float temperature = 0.0f;
 
-    if (!ctx->bmpData.drdyFlag) return;
+    if (!ctx->bmpData.drdyFlag)
+        return;
     ctx->bmpData.drdyFlag = false;
 
     SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
@@ -534,8 +538,8 @@ static void bmp390Task(void *p_ctx)
         return;
     }
 
-    SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(ctx->p_spi, &ctx->bmpData,
-                                                        &altitude, &pressure, &temperature);
+    SPP_RetVal_t ret = SPP_SERVICES_BMP390_getAltitude(ctx->p_spi, &ctx->bmpData, &altitude,
+                                                       &pressure, &temperature);
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
@@ -548,8 +552,8 @@ static void bmp390Task(void *p_ctx)
 #endif
 
     float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++,
-                                           payload, (spp_uint16_t)sizeof(payload));
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++, payload,
+                                           (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
@@ -566,23 +570,25 @@ static void bmp390Task(void *p_ctx)
 
 static SPP_RetVal_t bmp390Init(void *p_ctx)
 {
-    BMP390_t    *ctx = (BMP390_t *)p_ctx;
+    BMP390_t *ctx = (BMP390_t *)p_ctx;
     SPP_RetVal_t ret;
 
     ctx->p_spi = SPP_HAL_spiGetHandle(ctx->spiDevIdx);
-    ctx->seq   = 0U;
+    ctx->seq = 0U;
 
-    ctx->bmpData.intPin      = ctx->intPin;
+    ctx->bmpData.intPin = ctx->intPin;
     ctx->bmpData.intIntrType = ctx->intIntrType;
-    ctx->bmpData.intPull     = ctx->intPull;
+    ctx->bmpData.intPull = ctx->intPull;
 
     SPP_SERVICES_BMP390_init(&ctx->bmpData);
 
     ret = SPP_SERVICES_BMP390_auxConfig(ctx->p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SPP_SERVICES_BMP390_prepareMeasure(ctx->p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     return SPP_SERVICES_BMP390_intEnableDrdy(ctx->p_spi);
 }
@@ -594,23 +600,31 @@ static SPP_RetVal_t bmp390Start(void *p_ctx)
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t bmp390Stop(void *p_ctx)   { (void)p_ctx; return K_SPP_OK; }
-static SPP_RetVal_t bmp390Deinit(void *p_ctx) { (void)p_ctx; return K_SPP_OK; }
+static SPP_RetVal_t bmp390Stop(void *p_ctx)
+{
+    (void)p_ctx;
+    return K_SPP_OK;
+}
+static SPP_RetVal_t bmp390Deinit(void *p_ctx)
+{
+    (void)p_ctx;
+    return K_SPP_OK;
+}
 
 /* ----------------------------------------------------------------
  * Module descriptor
  * ---------------------------------------------------------------- */
 
 const SPP_Module_t g_bmp390Module = {
-    .p_name       = "bmp390",
-    .apid         = K_BMP390_SERVICE_APID,
-    .ctxSize      = sizeof(BMP390_t),
-    .init         = bmp390Init,
-    .start        = bmp390Start,
-    .stop         = bmp390Stop,
-    .deinit       = bmp390Deinit,
-    .produce      = bmp390Task,
+    .p_name = "bmp390",
+    .apid = K_BMP390_SERVICE_APID,
+    .ctxSize = sizeof(BMP390_t),
+    .init = bmp390Init,
+    .start = bmp390Start,
+    .stop = bmp390Stop,
+    .deinit = bmp390Deinit,
+    .produce = bmp390Task,
     .consumesApid = K_SPP_APID_NONE,
-    .onPacket     = NULL,
+    .onPacket = NULL,
     .onPacketPrio = 0U,
 };

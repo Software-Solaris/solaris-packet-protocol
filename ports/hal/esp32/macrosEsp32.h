@@ -22,7 +22,7 @@
 #define K_ESP32_PIN_MOSI (38)
 
 /** @brief SPI clock GPIO pin. */
-#define K_ESP32_PIN_CLK  (48)
+#define K_ESP32_PIN_CLK (48)
 
 /** @brief SPI peripheral to use. */
 #define K_ESP32_SPI_HOST SPI2_HOST

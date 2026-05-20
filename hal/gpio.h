@@ -42,7 +42,7 @@ typedef struct
  * @return K_SPP_OK on success.
  */
 SPP_RetVal_t SPP_HAL_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                      spp_uint32_t pull);
+                                         spp_uint32_t pull);
 
 /**
  * @brief Register an ISR handler for a GPIO pin.

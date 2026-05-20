@@ -74,8 +74,7 @@ typedef struct
      *
      * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
      */
-    SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data,
-                             spp_uint8_t length);
+    SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
     /* ---- GPIO / interrupts ------------------------------------- */
 
@@ -88,8 +87,7 @@ typedef struct
      *
      * @return K_SPP_OK on success.
      */
-    SPP_RetVal_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType,
-                                    spp_uint32_t pull);
+    SPP_RetVal_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 
     /**
      * @brief Register an ISR handler for a GPIO pin.

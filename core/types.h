@@ -24,15 +24,15 @@
  * Portable integer aliases
  * ---------------------------------------------------------------- */
 
-typedef uint8_t  spp_uint8_t;   /**< Unsigned 8-bit integer.  */
-typedef int8_t   spp_int8_t;    /**< Signed 8-bit integer.    */
-typedef uint16_t spp_uint16_t;  /**< Unsigned 16-bit integer. */
-typedef int16_t  spp_int16_t;   /**< Signed 16-bit integer.   */
-typedef uint32_t spp_uint32_t;  /**< Unsigned 32-bit integer. */
-typedef int32_t  spp_int32_t;   /**< Signed 32-bit integer.   */
-typedef uint64_t spp_uint64_t;  /**< Unsigned 64-bit integer. */
-typedef int64_t  spp_int64_t;   /**< Signed 64-bit integer.   */
-typedef bool     spp_bool_t;    /**< Boolean type.            */
+typedef uint8_t spp_uint8_t;   /**< Unsigned 8-bit integer.  */
+typedef int8_t spp_int8_t;     /**< Signed 8-bit integer.    */
+typedef uint16_t spp_uint16_t; /**< Unsigned 16-bit integer. */
+typedef int16_t spp_int16_t;   /**< Signed 16-bit integer.   */
+typedef uint32_t spp_uint32_t; /**< Unsigned 32-bit integer. */
+typedef int32_t spp_int32_t;   /**< Signed 32-bit integer.   */
+typedef uint64_t spp_uint64_t; /**< Unsigned 64-bit integer. */
+typedef int64_t spp_int64_t;   /**< Signed 64-bit integer.   */
+typedef bool spp_bool_t;       /**< Boolean type.            */
 
 /* ----------------------------------------------------------------
  * SPI configuration types
@@ -65,15 +65,15 @@ typedef enum
  */
 typedef struct
 {
-    int          busId;      /**< SPI bus / host identifier (platform-defined). */
-    int          pinMiso;    /**< MISO (CIPO) GPIO number.                       */
-    int          pinMosi;    /**< MOSI (COPI) GPIO number.                       */
-    int          pinSclk;    /**< Clock GPIO number.                             */
-    int          pinCs;      /**< Chip-select GPIO number.                       */
-    unsigned int maxHz;      /**< Maximum SPI clock frequency in Hz.             */
-    SPP_SpiMode_t   mode;    /**< SPI clock mode.                                */
-    SPP_SpiDuplex_t duplex;  /**< Duplex mode.                                   */
-    unsigned int queueSize;  /**< Transaction queue depth.                       */
+    int busId;              /**< SPI bus / host identifier (platform-defined). */
+    int pinMiso;            /**< MISO (CIPO) GPIO number.                       */
+    int pinMosi;            /**< MOSI (COPI) GPIO number.                       */
+    int pinSclk;            /**< Clock GPIO number.                             */
+    int pinCs;              /**< Chip-select GPIO number.                       */
+    unsigned int maxHz;     /**< Maximum SPI clock frequency in Hz.             */
+    SPP_SpiMode_t mode;     /**< SPI clock mode.                                */
+    SPP_SpiDuplex_t duplex; /**< Duplex mode.                                   */
+    unsigned int queueSize; /**< Transaction queue depth.                       */
 } SPP_SpiInitCfg_t;
 
 /* ----------------------------------------------------------------
@@ -87,12 +87,12 @@ typedef struct
  */
 typedef struct
 {
-    const char   *p_basePath;           /**< VFS mount point (e.g. "/sdcard").  */
-    int           spiHostId;            /**< SPI host used by the card.         */
-    int           pinCs;                /**< Chip-select GPIO for the SD card.  */
-    spp_uint32_t  maxFiles;             /**< Maximum simultaneously open files. */
-    spp_uint32_t  allocationUnitSize;   /**< FAT allocation unit size in bytes. */
-    spp_bool_t    formatIfMountFailed;  /**< Auto-format if mount fails.        */
+    const char *p_basePath;          /**< VFS mount point (e.g. "/sdcard").  */
+    int spiHostId;                   /**< SPI host used by the card.         */
+    int pinCs;                       /**< Chip-select GPIO for the SD card.  */
+    spp_uint32_t maxFiles;           /**< Maximum simultaneously open files. */
+    spp_uint32_t allocationUnitSize; /**< FAT allocation unit size in bytes. */
+    spp_bool_t formatIfMountFailed;  /**< Auto-format if mount fails.        */
 } SPP_StorageInitCfg_t;
 
 #endif /* SPP_TYPES_H */

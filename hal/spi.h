@@ -53,7 +53,6 @@ SPP_RetVal_t SPP_HAL_spiDeviceInit(void *p_handle);
  *
  * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
  */
-SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data,
-                               spp_uint8_t length);
+SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
 #endif /* SPP_HAL_SPI_H */

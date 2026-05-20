@@ -28,11 +28,11 @@
  * ---------------------------------------------------------------- */
 
 #if defined(SPP_NO_RTOS) && (SPP_NO_RTOS == 1)
-#  define SPP_THREAD_LOCAL /* empty — single-threaded baremetal */
+#define SPP_THREAD_LOCAL /* empty — single-threaded baremetal */
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#  define SPP_THREAD_LOCAL _Thread_local
+#define SPP_THREAD_LOCAL _Thread_local
 #else
-#  define SPP_THREAD_LOCAL /* fallback: static global */
+#define SPP_THREAD_LOCAL /* fallback: static global */
 #endif
 
 /* ----------------------------------------------------------------
@@ -46,9 +46,9 @@
  */
 typedef struct
 {
-    SPP_RetVal_t    code;    /**< The error code.                        */
-    const char *p_file;  /**< Source file name (__FILE__), or NULL.  */
-    int         line;    /**< Source line number (__LINE__), or 0.   */
+    SPP_RetVal_t code;  /**< The error code.                        */
+    const char *p_file; /**< Source file name (__FILE__), or NULL.  */
+    int line;           /**< Source line number (__LINE__), or 0.   */
 } SPP_ErrCtx_t;
 
 /* ----------------------------------------------------------------
@@ -130,8 +130,7 @@ const char *SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen);
  * Inline implementation of SPP_CORE_errToString
  * ---------------------------------------------------------------- */
 
-static inline const char *
-SPP_CORE_errToString(SPP_RetVal_t err)
+static inline const char *SPP_CORE_errToString(SPP_RetVal_t err)
 {
     return SPP_CORE_errToStringR(err, NULL, 0U);
 }
@@ -163,6 +162,10 @@ SPP_CORE_errToString(SPP_RetVal_t err)
  * @endcode
  */
 #define SPP_ERR_RETURN(code) \
-    do { SPP_ERR_SET(code); return (code); } while (0)
+    do                       \
+    {                        \
+        SPP_ERR_SET(code);   \
+        return (code);       \
+    } while (0)
 
 #endif /* SPP_ERROR_H */

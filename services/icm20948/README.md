@@ -11,8 +11,20 @@ APID: `K_ICM20948_SERVICE_APID` (`0x0002`)
 | File | Description |
 |---|---|
 | `icm20948.h` | Public API, register map, `ICM20948_t` context struct |
-| `icm20948.c` | Driver implementation, DMP loading, service task |
-| `dmpImage.h` | DMP firmware binary image (do not edit) |
+| `icm20948.c` | Driver implementation, DMP loading, FIFO parsing, service task |
+| `dmpImage.h` | TDK InvenSense DMP firmware binary image (do not edit) |
+
+---
+
+## References and credits
+
+The DMP firmware binary passed to the sensor is the vendor firmware image from TDK InvenSense for the ICM20948 DMP. It is treated as a binary blob and is not modified manually.
+
+The driver implementation is written for the Solaris Packet Protocol architecture. The SparkFun ICM-20948 Arduino Library was used as a public technical reference for understanding the ICM20948 DMP initialization flow, register sequence and DMP configuration approach:
+
+`https://github.com/sparkfun/SparkFun_ICM-20948_ArduinoLibrary`
+
+No SparkFun source code is copied into this service.
 
 ---
 
@@ -52,10 +64,21 @@ The ICM20948 has four register banks (0–3) selected via register `0x7F`. The d
 ## DMP support
 
 The DMP firmware (`dmpImage.h`) is loaded into the sensor's RAM at init time. Current config:
-- **DATA_OUT_CTL1 = 0x8400** → Accel + Quat9 only
-- **Packet size = 24 bytes**: Header(2) + Accel(6) + Quat9(14) + Footer(2)
 
-Disable DMP at build time with `-DSPP_ICM20948_NO_DMP=1` to save ~14 KB of flash.
+- **DATA_OUT_CTL1 = 0xE400** → Accel + Gyro + Compass + Quat9
+- **MOTION_EVENT_CTL = 0x03C0**
+- **DMP FIFO packet size = 42 bytes**
+- FIFO frame parsed by the driver:
+  - Header: 2 bytes
+  - Accelerometer: 6 bytes
+  - Gyroscope raw: 6 bytes
+  - Gyroscope bias: 6 bytes
+  - Compass / magnetometer: 6 bytes
+  - Quat9: 12 bytes
+  - Heading accuracy: 2 bytes
+  - Footer: 2 bytes
+
+The driver currently publishes accel + gyro + magnetometer through SPP. Quat9 is parsed/debugged internally but is not part of the published SPP payload.
 
 ---
 
@@ -78,16 +101,31 @@ SPP_SERVICES_register(&g_icm20948Module, &s_icm);
 
 ---
 
-## Packet payload layout (24 bytes — Accel + Quat9)
+## Packet payload layout (36 bytes — Accel + Gyro + Mag)
+
+The published SPP payload is composed of 9 floats:
+
+```c
+float payload[9] = {
+    ax, ay, az,
+    gx, gy, gz,
+    mx, my, mz
+};
+```
 
 | Offset | Type | Field |
 |---|---|---|
 | 0  | `float` | Accel X (g) |
 | 4  | `float` | Accel Y (g) |
 | 8  | `float` | Accel Z (g) |
-| 12 | `float` | Quat9 Q1 |
-| 16 | `float` | Quat9 Q2 |
-| 20 | `float` | Quat9 Q3 |
+| 12 | `float` | Gyro X (dps) |
+| 16 | `float` | Gyro Y (dps) |
+| 20 | `float` | Gyro Z (dps) |
+| 24 | `float` | Mag X (µT) |
+| 28 | `float` | Mag Y (µT) |
+| 32 | `float` | Mag Z (µT) |
+
+Important: the DMP FIFO frame is 42 bytes, but the SPP payload published by this service is 36 bytes.
 
 ---
 

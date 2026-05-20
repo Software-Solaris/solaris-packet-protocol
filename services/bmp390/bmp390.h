@@ -32,7 +32,8 @@
 #include "spp/services/service.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* ============================================================================
@@ -40,136 +41,136 @@ extern "C" {
  * ========================================================================= */
 
 /** @brief Timeout in ms for waiting for the BMP390 data-ready interrupt. */
-#define K_BMP390_DRDY_TIMEOUT_MS     5000U
+#define K_BMP390_DRDY_TIMEOUT_MS 5000U
 
-/* ============================================================================
+    /* ============================================================================
  * Data Types — driver context
  * ========================================================================= */
 
-/**
+    /**
  * @brief BMP390 device context.
  *
  * Groups the SPI handler, DRDY flag, ISR context and GPIO interrupt
  * configuration required to operate one BMP390 sensor instance.
  */
-typedef struct
-{
-    void              *p_handler_spi;  /**< SPI device handle.                         */
-    volatile spp_bool_t drdyFlag;      /**< Set by ISR when data-ready fires.          */
-    SPP_GpioIsrCtx_t   isr_ctx;       /**< ISR context (points at drdyFlag).          */
-    spp_uint32_t       intPin;         /**< GPIO pin number for the interrupt.         */
-    spp_uint32_t       intIntrType;    /**< Interrupt trigger type.                    */
-    spp_uint32_t       intPull;        /**< Pull resistor: 0=none, 1=up, 2=down.       */
-} BMP390_Data_t;
+    typedef struct
+    {
+        void *p_handler_spi;          /**< SPI device handle.                         */
+        volatile spp_bool_t drdyFlag; /**< Set by ISR when data-ready fires.          */
+        SPP_GpioIsrCtx_t isr_ctx;     /**< ISR context (points at drdyFlag).          */
+        spp_uint32_t intPin;          /**< GPIO pin number for the interrupt.         */
+        spp_uint32_t intIntrType;     /**< Interrupt trigger type.                    */
+        spp_uint32_t intPull;         /**< Pull resistor: 0=none, 1=up, 2=down.       */
+    } BMP390_Data_t;
 
 /** @brief Chip-select GPIO pin for the BMP390 (informational; set by HAL). */
 #define K_BMP390_PIN_NUM_CS 18
 
-/* ============================================================================
+    /* ============================================================================
  * Configuration and Identity Check
  * ========================================================================= */
 
-#define K_BMP390_CHIP_ID_REG     0x00
-#define K_BMP390_CHIP_ID_VALUE   0x60
-#define K_BMP390_SOFT_RESET_REG  0x7E
-#define BMP390_SOFT_RESET_CMD    0xB6
-#define K_BMP390_IF_CONF_REG     0x1A
-#define BMP390_IF_CONF_SPI       0x00
+#define K_BMP390_CHIP_ID_REG    0x00
+#define K_BMP390_CHIP_ID_VALUE  0x60
+#define K_BMP390_SOFT_RESET_REG 0x7E
+#define BMP390_SOFT_RESET_CMD   0xB6
+#define K_BMP390_IF_CONF_REG    0x1A
+#define BMP390_IF_CONF_SPI      0x00
 
-/* ============================================================================
+    /* ============================================================================
  * Measurement Configuration
  * ========================================================================= */
 
-#define K_BMP390_REG_PWRCTRL   0x1B
-#define BMP390_VALUE_PWRCTRL   0x33
-#define K_BMP390_REG_OSR       0x1C
-#define BMP390_VALUE_OSR       0x00
-#define K_BMP390_REG_ODR       0x1D
-#define BMP390_VALUE_ODR       0x02
-#define K_BMP390_REG_IIR       0x1F
-#define BMP390_VALUE_IIR       0x02
-#define K_BMP390_REG_STATUS    0x03
+#define K_BMP390_REG_PWRCTRL      0x1B
+#define BMP390_VALUE_PWRCTRL      0x33
+#define K_BMP390_REG_OSR          0x1C
+#define BMP390_VALUE_OSR          0x00
+#define K_BMP390_REG_ODR          0x1D
+#define BMP390_VALUE_ODR          0x02
+#define K_BMP390_REG_IIR          0x1F
+#define BMP390_VALUE_IIR          0x02
+#define K_BMP390_REG_STATUS       0x03
 #define K_BMP390_STATUS_DRDY_TEMP 0x40
 #define BMP390_STATUS_DRDY_PRES   0x20
 
-/* ============================================================================
+    /* ============================================================================
  * Temperature Calibration and Reading
  * ========================================================================= */
 
 #define K_BMP390_TEMP_CALIB_REG_START 0x31
 
-/** @brief Raw temperature calibration coefficients (as read from sensor). */
-typedef struct
-{
-    uint16_t par_t1; /**< T1 (unsigned 16-bit). */
-    int16_t  par_t2; /**< T2 (signed 16-bit).   */
-    int8_t   par_t3; /**< T3 (signed 8-bit).    */
-    float    t_lin;  /**< Linearised temperature. */
-} BMP390_temp_calib_t;
+    /** @brief Raw temperature calibration coefficients (as read from sensor). */
+    typedef struct
+    {
+        uint16_t par_t1; /**< T1 (unsigned 16-bit). */
+        int16_t par_t2;  /**< T2 (signed 16-bit).   */
+        int8_t par_t3;   /**< T3 (signed 8-bit).    */
+        float t_lin;     /**< Linearised temperature. */
+    } BMP390_temp_calib_t;
 
-/** @brief Scaled temperature calibration parameters. */
-typedef struct
-{
-    float PAR_T1; /**< Scaled T1 = raw_t1 * 2^8.   */
-    float PAR_T2; /**< Scaled T2 = raw_t2 / 2^30.  */
-    float PAR_T3; /**< Scaled T3 = raw_t3 / 2^48.  */
-} BMP390_temp_params_t;
+    /** @brief Scaled temperature calibration parameters. */
+    typedef struct
+    {
+        float PAR_T1; /**< Scaled T1 = raw_t1 * 2^8.   */
+        float PAR_T2; /**< Scaled T2 = raw_t2 / 2^30.  */
+        float PAR_T3; /**< Scaled T3 = raw_t3 / 2^48.  */
+    } BMP390_temp_params_t;
 
 #define K_BMP390_TEMP_RAW_REG 0x07
 
-/* ============================================================================
+    /* ============================================================================
  * Pressure Calibration and Reading
  * ========================================================================= */
 
 #define K_BMP390_PRESS_CALIB_REG_START 0x36
 
-/** @brief Raw pressure calibration coefficients. */
-typedef struct
-{
-    spp_uint16_t par_p1;
-    spp_uint16_t par_p2;
-    spp_int8_t   par_p3;
-    spp_int8_t   par_p4;
-    spp_uint16_t par_p5;
-    spp_uint16_t par_p6;
-    spp_int8_t   par_p7;
-    spp_int8_t   par_p8;
-    spp_int16_t  par_p9;
-    spp_int8_t   par_p10;
-    spp_int8_t   par_p11;
-} BMP390_press_calib_t;
+    /** @brief Raw pressure calibration coefficients. */
+    typedef struct
+    {
+        spp_uint16_t par_p1;
+        spp_uint16_t par_p2;
+        spp_int8_t par_p3;
+        spp_int8_t par_p4;
+        spp_uint16_t par_p5;
+        spp_uint16_t par_p6;
+        spp_int8_t par_p7;
+        spp_int8_t par_p8;
+        spp_int16_t par_p9;
+        spp_int8_t par_p10;
+        spp_int8_t par_p11;
+    } BMP390_press_calib_t;
 
-/** @brief Scaled pressure calibration parameters. */
-typedef struct
-{
-    float PAR_P1;
-    float PAR_P2;
-    float PAR_P3;
-    float PAR_P4;
-    float PAR_P5;
-    float PAR_P6;
-    float PAR_P7;
-    float PAR_P8;
-    float PAR_P9;
-    float PAR_P10;
-    float PAR_P11;
-} BMP390_press_params_t;
+    /** @brief Scaled pressure calibration parameters. */
+    typedef struct
+    {
+        float PAR_P1;
+        float PAR_P2;
+        float PAR_P3;
+        float PAR_P4;
+        float PAR_P5;
+        float PAR_P6;
+        float PAR_P7;
+        float PAR_P8;
+        float PAR_P9;
+        float PAR_P10;
+        float PAR_P11;
+    } BMP390_press_params_t;
 
 #define K_BMP390_PRESS_RAW_REG 0x04
 
-/* ============================================================================
+    /* ============================================================================
  * Interrupt Configuration
  * ========================================================================= */
 
-#define K_BMP390_REG_INT_CTRL        0x19
-#define K_BMP390_INT_CTRL_DRDY_EN    0x40
-#define K_BMP390_INT_CTRL_LEVEL      0x02
+#define K_BMP390_REG_INT_CTRL     0x19
+#define K_BMP390_INT_CTRL_DRDY_EN 0x40
+#define K_BMP390_INT_CTRL_LEVEL   0x02
 
-/* ============================================================================
+    /* ============================================================================
  * Sensor instance
  * ========================================================================= */
 
-/**
+    /**
  * @brief BMP390 sensor instance.
  *
  * Declare one static instance with the hardware pin fields filled in, then
@@ -185,55 +186,60 @@ typedef struct
  * };
  * @endcode
  */
-typedef struct
-{
-    /* Hardware configuration — set at declaration */
-    spp_uint8_t  spiDevIdx;   /**< SPI device handle index.        */
-    spp_uint32_t intPin;      /**< GPIO pin for DRDY interrupt.    */
-    spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising). */
-    spp_uint32_t intPull;     /**< Pull resistor (0=none,1=up).    */
+    typedef struct
+    {
+        /* Hardware configuration — set at declaration */
+        spp_uint8_t spiDevIdx;    /**< SPI device handle index.        */
+        spp_uint32_t intPin;      /**< GPIO pin for DRDY interrupt.    */
+        spp_uint32_t intIntrType; /**< Interrupt edge type (1=rising). */
+        spp_uint32_t intPull;     /**< Pull resistor (0=none,1=up).    */
 
-    /* Runtime state — filled in by init, do not set manually */
-    void         *p_spi;      /**< SPI device handle.              */
-    BMP390_Data_t bmpData;    /**< Driver context (ISR flag, etc). */
-    spp_uint16_t  seq;        /**< Packet sequence counter.        */
-} BMP390_t;
+        /* Runtime state — filled in by init, do not set manually */
+        void *p_spi;           /**< SPI device handle.              */
+        BMP390_Data_t bmpData; /**< Driver context (ISR flag, etc). */
+        spp_uint16_t seq;      /**< Packet sequence counter.        */
+    } BMP390_t;
 
 /** @brief APID produced by the BMP390 module (single bit, bitmask scheme). */
 #define K_BMP390_SERVICE_APID (0x0004U)
 
-/**
+    /**
  * @brief BMP390 module descriptor — pass to SPP_SERVICES_register().
  */
-extern const SPP_Module_t g_bmp390Module;
+    extern const SPP_Module_t g_bmp390Module;
 
-/* ============================================================================
+    /* ============================================================================
  * Driver API (low-level — used internally and for testing)
  * ========================================================================= */
 
-void     SPP_SERVICES_BMP390_init(void *p_data);
-SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spi);
-SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spi);
-SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spi);
-SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spi);
-SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spi);
-SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms);
-SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib);
-SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out);
-SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp);
-float    SPP_SERVICES_BMP390_compensateTemperature(spp_uint32_t raw_temp, BMP390_temp_params_t *params);
-SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi, const BMP390_temp_params_t *temp_params,
-                             spp_uint32_t *raw_temp, float *comp_temp);
-SPP_RetVal_t SPP_SERVICES_BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib);
-SPP_RetVal_t SPP_SERVICES_BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out);
-SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press);
-float    SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin,
-                                    BMP390_press_params_t *p);
-SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi, const BMP390_press_params_t *press_params,
-                              float t_lin, spp_uint32_t *raw_press, float *comp_press);
-SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp, float *altitude_m,
-                            float *pressure_pa, float *temperature_c);
-SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi);
+    void SPP_SERVICES_BMP390_init(void *p_data);
+    SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spi);
+    SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spi);
+    SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spi);
+    SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spi);
+    SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spi);
+    SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms);
+    SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spi, BMP390_temp_calib_t *tcalib);
+    SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spi, BMP390_temp_params_t *out);
+    SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spi, uint32_t *raw_temp);
+    float SPP_SERVICES_BMP390_compensateTemperature(spp_uint32_t raw_temp,
+                                                    BMP390_temp_params_t *params);
+    SPP_RetVal_t SPP_SERVICES_BMP390_auxGetTemp(void *p_spi,
+                                                const BMP390_temp_params_t *temp_params,
+                                                spp_uint32_t *raw_temp, float *comp_temp);
+    SPP_RetVal_t SPP_SERVICES_BMP390_readRawPressCoeffs(void *p_spi, BMP390_press_calib_t *pcalib);
+    SPP_RetVal_t SPP_SERVICES_BMP390_calibratePressParams(void *p_spi, BMP390_press_params_t *out);
+    SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spi, spp_uint32_t *raw_press);
+    float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin,
+                                                 BMP390_press_params_t *p);
+    SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spi,
+                                                 const BMP390_press_params_t *press_params,
+                                                 float t_lin, spp_uint32_t *raw_press,
+                                                 float *comp_press);
+    SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spi, BMP390_Data_t *p_bmp,
+                                                 float *altitude_m, float *pressure_pa,
+                                                 float *temperature_c);
+    SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spi);
 
 #ifdef __cplusplus
 }

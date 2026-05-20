@@ -54,8 +54,7 @@ SPP_RetVal_t SPP_HAL_spiDeviceInit(void *p_handle)
     return p_port->spiDeviceInit(p_handle);
 }
 
-SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data,
-                               spp_uint8_t length)
+SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->spiTransmit == NULL))
@@ -69,8 +68,7 @@ SPP_RetVal_t SPP_HAL_spiTransmit(void *p_handle, spp_uint8_t *p_data,
  * GPIO dispatch
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                      spp_uint32_t pull)
+SPP_RetVal_t SPP_HAL_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull)
 {
     const SPP_HalPort_t *p_port = getPort();
     if ((p_port == NULL) || (p_port->gpioConfigInterrupt == NULL))
