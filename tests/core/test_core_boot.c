@@ -8,33 +8,34 @@
 #include "spp/core/core.h"
 #include "spp/core/returnTypes.h"
 
-extern const SPP_HalPort_t g_stubHalPort;
+SPP_HalPort_t g_stubHalPort = {.spiBusInit = NULL,
+                               .spiGetHandle = NULL,
+                               .spiDeviceInit = NULL,
+                               .spiTransmit = NULL,
+                               .gpioConfigInterrupt = NULL,
+                               .gpioRegisterIsr = NULL,
+                               .storageMount = NULL,
+                               .getTimeMs = NULL,
+                               .delayMs = NULL};
 
 /* ----------------------------------------------------------------
- * SPP_CORE_boot
+ * Describe: SPP_CORE_boot
  * ---------------------------------------------------------------- */
 
-Describe(SppCoreBoot);
-BeforeEach(SppCoreBoot)
+Describe(SPP_CORE_boot);
+BeforeEach(SPP_CORE_boot)
 {
 }
-AfterEach(SppCoreBoot)
+AfterEach(SPP_CORE_boot)
 {
 }
 
-Ensure(SppCoreBoot, returns_ok_when_passing_the_hal_port_correctly)
+Ensure(SPP_CORE_boot, rejects_null_pointer)
 {
-    const SPP_HalPort_t testHalPort = {
-        .spiBusInit = NULL,
-        .spiGetHandle = NULL,
-        .spiDeviceInit = NULL,
-        .spiTransmit = NULL,
-        .gpioConfigInterrupt = NULL,
-        .gpioRegisterIsr = NULL,
-        .storageMount = NULL,
-        .storageUnmount = NULL,
-        .getTimeMs = NULL,
-        .delayMs = NULL,
-    };
-    assert_that(SPP_CORE_boot(&testHalPort), is_equal_to(K_SPP_OK));
+    assert_that(SPP_CORE_boot(NULL), is_equal_to(K_SPP_ERROR_NULL_POINTER));
+}
+
+Ensure(SPP_CORE_boot, succeeds_with_hal_port_registered)
+{
+    assert_that(SPP_CORE_boot(&g_stubHalPort), is_equal_to(K_SPP_OK));
 }

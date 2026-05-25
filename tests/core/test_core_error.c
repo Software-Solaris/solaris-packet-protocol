@@ -8,6 +8,9 @@
 #include "spp/core/error.h"
 #include "spp/core/returnTypes.h"
 
+#define FILE_EXAMPLE "Example.c"
+#define LINE_EXAMPLE 67
+
 /* ----------------------------------------------------------------
  * Describe: SPP_CORE_errGet
  * ---------------------------------------------------------------- */
@@ -34,6 +37,6 @@ Ensure(SPP_CORE_errGet, returns_last_error_with_errSet)
 
 Ensure(SPP_CORE_errGet, returns_last_erro_with_errSetCtx)
 {
-    SPP_CORE_errSetCtx(K_SPP_ERROR, 1, 2);
+    SPP_CORE_errSetCtx(K_SPP_ERROR, FILE_EXAMPLE, LINE_EXAMPLE);
     assert_that(SPP_CORE_errGet(), is_equal_to(K_SPP_ERROR));
 }

@@ -12,7 +12,15 @@
 #include "spp/core/core.h"
 #include "spp/core/returnTypes.h"
 
-extern const SPP_HalPort_t g_stubHalPort;
+const SPP_HalPort_t g_stubHalPort = {.spiBusInit = NULL,
+                                     .spiGetHandle = NULL,
+                                     .spiDeviceInit = NULL,
+                                     .spiTransmit = NULL,
+                                     .gpioConfigInterrupt = NULL,
+                                     .gpioRegisterIsr = NULL,
+                                     .storageMount = NULL,
+                                     .getTimeMs = NULL,
+                                     .delayMs = NULL};
 
 /* ----------------------------------------------------------------
  * Describe: SPP_CORE_setHalPort
@@ -66,31 +74,5 @@ Ensure(SPP_CORE_init, fails_when_hal_port_missing)
 
 Ensure(SPP_CORE_init, succeeds_with_hal_port_registered)
 {
-    SPP_RetVal_t ret = SPP_CORE_init();
-    assert_that(ret, is_equal_to(K_SPP_OK));
-}
-
-/* ----------------------------------------------------------------
- * Describe: SPP_CORE_boot
- * ---------------------------------------------------------------- */
-
-Describe(SPP_CORE_boot);
-BeforeEach(SPP_CORE_boot)
-{
-    //SPP_CORE_setHalPort(&g_stubHalPort); // not necessary bcs SPP_CORE_boot call SPP_CORE_setHalPort internally
-}
-AfterEach(SPP_CORE_boot)
-{
-}
-
-Ensure(SPP_CORE_boot, rejects_null_pointer)
-{
-    SPP_RetVal_t ret = SPP_CORE_boot(NULL);
-    assert_that(ret, is_equal_to(K_SPP_ERROR_NULL_POINTER));
-}
-
-Ensure(SPP_CORE_boot, succeeds_with_hal_port_registered)
-{
-    SPP_RetVal_t ret = SPP_CORE_boot(&g_stubHalPort);
-    assert_that(ret, is_equal_to(K_SPP_OK));
+    assert_that(SPP_CORE_init(), is_equal_to(K_SPP_OK));
 }
