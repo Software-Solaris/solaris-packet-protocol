@@ -11,6 +11,9 @@
 #define FILE_EXAMPLE "Example.c"
 #define LINE_EXAMPLE 67
 
+SPP_RetVal_t unknown_error = (SPP_RetVal_t)9999;
+char buf_example[1];
+
 /* ----------------------------------------------------------------
  * Describe: SPP_CORE_errGet
  * ---------------------------------------------------------------- */
@@ -39,4 +42,30 @@ Ensure(SPP_CORE_errGet, returns_last_erro_with_errSetCtx)
 {
     SPP_CORE_errSetCtx(K_SPP_ERROR, FILE_EXAMPLE, LINE_EXAMPLE);
     assert_that(SPP_CORE_errGet(), is_equal_to(K_SPP_ERROR));
+}
+
+/* ----------------------------------------------------------------
+ * Describe: SPP_CORE_errToStringR
+ * ---------------------------------------------------------------- */
+Describe(SPP_CORE_errToStringR);
+BeforeEach(SPP_CORE_errToStringR)
+{
+}
+AfterEach(SPP_CORE_errToStringR)
+{
+}
+
+Ensure(SPP_CORE_errToStringR, returns_ok_with_no_errors)
+{
+    assert_that(SPP_CORE_errToStringR(K_SPP_OK, NULL, 0), is_equal_to_string("OK"));
+}
+
+Ensure(SPP_CORE_errToStringR, returns_generic_error_with_error)
+{
+    assert_that(SPP_CORE_errToStringR(K_SPP_ERROR, NULL, 0), is_equal_to_string("generic error"));
+}
+
+Ensure(SPP_CORE_errToStringR, returns_unkown_error_with_no_SPP_type_error)
+{
+    assert_that(SPP_CORE_errToStringR(unknown_error, NULL, 0), is_equal_to_string("unknown error"));
 }
