@@ -13,6 +13,7 @@
 
 SPP_RetVal_t unknown_error = (SPP_RetVal_t)9999;
 char buf_example[1];
+char buf[4] = {'A', 'B', 'C', '\0'};
 
 /* ----------------------------------------------------------------
  * Describe: SPP_CORE_errGet
@@ -68,4 +69,11 @@ Ensure(SPP_CORE_errToStringR, returns_generic_error_with_error)
 Ensure(SPP_CORE_errToStringR, returns_unkown_error_with_no_SPP_type_error)
 {
     assert_that(SPP_CORE_errToStringR(unknown_error, NULL, 0), is_equal_to_string("unknown error"));
+}
+
+Ensure(SPP_CORE_errToStringR, length_zero_does_not_modify_buffer)
+{
+    SPP_CORE_errToStringR(K_SPP_OK, buf, 0);
+
+    assert_that(buf, is_equal_to_string("ABC"));
 }
