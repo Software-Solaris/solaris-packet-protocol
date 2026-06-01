@@ -12,8 +12,7 @@
 #define LINE_EXAMPLE 67
 
 SPP_RetVal_t unknown_error = (SPP_RetVal_t)9999;
-char buf_example[1];
-char buf[4] = {'A', 'B', 'C', '\0'};
+
 
 /* ----------------------------------------------------------------
  * Describe: SPP_CORE_errGet
@@ -66,14 +65,29 @@ Ensure(SPP_CORE_errToStringR, returns_generic_error_with_error)
     assert_that(SPP_CORE_errToStringR(K_SPP_ERROR, NULL, 0), is_equal_to_string("generic error"));
 }
 
-Ensure(SPP_CORE_errToStringR, returns_unkown_error_with_no_SPP_type_error)
+Ensure(SPP_CORE_errToStringR, returns_unknown_error_with_no_SPP_type_error)
 {
     assert_that(SPP_CORE_errToStringR(unknown_error, NULL, 0), is_equal_to_string("unknown error"));
 }
 
+Ensure(SPP_CORE_errToStringR, writes_buffer)
+{
+    char buf[25];
+    assert_that(SPP_CORE_errToStringR(K_SPP_OK, buf, sizeof(buf)), is_equal_to(buf));
+    assert_that(buf, is_equal_to_string("OK"));
+}
+
 Ensure(SPP_CORE_errToStringR, length_zero_does_not_modify_buffer)
 {
+    char buf[4] = {'A', 'B', 'C', '\0'};
     SPP_CORE_errToStringR(K_SPP_OK, buf, 0);
 
     assert_that(buf, is_equal_to_string("ABC"));
+}
+
+Ensure(SPP_CORE_errToStringR, unitary_length_buf_returns_empty_str)
+{
+    char buf[1] = {'A'};
+    SPP_CORE_errToStringR(K_SPP_OK, buf, sizeof(buf));
+    assert_that(buf[0], is_equal_to('\0'));
 }
