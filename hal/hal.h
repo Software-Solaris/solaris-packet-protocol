@@ -1,15 +1,8 @@
 /**
- * @file port.h
- * @brief SPP HAL port contract — the interface every hardware port must implement.
- *
- * To port SPP to a new MCU (ESP32, STM32, RP2040…):
- *   1. Allocate a static @ref SPP_HalPort_t.
- *   2. Fill every mandatory function pointer.  Optional pointers may be NULL.
- *   3. Call @ref SPP_CORE_setHalPort() before @ref SPP_CORE_init().
- *
- * Naming conventions used in this file:
- * - Types: SPP_HalPort_t
- * - Pointer parameters: p_*
+ * @file hal.h
+ * @brief This file contains the structs that contain all the pointers to the functions that are used by the SPP library.
+ *        The structs are used to abstract the hardware and to make the code more portable.
+ *        It also contains the public functions needed to initialize all these structs.
  */
 
 #ifndef SPP_HAL_PORT_H
@@ -19,19 +12,16 @@
 #include "spp/core/returnTypes.h"
 
 /* ----------------------------------------------------------------
- * HAL port struct
+ * STRUCTS
  * ---------------------------------------------------------------- */
 
+
 /**
- * @brief Hardware abstraction layer port descriptor.
- *
- * Register one instance per build target via @ref SPP_CORE_setHalPort().
- * Pointers marked as optional may be set to NULL if the feature is not used.
- */
+    * @brief SPI bus struct that contains all the pointers to the SPI functions
+    *
+  */
 typedef struct
 {
-    /* ---- SPI bus ----------------------------------------------- */
-
     /**
      * @brief Initialise the SPI bus.
      *
@@ -74,11 +64,15 @@ typedef struct
      *
      * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
      */
-    SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data,
-                             spp_uint8_t length);
+    SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
-    /* ---- GPIO / interrupts ------------------------------------- */
+} SPP_HALSpi_t;
 
+/**
+* @brief GPIO struct that contains all the pointers to the GPIO functions
+*/
+typedef struct
+{
     /**
      * @brief Configure a GPIO pin as an interrupt input.
      *
@@ -88,8 +82,7 @@ typedef struct
      *
      * @return K_SPP_OK on success.
      */
-    SPP_RetVal_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType,
-                                    spp_uint32_t pull);
+    SPP_RetVal_t (*gpioConfigInterrupt)(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 
     /**
      * @brief Register an ISR handler for a GPIO pin.
@@ -100,9 +93,13 @@ typedef struct
      * @return K_SPP_OK on success.
      */
     SPP_RetVal_t (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
+} SPP_HALGpio_t;
 
-    /* ---- Storage (optional) ------------------------------------ */
-
+/**
+* @brief Storage struct that contains all the pointers to the Storage functions
+*/
+typedef struct
+{
     /**
      * @brief Mount the storage filesystem.  NULL if storage is not used.
      *
@@ -120,9 +117,13 @@ typedef struct
      * @return K_SPP_OK on success.
      */
     SPP_RetVal_t (*storageUnmount)(void *p_cfg);
+} SPP_HALStorage_t;
 
-    /* ---- Time -------------------------------------------------- */
-
+/**
+* @brief Time struct that contains all the pointers to the Time functions
+*/
+typedef struct
+{
     /**
      * @brief Return the current hardware time in milliseconds.
      *
@@ -141,7 +142,40 @@ typedef struct
      * @param[in] ms  Number of milliseconds to delay.
      */
     void (*delayMs)(spp_uint32_t ms);
+} SPP_HALTime_t;
 
+
+/**
+* @brief Ports struct that contains all the pointers to the Ports functions
+*/
+typedef struct
+{
+    SPP_HALSpi_t spi;
+    SPP_HALGpio_t gpio;
+    SPP_HALStorage_t storage;
+    SPP_HALTime_t time;
 } SPP_HalPort_t;
+
+
+/* ----------------------------------------------------------------
+ * PUBLIC FUNCTIONS
+ * ---------------------------------------------------------------- */
+
+/**
+* @brief This functions initializes the ports struct and initializes all the peripherals.
+*/
+SPP_RetVal_t SPP_HAL_init(const SPP_HalPort_t *p_port);
+
+/**
+* @brief This function is used to get the pointers to the functions that are used by the SPP library.
+* The structs are used to abstract the hardware and to make the code more portable.
+* It also contains the public functions needed to initialize all these structs.
+*
+* @param[in] p_ports  Pointer to the ports struct that will be initialized.
+* @return NULL if the pointer to the ports struct is NULL.
+* @return Pointer to the ports struct, if it has beeen initialized.
+ */
+const SPP_HalPort_t *SPP_HAL_getPort(void);
+
 
 #endif /* SPP_HAL_PORT_H */
