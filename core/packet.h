@@ -21,7 +21,7 @@
  * ---------------------------------------------------------------- */
 
 /** @brief Current SPP protocol version embedded in each packet. */
-#define K_SPP_PKT_VERSION     (1U)
+#define K_SPP_PKT_VERSION (1U)
 
 /** @brief Maximum payload size in bytes per packet. */
 #define K_SPP_PKT_PAYLOAD_MAX (48U)
@@ -42,10 +42,10 @@
  */
 typedef struct
 {
-    spp_uint8_t  version;     /**< Protocol version (= K_SPP_PKT_VERSION).        */
-    spp_uint16_t apid;        /**< Application Process Identifier.                */
-    spp_uint16_t seq;         /**< Packet sequence counter (wraps at UINT16_MAX). */
-    spp_uint16_t payloadLen;  /**< Length of the payload field in bytes.          */
+    spp_uint8_t version;     /**< Protocol version (= K_SPP_PKT_VERSION).        */
+    spp_uint16_t apid;       /**< Application Process Identifier.                */
+    spp_uint16_t seq;        /**< Packet sequence counter (wraps at UINT16_MAX). */
+    spp_uint16_t payloadLen; /**< Length of the payload field in bytes.          */
 } SPP_PacketPrimary_t;
 
 /**
@@ -54,7 +54,7 @@ typedef struct
 typedef struct
 {
     spp_uint32_t timestampMs; /**< System timestamp at packet creation (ms). */
-    spp_uint8_t  dropCounter; /**< Number of packets dropped since last reset. */
+    spp_uint8_t dropCounter;  /**< Number of packets dropped since last reset. */
 } SPP_PacketSecondary_t;
 
 /* ----------------------------------------------------------------
@@ -70,10 +70,10 @@ typedef struct
  */
 typedef struct
 {
-    SPP_PacketPrimary_t   primaryHeader;          /**< Routing / framing header.  */
-    SPP_PacketSecondary_t secondaryHeader;         /**< Timing / metadata header.  */
-    spp_uint8_t           payload[K_SPP_PKT_PAYLOAD_MAX]; /**< Raw payload bytes. */
-    spp_uint16_t          crc;                    /**< CRC-16 over the full packet (0 = not computed). */
+    SPP_PacketPrimary_t primaryHeader;          /**< Routing / framing header.  */
+    SPP_PacketSecondary_t secondaryHeader;      /**< Timing / metadata header.  */
+    spp_uint8_t payload[K_SPP_PKT_PAYLOAD_MAX]; /**< Raw payload bytes. */
+    spp_uint16_t crc;                           /**< CRC-16 over the full packet (0 = not computed). */
 } SPP_Packet_t;
 
 #endif /* SPP_PACKET_H */
