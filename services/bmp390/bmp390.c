@@ -31,6 +31,7 @@
  * STATIC FUNCTIONS DEFINITION
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void *p_data);
+static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
@@ -59,7 +60,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 static const SPP_SERVICE_ProducerContract_t g_bmp390Producer = {.producerID = K_BMP390_SERVICE_APID,
                                                                 .p_nameProducer = "bmp390",
                                                                 .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
-                                                                .init = SPP_SERVICES_BMP390_init};
+                                                                .init = SPP_SERVICES_BMP390_init,
+                                                                .acquireData = SPP_BMP390_acquireData};
 
 static BMP390_t s_bmp;
 
@@ -99,7 +101,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void *p_data)
 
     if (ret == K_SPP_OK)
     {
-        ret = SPP_HAL_GPIO_registerIsr(p_bmpData->gpioConfig.intPin, (void *)&p_bmpData->bmpData.drdyFlag);
+        ret = SPP_HAL_GPIO_registerIsr(p_bmpData->gpioConfig.intPin, (volatile void *)&p_bmpData->bmpData.drdyFlag);
     }
 
     if (ret == K_SPP_OK)
@@ -119,6 +121,63 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void *p_data)
     }
 
     return ret;
+}
+
+
+/**
+ * @brief  Acquisition callback invoked by the SPP service task on each cycle.
+ *
+ * Checks the DRDY flag, reads compensated altitude, pressure and temperature
+ * from the sensor, packs the values into an SPP packet and publishes it.
+ * Silently returns if DRDY is not set or no free packet is available.
+ *
+ * @param  p_data  Pointer to the BMP390_t sensor instance.
+ */
+static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
+{
+    BMP390_t *ctx = (BMP390_t *)p_data;
+    float altitude = 0.0f;
+    float pressure = 0.0f;
+    float temperature = 0.0f;
+
+    if (!ctx->bmpData.drdyFlag)
+    {
+        return K_SPP_OK;
+    }
+    ctx->bmpData.drdyFlag = false;
+
+    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
+    if (p_packet == NULL)
+    {
+        SPP_LOGW(k_svcTag, "No free packet");
+        return K_SPP_ERROR;
+    }
+
+    SPP_RetVal_t ret =
+        SPP_SERVICES_BMP390_getAltitude(ctx->spiConfig.p_spiHandler, &ctx->bmpData, &altitude, &pressure, &temperature);
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
+        return ret;
+    }
+
+#ifdef SPP_DEBUG_PRINT
+    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+#endif
+
+    float payload[3] = {altitude, pressure, temperature};
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++, payload,
+                                           (spp_uint16_t)sizeof(payload));
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
+        return ret;
+    }
+
+    (void)SPP_SERVICES_PUBSUB_publish(p_packet);
+    return K_SPP_OK;
 }
 
 
@@ -659,72 +718,24 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler)
 }
 
 /* ----------------------------------------------------------------
- * Service — acquisition task
- * ---------------------------------------------------------------- */
-
-static void bmp390Task(void *p_ctx)
-{
-    BMP390_t *ctx = (BMP390_t *)p_ctx;
-    float altitude = 0.0f;
-    float pressure = 0.0f;
-    float temperature = 0.0f;
-
-    if (!ctx->bmpData.drdyFlag)
-        return;
-    ctx->bmpData.drdyFlag = false;
-
-    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
-    if (p_packet == NULL)
-    {
-        SPP_LOGW(k_svcTag, "No free packet");
-        return;
-    }
-
-    SPP_RetVal_t ret =
-        SPP_SERVICES_BMP390_getAltitude(ctx->p_spiHandler, &ctx->bmpData, &altitude, &pressure, &temperature);
-    if (ret != K_SPP_OK)
-    {
-        SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
-        return;
-    }
-
-#ifdef SPP_DEBUG_PRINT
-    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
-#endif
-
-    float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++, payload,
-                                           (spp_uint16_t)sizeof(payload));
-    if (ret != K_SPP_OK)
-    {
-        SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
-        return;
-    }
-
-    (void)SPP_SERVICES_PUBSUB_publish(p_packet);
-}
-
-/* ----------------------------------------------------------------
  * Service — callbacks
  * ---------------------------------------------------------------- */
 
 
-static SPP_RetVal_t bmp390Start(void *p_ctx)
+static SPP_RetVal_t bmp390Start(void *p_data)
 {
-    (void)p_ctx;
+    (void)p_data;
     SPP_LOGI(k_svcTag, "Ready");
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t bmp390Stop(void *p_ctx)
+static SPP_RetVal_t bmp390Stop(void *p_data)
 {
-    (void)p_ctx;
+    (void)p_data;
     return K_SPP_OK;
 }
-static SPP_RetVal_t bmp390Deinit(void *p_ctx)
+static SPP_RetVal_t bmp390Deinit(void *p_data)
 {
-    (void)p_ctx;
+    (void)p_data;
     return K_SPP_OK;
 }
