@@ -46,13 +46,20 @@ SPP_RetVal_t SPP_CORE_init(void)
         return ret;
     }
 
+    // Init all the producers and consumer init functions
+    ret = SPP_SERVICES_PUBSUB_init();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
     // TODO: This to be pending on how it works in the overall scheme
     // SPP_SERVICES_PUBSUB_init();
 
     // SPP_SERVICES_LOG_setOutput(coreLogOutput);
 
-    SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR,
-             K_SPP_VERSION_MINOR, K_SPP_VERSION_PATCH);
+    SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR, K_SPP_VERSION_MINOR,
+             K_SPP_VERSION_PATCH);
 
     return K_SPP_OK;
 }
@@ -76,8 +83,7 @@ static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p
     {
         char buf[K_SPP_PKT_PAYLOAD_MAX];
         int n = snprintf(buf, sizeof(buf), "[%c] %s: %s", lvlChar, p_tag, p_message);
-        spp_uint16_t len =
-            (n > 0 && n < (int)sizeof(buf)) ? (spp_uint16_t)(n + 1U) : (spp_uint16_t)sizeof(buf);
+        spp_uint16_t len = (n > 0 && n < (int)sizeof(buf)) ? (spp_uint16_t)(n + 1U) : (spp_uint16_t)sizeof(buf);
 
         (void)SPP_SERVICES_DATABANK_packetData(p_pkt, K_SPP_APID_LOG, s_logSeq++, buf, len);
         (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
