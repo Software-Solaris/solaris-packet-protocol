@@ -15,42 +15,25 @@
 
 #include <stdio.h>
 
-/* ----------------------------------------------------------------
- * Private state
- * ---------------------------------------------------------------- */
-
-static const SPP_HalPort_t *s_p_halPort = NULL;
 
 /* ----------------------------------------------------------------
- * Port registration
- * ---------------------------------------------------------------- */
+* VARIABLES
+* ---------------------------------------------------------------- */
+static spp_uint16_t s_logSeq = 0U;
+static spp_bool_t s_logBusy = false;
 
-SPP_RetVal_t SPP_CORE_setHalPort(const SPP_HalPort_t *p_port)
-{
-    if (p_port == NULL)
-    {
-        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
-    }
-    s_p_halPort = p_port;
-    return K_SPP_OK;
-}
-
-const SPP_HalPort_t *SPP_CORE_getHalPort(void)
-{
-    return s_p_halPort;
-}
 
 /* ----------------------------------------------------------------
- * Core initialisation
- * ---------------------------------------------------------------- */
+* STATIC FUNCTIONS DECLARATIONS
+* ---------------------------------------------------------------- */
+static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p_message);
+
+/* ----------------------------------------------------------------
+* PUBLIC FUNCTIONS
+* ---------------------------------------------------------------- */
 
 SPP_RetVal_t SPP_CORE_init(void)
 {
-    if (s_p_halPort == NULL)
-    {
-        SPP_ERR_RETURN(K_SPP_ERROR_NOT_INITIALIZED);
-    }
-
     SPP_RetVal_t ret = SPP_SERVICES_LOG_init();
     if (ret != K_SPP_OK)
     {
@@ -63,7 +46,10 @@ SPP_RetVal_t SPP_CORE_init(void)
         return ret;
     }
 
-    SPP_SERVICES_PUBSUB_init();
+    // TODO: This to be pending on how it works in the overall scheme
+    // SPP_SERVICES_PUBSUB_init();
+
+    // SPP_SERVICES_LOG_setOutput(coreLogOutput);
 
     SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR,
              K_SPP_VERSION_MINOR, K_SPP_VERSION_PATCH);
@@ -72,12 +58,8 @@ SPP_RetVal_t SPP_CORE_init(void)
 }
 
 /* ----------------------------------------------------------------
- * Boot
- * ---------------------------------------------------------------- */
-
-static spp_uint16_t s_logSeq = 0U;
-static spp_bool_t   s_logBusy = false;
-
+* STATIC FUNCTIONS IMPLEMENTATIONS
+* ---------------------------------------------------------------- */
 static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p_message)
 {
     static const char k_lvl[] = "?EWID V";
@@ -102,22 +84,4 @@ static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p
     }
 
     s_logBusy = false;
-}
-
-SPP_RetVal_t SPP_CORE_boot(const SPP_HalPort_t *p_port)
-{
-    SPP_RetVal_t ret = SPP_CORE_setHalPort(p_port);
-    if (ret != K_SPP_OK)
-    {
-        return ret;
-    }
-
-    ret = SPP_CORE_init();
-    if (ret != K_SPP_OK)
-    {
-        return ret;
-    }
-
-    SPP_SERVICES_LOG_setOutput(coreLogOutput);
-    return K_SPP_OK;
 }
