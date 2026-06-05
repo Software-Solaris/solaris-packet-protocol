@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------- */
 #include "spp/core/returnTypes.h"
 #include "spp/hal/hal.h"
-#include "spp/hal/spi.h"
+#include "spp/hal/spi/spi.h"
 
 /* ----------------------------------------------------------------
  * VARIABLES
