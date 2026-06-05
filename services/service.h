@@ -1,24 +1,6 @@
 /**
  * @file service.h
  * @brief SPP module descriptor and registry API.
- *
- * A module is any producer or consumer of @ref SPP_Packet_t data (sensor
- * driver, telemetry downlink, SD logger, antenna control, …).  Each module
- * describes itself with a static @ref SPP_Module_t and registers via
- * @ref SPP_SERVICES_register().
- *
- * Registration automatically wires up pub/sub subscriptions: if a module
- * sets @c onPacket != NULL, @ref SPP_SERVICES_register() calls
- * @ref SPP_SERVICES_PUBSUB_subscribe() with @c consumesApid and @c onPacketPrio.
- *
- * @ref SPP_SERVICES_callProducers() iterates every registered module and calls its
- * @c produce, replacing the per-sensor DRDY checks in the superloop.
- *
- * Naming conventions used in this file:
- * - Constants/macros: K_SPP_*
- * - Types: SPP_Module_t
- * - Public functions: SPP_SERVICES_*()
- * - Pointer parameters: p_*
  */
 
 #ifndef SPP_SERVICE_H
@@ -30,7 +12,7 @@
 #include "spp/services/pubsub/pubsub.h"
 
 /* ----------------------------------------------------------------
- * Module descriptor
+ * STRUCTS AND ENUMS
  * ---------------------------------------------------------------- */
 
 /**
@@ -47,9 +29,25 @@ typedef struct
     spp_uint8_t producerID;
     const char *p_nameProducer;                /**< Human-readable module name (for logging). */
     spp_uint16_t tiemoutMs;                    /**< Timeout for the producer to send a packet */
-    SPP_RetVal_t (*init)(void *p_data);        /**< Initialise the module. */
+    SPP_RetVal_t (*init)();                    /**< Initialise the module. */
     SPP_RetVal_t (*acquireData)(void *p_data); /**< Acquire data from the module. */
 } SPP_SERVICE_ProducerContract_t;
+
+/**
+* @brief Describes the contract of a consumer module. This module needs to have:
+*   - a consumer ID
+*   - a name
+*   - a timeout (optional)
+*   - a consumeData function
+*/
+typedef struct
+{
+    spp_uint8_t consumerID;
+    const char *p_nameConsumer;                /**< Human-readable module name (for logging). */
+    spp_uint16_t tiemoutMs;                    /**< Timeout for the consumer to receive a packet */
+    SPP_RetVal_t (*init)();                    /**< Initialise the module. */
+    SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
+} SPP_SERVICE_ConsumerContract_t;
 /* ----------------------------------------------------------------
  * Registry API
  * ---------------------------------------------------------------- */
