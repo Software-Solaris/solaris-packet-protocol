@@ -26,7 +26,7 @@ typedef struct {
     spp_uint32_t intPull;      // Pull resistor: 0=none 1=up 2=down
 
     /* Runtime — filled by init, do not set manually */
-    void        *p_spi;
+    void        *p_spiHandler;
     BMP390_Data_t bmpData;     // drdyFlag + ISR context
     spp_uint16_t  seq;
 } BMP390_t;
