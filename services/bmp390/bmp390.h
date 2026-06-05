@@ -36,16 +36,16 @@
  * ---------------------------------------------------------------- */
 
 /* Service */
-#define K_BMP_SERVICE_TASK_PRIO     (5U)   /**< FreeRTOS task priority for the BMP390 service. */
-#define K_BMP_SERVICE_TASK_DELAY_MS (200U) /**< Delay in ms between measurement cycles. */
-#define K_BMP_SERVICE_TASK_STACK_SIZE \
-    (4096U)                             /**< Stack size in bytes for the BMP390 service task. */
-#define K_BMP_SERVICE_PAYLOAD_LEN (12U) /**< Payload length in bytes (temp + press + alt). */
+#define K_BMP_SERVICE_TASK_PRIO       (5U)    /**< FreeRTOS task priority for the BMP390 service. */
+#define K_BMP_SERVICE_TASK_DELAY_MS   (200U)  /**< Delay in ms between measurement cycles. */
+#define K_BMP_SERVICE_TASK_STACK_SIZE (4096U) /**< Stack size in bytes for the BMP390 service task. */
+#define K_BMP_SERVICE_PAYLOAD_LEN     (12U)   /**< Payload length in bytes (temp + press + alt). */
 
 /* SPI */
-#define K_BMP390_SPI_READ   0x80U /**< SPI read flag: OR with register address. */
-#define K_BMP390_SPI_WRITE  0x00U /**< SPI write flag: OR with register address. */
-#define K_BMP390_PIN_NUM_CS 18    /**< Chip-select GPIO pin (informational; set by HAL). */
+#define K_BMP390_SPI_READ    0x80U /**< SPI read flag: OR with register address. */
+#define K_BMP390_SPI_WRITE   0x00U /**< SPI write flag: OR with register address. */
+#define K_BMP390_PIN_NUM_CS  18    /**< Chip-select GPIO pin (informational; set by HAL). */
+#define K_BMP390_SPI_BUS_IDX 1U    /**< SPI bus index (informational; set by HAL). */
 
 /* Identity and reset */
 #define K_BMP390_CHIP_ID_REG    0x00 /**< Chip ID register address. */
@@ -91,21 +91,6 @@
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS
  * ---------------------------------------------------------------- */
-
-/**
- * @brief BMP390 device context.
- *
- * Groups the SPI handler, DRDY flag, ISR context and GPIO interrupt
- * configuration required to operate one BMP390 sensor instance.
- */
-typedef struct
-{
-    volatile spp_bool_t drdyFlag; /**< Set by ISR when data-ready fires.          */
-    SPP_GpioIsrCtx_t isr_ctx;     /**< ISR context (points at drdyFlag).          */
-    spp_uint32_t intPin;          /**< GPIO pin number for the interrupt.         */
-    spp_uint32_t intIntrType;     /**< Interrupt trigger type.                    */
-    spp_uint32_t intPull;         /**< Pull resistor: 0=none, 1=up, 2=down.       */
-} BMP390_Data_t;
 
 /** @brief Raw temperature calibration coefficients (as read from sensor). */
 typedef struct
@@ -157,8 +142,8 @@ typedef struct
 } BMP390_press_params_t;
 
 /* ----------------------------------------------------------------
- * SENSOR INSTANCE
- * ---------------------------------------------------------------- */
+* STRUCTS AND ENUMS
+* ---------------------------------------------------------------- */
 
 typedef struct
 {
@@ -182,12 +167,13 @@ typedef struct
 {
     BMP390_GpioConfig_t gpioConfig; /**< GPIO configuration.        */
     BMP390_SpiConfig_t spiConfig;   /**< SPI configuration.        */
-    BMP390_Data_t bmpData;          /**< Driver context (ISR flag, etc). */
     spp_uint16_t seq;               /**< Packet sequence counter.        */
 } BMP390_t;
 
-/** @brief BMP390 module descriptor — pass to SPP_SERVICES_register(). */
-extern const SPP_Module_t g_bmp390Module;
 
+/* ----------------------------------------------------------------
+*  PUBLIC FUNCTIONS
+* ---------------------------------------------------------------- */
+const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(void);
 
 #endif /* SPP_BMP390_H */

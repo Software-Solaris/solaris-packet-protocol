@@ -30,7 +30,7 @@
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DEFINITION
  * ---------------------------------------------------------------- */
-static SPP_RetVal_t SPP_SERVICES_BMP390_init(void *p_data);
+static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
 static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
@@ -57,13 +57,13 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t g_bmp390Producer = {.producerID = K_BMP390_SERVICE_APID,
-                                                                .p_nameProducer = "bmp390",
-                                                                .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
-                                                                .init = SPP_SERVICES_BMP390_init,
-                                                                .acquireData = SPP_BMP390_acquireData};
+static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.producerID = K_BMP390_SERVICE_APID,
+                                                                        .p_nameProducer = "bmp390",
+                                                                        .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
+                                                                        .init = SPP_SERVICES_BMP390_init,
+                                                                        .acquireData = SPP_BMP390_acquireData};
 
-static BMP390_t s_bmp;
+static BMP390_t *s_p_bmpData;
 
 /* ----------------------------------------------------------------
 * DEFINES
@@ -75,6 +75,14 @@ static float s_po1, s_po2;
 static float s_compPress;
 
 /* ----------------------------------------------------------------
+* PUBLIC FUNCTIONS
+* ---------------------------------------------------------------- */
+const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(void)
+{
+    return &g_bmp390ProducerContract;
+}
+
+/* ----------------------------------------------------------------
 * STATIC FUNCTIONS
 * ---------------------------------------------------------------- */
 /**
@@ -83,37 +91,44 @@ static float s_compPress;
 * @param    p_data    Pointer to the BMP390 sensor instance.
 * @return   K_SPP_OK on success.
 */
-static SPP_RetVal_t SPP_SERVICES_BMP390_init(void *p_data)
+static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 {
-    BMP390_t *p_bmpData = (BMP390_t *)p_data;
     SPP_RetVal_t ret = K_SPP_OK;
 
-    p_bmpData->spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(p_bmpData->spiConfig.spiDevIdx);
-    p_bmpData->gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
-    p_bmpData->gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
-    p_bmpData->gpioConfig.intPull = K_BMP390_INT_PULL;
+    s_p_bmpData->gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
+    s_p_bmpData->gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
+    s_p_bmpData->gpioConfig.intPull = K_BMP390_INT_PULL;
+    s_p_bmpData->spiConfig.spiDevIdx = K_BMP390_SPI_BUS_IDX;
+
+    // Get the SPI bus handler
+    s_p_bmpData->spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_p_bmpData->spiConfig.spiDevIdx);
+
+
+    // Init the SPI bus for the BMP390 sensor
+    (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_p_bmpData->spiConfig.spiDevIdx));
+
 
     if (ret == K_SPP_OK)
     {
-        ret = SPP_HAL_GPIO_configInterrupt(p_bmpData->gpioConfig.intPin, p_bmpData->gpioConfig.intIntrType,
-                                           p_bmpData->gpioConfig.intPull);
+        ret = SPP_HAL_GPIO_configInterrupt(s_p_bmpData->gpioConfig.intPin, s_p_bmpData->gpioConfig.intIntrType,
+                                           s_p_bmpData->gpioConfig.intPull);
     }
 
     if (ret == K_SPP_OK)
     {
-        ret = SPP_HAL_GPIO_registerIsr(p_bmpData->gpioConfig.intPin, (volatile void *)&p_bmpData->bmpData.drdyFlag);
+        ret = SPP_HAL_GPIO_registerIsr(s_p_bmpData->gpioConfig.intPin, (volatile void *)&s_p_bmpData->bmpData.drdyFlag);
     }
 
     if (ret == K_SPP_OK)
     {
-        ret = SPP_SERVICES_BMP390_auxConfig(p_bmpData->spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_auxConfig(s_p_bmpData->spiConfig.p_spiHandler);
     }
 
     if (ret == K_SPP_OK)
     {
-        (void)SPP_SERVICES_BMP390_prepareMeasure(p_bmpData->spiConfig.p_spiHandler);
+        (void)SPP_SERVICES_BMP390_prepareMeasure(s_p_bmpData->spiConfig.p_spiHandler);
 
-        ret = SPP_SERVICES_BMP390_intEnableDrdy(p_bmpData->spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_intEnableDrdy(s_p_bmpData->spiConfig.p_spiHandler);
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;
