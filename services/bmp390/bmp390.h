@@ -152,9 +152,10 @@ typedef struct
 } BMP390_SpiConfig_t;
 typedef struct
 {
-    spp_uint32_t intPin;      /**< GPIO pin for DRDY interrupt.    */
-    spp_uint32_t intIntrType; /**< Interrupt trigger type (1=rising). */
-    spp_uint32_t intPull;     /**< Pull resistor: 0=none 1=up 2=down. */
+    spp_uint32_t intPin;          /**< GPIO pin for DRDY interrupt.    */
+    spp_uint32_t intIntrType;     /**< Interrupt trigger type (1=rising). */
+    spp_uint32_t intPull;         /**< Pull resistor: 0=none 1=up 2=down. */
+    volatile spp_bool_t drdyFlag; /**< Interrupt flag.                 */
 } BMP390_GpioConfig_t;
 /**
  * @brief BMP390 sensor instance.

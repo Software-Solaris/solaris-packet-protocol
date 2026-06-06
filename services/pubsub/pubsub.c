@@ -12,16 +12,16 @@
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
-static SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
+static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
 static spp_uint8_t s_registeredProducers = 0U;
-static SPP_SERVICE_ProducerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
+static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
 static spp_uint8_t s_registeredConsumers = 0U;
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(SPP_SERVICE_ProducerContract_t *p_producerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_producerData == NULL)
@@ -36,11 +36,12 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(SPP_SERVICE_ProducerContract_t
     {
         s_producers[s_registeredProducers] = p_producerData;
         s_registeredProducers++;
+        ret = K_SPP_OK;
     }
     return ret;
 }
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(SPP_SERVICE_ConsumerContract_t *p_consumerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_consumerData == NULL)
@@ -55,6 +56,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(SPP_SERVICE_ConsumerContract_t
     {
         s_consumers[s_registeredConsumers] = p_consumerData;
         s_registeredConsumers++;
+        ret = K_SPP_OK;
     }
     return ret;
 }

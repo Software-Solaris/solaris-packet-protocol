@@ -36,8 +36,8 @@
  */
 typedef struct
 {
-    SPP_Packet_t  *p_freePackets[K_SPP_DATABANK_SIZE]; /**< Free packet stack.  */
-    spp_uint32_t   freeCount;                          /**< Free packets count. */
+    SPP_Packet_t *p_freePackets[K_SPP_DATABANK_SIZE]; /**< Free packet stack.  */
+    spp_uint32_t freeCount;                           /**< Free packets count. */
 } SPP_Databank_t;
 
 /* ----------------------------------------------------------------
@@ -91,7 +91,7 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
  * fields, copies @p p_data into the payload, and computes a CRC-16/CCITT
  * checksum over every byte of the packet except the @c crc field itself.
  *
- * The timestamp is captured automatically via @ref SPP_HAL_getTimeMs().
+ * The timestamp is captured automatically via @ref SPP_HAL_TIME_getTimeMs().
  *
  * @param[out] p_packet  Packet previously acquired from @ref SPP_SERVICES_DATABANK_getPacket().
  * @param[in]  apid      Application Process Identifier.
@@ -104,7 +104,7 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
  * @return K_SPP_ERROR_INVALID_PARAMETER if @p dataLen exceeds K_SPP_PKT_PAYLOAD_MAX.
  */
 SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
-                                      spp_uint16_t seq, const void *p_data,
-                                      spp_uint16_t dataLen);
+                                              spp_uint16_t seq, const void *p_data,
+                                              spp_uint16_t dataLen);
 
 #endif /* SPP_DATABANK_H */

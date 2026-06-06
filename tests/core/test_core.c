@@ -5,7 +5,7 @@
  * Coverage targets:
  *  - SPP_CORE_setHalPort()  — NULL guard, happy path
  *  - SPP_CORE_init()        — missing port, port set
- *  - SPP_CORE_getHalPort()  — returns registered port
+ *  - SPP_HAL_getHalPort()  — returns registered port
  */
 
 #include <cgreen/cgreen.h>
@@ -47,7 +47,7 @@ Ensure(SPP_CORE_setHalPort, accepts_valid_port)
 Ensure(SPP_CORE_setHalPort, getHalPort_returns_registered_port)
 {
     SPP_CORE_setHalPort(&g_stubHalPort);
-    assert_that(SPP_CORE_getHalPort(), is_equal_to(&g_stubHalPort));
+    assert_that(SPP_HAL_getHalPort(), is_equal_to(&g_stubHalPort));
 }
 
 /* ----------------------------------------------------------------

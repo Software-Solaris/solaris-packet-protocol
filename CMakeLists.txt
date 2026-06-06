@@ -16,9 +16,9 @@ option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
 # ----------------------------------------------------------------
 # Services — opt-in (all ON by default)
 # ----------------------------------------------------------------
-option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  ON)
-option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            ON)
-option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    ON)
+option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
+option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
+option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
 
 # ----------------------------------------------------------------
 # Core SPP library (platform-agnostic)
@@ -27,7 +27,11 @@ option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    ON)
 set(SPP_CORE_SOURCES
     core/core.c
     core/error.c
-    hal/dispatch.c
+    hal/hal.c
+    hal/spi/spi.c
+    hal/gpio/gpio.c
+    hal/storage/storage.c
+    hal/time/time.c
     services/service.c
     services/databank/databank.c
     services/pubsub/pubsub.c

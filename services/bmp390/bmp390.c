@@ -37,7 +37,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spiHandler);
-static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms);
+static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_t *p_bmp, spp_uint32_t timeout_ms);
 static SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spiHandler, BMP390_temp_calib_t *tcalib);
 static SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spiHandler, BMP390_temp_params_t *out);
 static SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spiHandler, uint32_t *raw_temp);
@@ -50,8 +50,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spiHandler, spp_uin
 static float SPP_SERVICES_BMP390_compensatePressure(spp_uint32_t raw_press, float t_lin, BMP390_press_params_t *p);
 static SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spiHandler, const BMP390_press_params_t *press_params,
                                                     float t_lin, spp_uint32_t *raw_press, float *comp_press);
-static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, BMP390_Data_t *p_bmp, float *altitude_m,
-                                                    float *pressure_pa, float *temperature_c);
+static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, float *altitude_m, float *pressure_pa,
+                                                    float *temperature_c);
 static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 
 /* ----------------------------------------------------------------
@@ -107,17 +107,18 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
     // Init the SPI bus for the BMP390 sensor
     (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_p_bmpData->spiConfig.spiDevIdx));
 
+    // TODO: review this function
+    // if (ret == K_SPP_OK)
+    // {
+    //     ret = SPP_HAL_GPIO_configInterrupt(s_p_bmpData->gpioConfig.intPin, s_p_bmpData->gpioConfig.intIntrType,
+    //                                        s_p_bmpData->gpioConfig.intPull);
+    // }
 
-    if (ret == K_SPP_OK)
-    {
-        ret = SPP_HAL_GPIO_configInterrupt(s_p_bmpData->gpioConfig.intPin, s_p_bmpData->gpioConfig.intIntrType,
-                                           s_p_bmpData->gpioConfig.intPull);
-    }
-
-    if (ret == K_SPP_OK)
-    {
-        ret = SPP_HAL_GPIO_registerIsr(s_p_bmpData->gpioConfig.intPin, (volatile void *)&s_p_bmpData->bmpData.drdyFlag);
-    }
+    // if (ret == K_SPP_OK)
+    // {
+    //     ret = SPP_HAL_GPIO_registerIsr(s_p_bmpData->gpioConfig.intPin,
+    //                                    (volatile void *)&s_p_bmpData->gpioConfig.drdyFlag);
+    // }
 
     if (ret == K_SPP_OK)
     {
@@ -150,16 +151,16 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
  */
 static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
 {
-    BMP390_t *ctx = (BMP390_t *)p_data;
+    BMP390_t *p_bmpData = (BMP390_t *)p_data;
     float altitude = 0.0f;
     float pressure = 0.0f;
     float temperature = 0.0f;
 
-    if (!ctx->bmpData.drdyFlag)
+    if (!p_bmpData->gpioConfig.drdyFlag)
     {
         return K_SPP_OK;
     }
-    ctx->bmpData.drdyFlag = false;
+    p_bmpData->gpioConfig.drdyFlag = false;
 
     SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
     if (p_packet == NULL)
@@ -169,7 +170,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
     }
 
     SPP_RetVal_t ret =
-        SPP_SERVICES_BMP390_getAltitude(ctx->spiConfig.p_spiHandler, &ctx->bmpData, &altitude, &pressure, &temperature);
+        SPP_SERVICES_BMP390_getAltitude(p_bmpData->spiConfig.p_spiHandler, &altitude, &pressure, &temperature);
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
@@ -182,7 +183,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
 #endif
 
     float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, ctx->seq++, payload,
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, p_bmpData->seq++, payload,
                                            (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
@@ -191,7 +192,8 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
         return ret;
     }
 
-    (void)SPP_SERVICES_PUBSUB_publish(p_packet);
+    // TODO: review when this is implemented
+    // (void)SPP_SERVICES_PUBSUB_publish(p_packet);
     return K_SPP_OK;
 }
 
@@ -306,18 +308,18 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spiHandler)
  * @param  timeout_ms   Maximum time to wait in milliseconds.
  * @return K_SPP_OK when data is ready, K_SPP_ERROR on timeout.
  */
-static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_Data_t *p_bmp, spp_uint32_t timeout_ms)
+static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_t *p_bmp, spp_uint32_t timeout_ms)
 {
     spp_uint32_t start = SPP_HAL_TIME_getTimeMs();
 
-    while (!p_bmp->drdyFlag)
+    while (!p_bmp->gpioConfig.drdyFlag)
     {
         if ((SPP_HAL_TIME_getTimeMs() - start) >= timeout_ms)
         {
             return K_SPP_ERROR;
         }
     }
-    p_bmp->drdyFlag = false;
+    p_bmp->gpioConfig.drdyFlag = false;
     return K_SPP_OK;
 }
 
@@ -661,11 +663,9 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spiHandler, const BM
  * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if any pointer is NULL,
  *         K_SPP_ERROR on SPI failure.
  */
-static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, BMP390_Data_t *p_bmp, float *altitude_m,
-                                                    float *pressure_pa, float *temperature_c)
+static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, float *altitude_m, float *pressure_pa,
+                                                    float *temperature_c)
 {
-    (void)p_bmp; /* DRDY wait is handled by the caller */
-
     if ((p_spiHandler == NULL) || (altitude_m == NULL) || (pressure_pa == NULL) || (temperature_c == NULL))
     {
         return K_SPP_ERROR_NULL_POINTER;

@@ -63,31 +63,3 @@ SPP_RetVal_t SPP_CORE_init(void)
 
     return K_SPP_OK;
 }
-
-/* ----------------------------------------------------------------
-* STATIC FUNCTIONS IMPLEMENTATIONS
-* ---------------------------------------------------------------- */
-static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p_message)
-{
-    static const char k_lvl[] = "?EWID V";
-    char lvlChar = k_lvl[(unsigned)level < sizeof(k_lvl) ? (unsigned)level : 0U];
-
-    if (s_logBusy)
-    {
-        return;
-    }
-    s_logBusy = true;
-
-    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
-    if (p_pkt != NULL)
-    {
-        char buf[K_SPP_PKT_PAYLOAD_MAX];
-        int n = snprintf(buf, sizeof(buf), "[%c] %s: %s", lvlChar, p_tag, p_message);
-        spp_uint16_t len = (n > 0 && n < (int)sizeof(buf)) ? (spp_uint16_t)(n + 1U) : (spp_uint16_t)sizeof(buf);
-
-        (void)SPP_SERVICES_DATABANK_packetData(p_pkt, K_SPP_APID_LOG, s_logSeq++, buf, len);
-        (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
-    }
-
-    s_logBusy = false;
-}

@@ -24,9 +24,9 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(SPP_SERVICE_ProducerContract_t *p_producerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData);
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(SPP_SERVICE_ConsumerContract_t *p_consumerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData);
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 
