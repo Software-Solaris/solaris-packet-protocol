@@ -10,6 +10,7 @@
 #include "spp/core/returnTypes.h"
 #include "spp/core/types.h"
 #include "macrosEsp32.h"
+#include "halEsp32.h"
 
 #include "driver/spi_common.h"
 #include "driver/spi_master.h"
@@ -68,16 +69,25 @@ const static SPP_HALTime_t s_esp32HalTime = {
 };
 
 
-/* ----------------------------------------------------------------
- * GLOBAL VARIABLES
- * ---------------------------------------------------------------- */
-
-const SPP_HalPort_t g_esp32HalPorts = {
+static const SPP_HalPort_t s_esp32HalPorts = {
     .spi = s_esp32HalSpi,
     .gpio = s_esp32HalGpio,
     .storage = s_esp32HalStorage,
     .time = s_esp32HalTime,
 };
+
+/* ----------------------------------------------------------------
+ * PUBLIC FUNCTIONS
+ * ---------------------------------------------------------------- */
+
+/**
+ * @brief  Returns a pointer to the ESP32-S3 HAL port descriptor.
+ * @return Pointer to the static @ref SPP_HalPort_t.
+ */
+const SPP_HalPort_t *SPP_PORTS_ESP32S3_getHalPorts(void)
+{
+    return &s_esp32HalPorts;
+}
 
 /* ----------------------------------------------------------------
  * PRIVATE VARIABLES
