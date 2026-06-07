@@ -28,7 +28,7 @@ typedef struct
     const char *p_nameProducer;                /**< Human-readable module name (for logging). */
     spp_uint16_t tiemoutMs;                    /**< Timeout for the producer to send a packet */
     SPP_RetVal_t (*init)();                    /**< Initialise the module. */
-    SPP_RetVal_t (*acquireData)(void *p_data); /**< Acquire data from the module. */
+    SPP_RetVal_t (*acquireData)(void); /**< Acquire data from the module. */
 } SPP_SERVICE_ProducerContract_t;
 
 /**

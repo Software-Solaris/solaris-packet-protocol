@@ -42,19 +42,19 @@
 #define K_ICM20948_SERVICE_APID          (0x0002U) /**< APID produced by the ICM20948 module (bitmask scheme). */
 
 /* SPI */
-#define K_ICM20948_SPI_HOST_USED    (1U)  /**< SPI host identifier (SPI2_HOST = 1 on ESP32). */
-#define K_ICM20948_PIN_NUM_CS       21U   /**< SPI chip-select GPIO pin. */
-#define K_ICM20948_PIN_NUM_CIPO     47U   /**< SPI CIPO (MISO) GPIO pin. */
-#define K_ICM20948_PIN_NUM_COPI     38U   /**< SPI COPI (MOSI) GPIO pin. */
-#define K_ICM20948_PIN_NUM_CLK      48U   /**< SPI clock GPIO pin. */
-#define K_ICM20948_READ_OP          0x80U /**< SPI read flag: set MSB to signal a read transaction. */
-#define K_ICM20948_WRITE_OP         0x00U /**< SPI write marker (zero). */
-#define K_ICM20948_EMPTY_MESSAGE    0x00U /**< Dummy byte clocked out during SPI reads. */
+#define K_ICM20948_SPI_HOST_USED (1U)  /**< SPI host identifier (SPI2_HOST = 1 on ESP32). */
+#define K_ICM20948_PIN_NUM_CS    21U   /**< SPI chip-select GPIO pin. */
+#define K_ICM20948_PIN_NUM_CIPO  47U   /**< SPI CIPO (MISO) GPIO pin. */
+#define K_ICM20948_PIN_NUM_COPI  38U   /**< SPI COPI (MOSI) GPIO pin. */
+#define K_ICM20948_PIN_NUM_CLK   48U   /**< SPI clock GPIO pin. */
+#define K_ICM20948_READ_OP       0x80U /**< SPI read flag: set MSB to signal a read transaction. */
+#define K_ICM20948_WRITE_OP      0x00U /**< SPI write marker (zero). */
+#define K_ICM20948_EMPTY_MESSAGE 0x00U /**< Dummy byte clocked out during SPI reads. */
 
 /* Interrupt */
-#define K_ICM20948_INT_PIN_NUM    10U /**< GPIO interrupt pin. */
-#define K_ICM20948_INT_INTR_TYPE  1U  /**< Interrupt trigger type (1=rising). */
-#define K_ICM20948_INT_PULL       0U  /**< Pull resistor: 0=none, 1=up, 2=down. */
+#define K_ICM20948_INT_PIN_NUM   17U /**< GPIO interrupt pin. */
+#define K_ICM20948_INT_INTR_TYPE 1U  /**< Interrupt trigger type (1=rising). */
+#define K_ICM20948_INT_PULL      0U  /**< Pull resistor: 0=none, 1=up, 2=down. */
 
 /* Register bank select */
 #define K_ICM20948_REG_BANK_SEL 0x7FU /**< Register bank select register address. */
@@ -429,8 +429,8 @@ typedef union
 /** @brief Gyroscope full-scale range selection. */
 typedef enum
 {
-    K_ICM20948_GYRO_FS_250DPS  = 0U,
-    K_ICM20948_GYRO_FS_500DPS  = 1U,
+    K_ICM20948_GYRO_FS_250DPS = 0U,
+    K_ICM20948_GYRO_FS_500DPS = 1U,
     K_ICM20948_GYRO_FS_1000DPS = 2U,
     K_ICM20948_GYRO_FS_2000DPS = 3U
 } ICM20948_GyroFsSel_t;
@@ -451,9 +451,9 @@ typedef union
 /** @brief Accelerometer full-scale range selection. */
 typedef enum
 {
-    K_ICM20948_ACCEL_FS_2G  = 0U,
-    K_ICM20948_ACCEL_FS_4G  = 1U,
-    K_ICM20948_ACCEL_FS_8G  = 2U,
+    K_ICM20948_ACCEL_FS_2G = 0U,
+    K_ICM20948_ACCEL_FS_4G = 1U,
+    K_ICM20948_ACCEL_FS_8G = 2U,
     K_ICM20948_ACCEL_FS_16G = 3U
 } ICM20948_AccelFsSel_t;
 

@@ -19,6 +19,12 @@
 #include "spp/services/databank/databank.h"
 #include "spp/services/service.h"
 #include "spp/services/pubsub/pubsub.h"
+#ifdef SPP_DEBUG_PRINT
+#include <stdio.h>
+#endif
+
+#include <stdio.h>
+
 
 #include <string.h>
 #include <math.h>
@@ -74,7 +80,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data);
 static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx);
 static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm);
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void);
-static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void *p_data);
+static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void);
 
 /* ----------------------------------------------------------------
  * VARIABLES
@@ -110,6 +116,113 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_ICM20948_getProducerContract(
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * Service — init and acquire
+ * ---------------------------------------------------------------- */
+
+/**
+ * @brief  Initialises the ICM20948 interrupt context and registers the GPIO ISR.
+ * @param  p_icm  Pointer to the ICM20948 interrupt context to initialise.
+ */
+static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
+{
+    p_icm->drdyFlag = false;
+    p_icm->isr_ctx.p_flag = &p_icm->drdyFlag;
+    SPP_HAL_GPIO_configInterrupt(p_icm->intPin, p_icm->intIntrType, p_icm->intPull);
+    SPP_HAL_GPIO_registerIsr(p_icm->intPin, (void *)&p_icm->isr_ctx);
+}
+
+/**
+ * @brief  Service init callback — sets hardware config, registers GPIO ISR, loads DMP firmware.
+ * @return K_SPP_OK on success, K_SPP_ERROR on DMP init failure.
+ */
+static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
+{
+    s_icmData.spiDevIdx = K_ICM20948_SPI_HOST_USED;
+    s_icmData.intPin = K_ICM20948_INT_PIN_NUM;
+    s_icmData.intIntrType = K_ICM20948_INT_INTR_TYPE;
+    s_icmData.intPull = K_ICM20948_INT_PULL;
+    s_icmData.seq = 0U;
+
+    s_icmData.icmData.intPin = s_icmData.intPin;
+    s_icmData.icmData.intIntrType = s_icmData.intIntrType;
+    s_icmData.icmData.intPull = s_icmData.intPull;
+
+    SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
+
+    s_icmData.p_spi = SPP_HAL_SPI_getHandle(s_icmData.spiDevIdx);
+    (void)SPP_HAL_SPI_deviceInit(s_icmData.p_spi);
+
+    SPP_LOGI(K_ICM20948_LOG_TAG, "Init (spiDevIdx=%u intPin=%u)", s_icmData.spiDevIdx, s_icmData.intPin);
+
+    SPP_RetVal_t ret = SPP_SERVICES_ICM20948_configDmpInit(s_icmData.p_spi);
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(K_ICM20948_LOG_TAG, "configDmpInit failed ret=%d", (int)ret);
+    }
+    return ret;
+}
+
+/**
+ * @brief  Service acquire callback — reads FIFO data and publishes a packet.
+ *
+ * Called by the service framework on each cycle. Checks the DRDY flag, reads
+ * the DMP FIFO, packs 9-axis sensor data into an SPP packet and publishes it.
+ *
+ * @return K_SPP_OK on success or no data; K_SPP_ERROR if packet allocation or packing fails.
+ */
+static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void)
+{
+    ICM20948_t *p_ctx = &s_icmData;
+
+    if (!p_ctx->icmData.drdyFlag)
+    {
+        return K_SPP_OK;
+    }
+    p_ctx->icmData.drdyFlag = false;
+    p_ctx->lastData.dataReady = false;
+
+    SPP_SERVICES_ICM20948_checkFifoData(p_ctx);
+
+    if (!p_ctx->lastData.dataReady)
+    {
+        return K_SPP_OK;
+    }
+
+    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
+    if (p_pkt == NULL)
+    {
+        SPP_LOGI(K_ICM20948_LOG_TAG, "No free packet");
+        return K_SPP_ERROR;
+    }
+
+    float payload[9] = {
+        p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy,
+        p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz,
+    };
+
+#ifdef SPP_DEBUG_PRINT
+    printf("[ICM] ax=%.2f ay=%.2f az=%.2f gx=%.2f gy=%.2f gz=%.2f mx=%.2f my=%.2f mz=%.2f\n", p_ctx->lastData.ax,
+           p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy, p_ctx->lastData.gz,
+           p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz);
+#endif
+    printf("[ICM] ax=%.2f ay=%.2f az=%.2f gx=%.2f gy=%.2f gz=%.2f mx=%.2f my=%.2f mz=%.2f\n", p_ctx->lastData.ax,
+           p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy, p_ctx->lastData.gz,
+           p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz);
+
+    SPP_RetVal_t ret = SPP_SERVICES_DATABANK_packetData(p_pkt, K_ICM20948_SERVICE_APID, p_ctx->seq++, payload,
+                                                        (spp_uint16_t)sizeof(payload));
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt);
+        return ret;
+    }
+
+    // (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
+    return K_SPP_OK;
+}
 
 /* ----------------------------------------------------------------
  * Driver — private helpers
@@ -1647,106 +1760,4 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
             }
         }
     }
-}
-
-/* ----------------------------------------------------------------
- * Driver — interrupt
- * ---------------------------------------------------------------- */
-
-/**
- * @brief  Initialises the ICM20948 interrupt context and registers the GPIO ISR.
- * @param  p_icm  Pointer to the ICM20948 interrupt context to initialise.
- */
-static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
-{
-    p_icm->drdyFlag = false;
-    p_icm->isr_ctx.p_flag = &p_icm->drdyFlag;
-    SPP_HAL_GPIO_configInterrupt(p_icm->intPin, p_icm->intIntrType, p_icm->intPull);
-    SPP_HAL_GPIO_registerIsr(p_icm->intPin, (void *)&p_icm->isr_ctx);
-}
-
-/* ----------------------------------------------------------------
- * Service — init and acquire
- * ---------------------------------------------------------------- */
-
-/**
- * @brief  Service init callback — sets hardware config, registers GPIO ISR, loads DMP firmware.
- * @return K_SPP_OK on success, K_SPP_ERROR on DMP init failure.
- */
-static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
-{
-    s_icmData.spiDevIdx = K_ICM20948_SPI_HOST_USED;
-    s_icmData.intPin = K_ICM20948_INT_PIN_NUM;
-    s_icmData.intIntrType = K_ICM20948_INT_INTR_TYPE;
-    s_icmData.intPull = K_ICM20948_INT_PULL;
-    s_icmData.seq = 0U;
-
-    s_icmData.p_spi = SPP_HAL_SPI_getHandle(s_icmData.spiDevIdx);
-
-    s_icmData.icmData.intPin = s_icmData.intPin;
-    s_icmData.icmData.intIntrType = s_icmData.intIntrType;
-    s_icmData.icmData.intPull = s_icmData.intPull;
-
-    SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
-
-    SPP_LOGI(K_ICM20948_LOG_TAG, "Init (spiDevIdx=%u intPin=%u)", s_icmData.spiDevIdx, s_icmData.intPin);
-
-    SPP_RetVal_t ret = SPP_SERVICES_ICM20948_configDmpInit(s_icmData.p_spi);
-    if (ret != K_SPP_OK)
-    {
-        SPP_LOGE(K_ICM20948_LOG_TAG, "configDmpInit failed ret=%d", (int)ret);
-    }
-    return ret;
-}
-
-/**
- * @brief  Service acquire callback — reads FIFO data and publishes a packet.
- *
- * Called by the service framework on each cycle.  Checks the DRDY flag, reads
- * the DMP FIFO, packs 9-axis sensor data into an SPP packet and publishes it.
- *
- * @param  p_data  Pointer to the ICM20948_t context cast to void*.
- * @return K_SPP_OK on success or no data; K_SPP_ERROR if packet allocation or packing fails.
- */
-static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void *p_data)
-{
-    ICM20948_t *p_ctx = (ICM20948_t *)p_data;
-
-    if (!p_ctx->icmData.drdyFlag)
-    {
-        return K_SPP_OK;
-    }
-    p_ctx->icmData.drdyFlag = false;
-    p_ctx->lastData.dataReady = false;
-
-    SPP_SERVICES_ICM20948_checkFifoData(p_ctx);
-
-    if (!p_ctx->lastData.dataReady)
-    {
-        return K_SPP_OK;
-    }
-
-    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
-    if (p_pkt == NULL)
-    {
-        SPP_LOGI(K_ICM20948_LOG_TAG, "No free packet");
-        return K_SPP_ERROR;
-    }
-
-    float payload[9] = {
-        p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy,
-        p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz,
-    };
-
-    SPP_RetVal_t ret = SPP_SERVICES_DATABANK_packetData(p_pkt, K_ICM20948_SERVICE_APID, p_ctx->seq++, payload,
-                                                        (spp_uint16_t)sizeof(payload));
-    if (ret != K_SPP_OK)
-    {
-        SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt);
-        return ret;
-    }
-
-    // (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
-    return K_SPP_OK;
 }

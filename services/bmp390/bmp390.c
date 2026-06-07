@@ -20,6 +20,8 @@
 #ifdef SPP_DEBUG_PRINT
 #include <stdio.h>
 #endif
+#include <stdio.h>
+
 
 /* ----------------------------------------------------------------
  * CONSTANTS
@@ -31,13 +33,12 @@
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
-static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data);
+static SPP_RetVal_t SPP_BMP390_acquireData(void);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_auxConfig(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spiHandler);
-static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_t *p_bmp, spp_uint32_t timeout_ms);
 static SPP_RetVal_t SPP_SERVICES_BMP390_readRawTempCoeffs(void *p_spiHandler, BMP390_temp_calib_t *tcalib);
 static SPP_RetVal_t SPP_SERVICES_BMP390_calibrateTempParams(void *p_spiHandler, BMP390_temp_params_t *out);
 static SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spiHandler, uint32_t *raw_temp);
@@ -95,25 +96,19 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
     s_bmpData.gpioConfig.intPull = K_BMP390_INT_PULL;
     s_bmpData.spiConfig.spiDevIdx = K_BMP390_SPI_BUS_IDX;
 
-    // Get the SPI bus handler
+    // Configure GPIO interrupt before SPI device init
+    ret = SPP_HAL_GPIO_configInterrupt(s_bmpData.gpioConfig.intPin, s_bmpData.gpioConfig.intIntrType,
+                                       s_bmpData.gpioConfig.intPull);
+
+    if (ret == K_SPP_OK)
+    {
+        s_bmpData.gpioConfig.isrCtx.p_flag = &s_bmpData.gpioConfig.drdyFlag;
+        ret = SPP_HAL_GPIO_registerIsr(s_bmpData.gpioConfig.intPin, (void *)&s_bmpData.gpioConfig.isrCtx);
+    }
+
+    // Get the SPI bus handler and init the SPI device
     s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
-
-
-    // Init the SPI bus for the BMP390 sensor
     (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx));
-
-    // TODO: review this function
-    // if (ret == K_SPP_OK)
-    // {
-    //     ret = SPP_HAL_GPIO_configInterrupt(s_bmpData.gpioConfig.intPin, s_bmpData.gpioConfig.intIntrType,
-    //                                        s_bmpData.gpioConfig.intPull);
-    // }
-
-    // if (ret == K_SPP_OK)
-    // {
-    //     ret = SPP_HAL_GPIO_registerIsr(s_bmpData.gpioConfig.intPin,
-    //                                    (volatile void *)&s_bmpData.gpioConfig.drdyFlag);
-    // }
 
     if (ret == K_SPP_OK)
     {
@@ -144,9 +139,9 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
  *
  * @param  p_data  Pointer to the BMP390_t sensor instance.
  */
-static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
+static SPP_RetVal_t SPP_BMP390_acquireData(void)
 {
-    BMP390_t *p_bmpData = (BMP390_t *)p_data;
+    BMP390_t *p_bmpData = &s_bmpData;
     float altitude = 0.0f;
     float pressure = 0.0f;
     float temperature = 0.0f;
@@ -176,6 +171,9 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
 #ifdef SPP_DEBUG_PRINT
     printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
 #endif
+
+    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+
 
     float payload[3] = {altitude, pressure, temperature};
     ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, p_bmpData->seq++, payload,
@@ -303,20 +301,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spiHandler)
  * @param  timeout_ms   Maximum time to wait in milliseconds.
  * @return K_SPP_OK when data is ready, K_SPP_ERROR on timeout.
  */
-static SPP_RetVal_t SPP_SERVICES_BMP390_waitDrdy(BMP390_t *p_bmp, spp_uint32_t timeout_ms)
-{
-    spp_uint32_t start = SPP_HAL_TIME_getTimeMs();
-
-    while (!p_bmp->gpioConfig.drdyFlag)
-    {
-        if ((SPP_HAL_TIME_getTimeMs() - start) >= timeout_ms)
-        {
-            return K_SPP_ERROR;
-        }
-    }
-    p_bmp->gpioConfig.drdyFlag = false;
-    return K_SPP_OK;
-}
 
 /* ----------------------------------------------------------------
  * Driver — temperature

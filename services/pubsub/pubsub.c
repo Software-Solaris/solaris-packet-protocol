@@ -79,7 +79,7 @@ void SPP_SERVICES_PUBSUB_callProducers(void)
 {
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        (void)s_producers[i]->acquireData(NULL);
+        (void)s_producers[i]->acquireData();
     }
 }
 

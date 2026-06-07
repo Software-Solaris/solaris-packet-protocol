@@ -166,7 +166,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     else if (s_spiDevCount == K_ESP32_SPI_IDX_BMP)
     {
         devCfg.clock_speed_hz = 500 * 1000;
-        devCfg.mode = 0;
+        devCfg.mode = 3;
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
         devCfg.queue_size = 1;
     }

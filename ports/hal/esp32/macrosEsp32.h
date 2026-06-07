@@ -22,7 +22,7 @@
 #define K_ESP32_PIN_MOSI (38)
 
 /** @brief SPI clock GPIO pin. */
-#define K_ESP32_PIN_CLK  (48)
+#define K_ESP32_PIN_CLK (48)
 
 /** @brief SPI peripheral to use. */
 #define K_ESP32_SPI_HOST SPI2_HOST
@@ -51,10 +51,10 @@
  * Device index assignments
  * ---------------------------------------------------------------- */
 
-/** @brief SPI device index for the ICM20948. */
-#define K_ESP32_SPI_IDX_ICM (0U)
-
 /** @brief SPI device index for the BMP390. */
-#define K_ESP32_SPI_IDX_BMP (1U)
+#define K_ESP32_SPI_IDX_BMP (0U)
+
+/** @brief SPI device index for the ICM20948. */
+#define K_ESP32_SPI_IDX_ICM (1U)
 
 #endif /* SPP_MACROS_ESP32_H */

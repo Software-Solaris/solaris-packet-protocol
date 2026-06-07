@@ -53,9 +53,6 @@ SPP_RetVal_t SPP_CORE_init(void)
         return ret;
     }
 
-    // TODO: This to be pending on how it works in the overall scheme
-    // SPP_SERVICES_PUBSUB_init();
-
     // SPP_SERVICES_LOG_setOutput(coreLogOutput);
 
     SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR, K_SPP_VERSION_MINOR,
