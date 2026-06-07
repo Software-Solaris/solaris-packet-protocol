@@ -13,6 +13,7 @@
 #include "spp/services/log/log.h"
 #include "spp/services/databank/databank.h"
 #include "spp/core/packet.h"
+#include "spp/services/pubsub/pubsub.h"
 
 #include <string.h>
 #include <math.h>
@@ -187,7 +188,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data)
     }
 
     // TODO: review when this is implemented
-    // (void)SPP_SERVICES_PUBSUB_publish(p_packet);
+    (void)SPP_SERVICES_PUBSUB_publish(p_packet);
     return K_SPP_OK;
 }
 

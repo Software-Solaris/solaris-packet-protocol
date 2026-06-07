@@ -8,7 +8,7 @@
 
 #include "spp/core/types.h"
 #include "spp/core/returnTypes.h"
-
+#include "spp/core/packet.h"
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS
  * ---------------------------------------------------------------- */
@@ -44,6 +44,8 @@ typedef struct
     spp_int8_t priority;                       /**< Priority of the consumer */
     const char *p_nameConsumer;                /**< Human-readable module name (for logging). */
     spp_uint16_t tiemoutMs;                    /**< Timeout for the consumer to receive a packet */
+    spp_uint16_t suscribeToApid;               /**< APIDs to subscribe to */
+    SPP_Packet_t *p_mailBox;                   /**< Mailbox for the consumer - to recieve SPP packets */
     SPP_RetVal_t (*init)();                    /**< Initialise the module. */
     SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
 } SPP_SERVICE_ConsumerContract_t;
