@@ -69,6 +69,7 @@ SPP_RetVal_t SPP_HAL_SPI_deviceInit(void *p_handle)
 SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
+
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
     if ((p_port == NULL) || (p_port->spi.spiTransmit == NULL))
     {

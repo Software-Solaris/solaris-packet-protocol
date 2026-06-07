@@ -12,7 +12,6 @@
 #include "spp/hal/time/time.h"
 #include "spp/services/log/log.h"
 #include "spp/services/databank/databank.h"
-#include "spp/services/pubsub/pubsub.h"
 #include "spp/core/packet.h"
 
 #include <string.h>
@@ -28,7 +27,7 @@
 #define K_BMP390_SERVICE_APID    (0x0004U)
 
 /* ----------------------------------------------------------------
- * STATIC FUNCTIONS DEFINITION
+ * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
 static SPP_RetVal_t SPP_BMP390_acquireData(void *p_data);
@@ -62,12 +61,7 @@ static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.produce
                                                                         .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
                                                                         .init = SPP_SERVICES_BMP390_init,
                                                                         .acquireData = SPP_BMP390_acquireData};
-
-static BMP390_t *s_p_bmpData;
-
-/* ----------------------------------------------------------------
-* DEFINES
-* ---------------------------------------------------------------- */
+static BMP390_t s_bmpData;
 static const char *const k_tag = "BMP390";
 static const char *const k_svcTag = "BMP_SVC";
 static float s_pd1, s_pd2, s_pd3, s_pd4;
@@ -95,41 +89,41 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
-    s_p_bmpData->gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
-    s_p_bmpData->gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
-    s_p_bmpData->gpioConfig.intPull = K_BMP390_INT_PULL;
-    s_p_bmpData->spiConfig.spiDevIdx = K_BMP390_SPI_BUS_IDX;
+    s_bmpData.gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
+    s_bmpData.gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
+    s_bmpData.gpioConfig.intPull = K_BMP390_INT_PULL;
+    s_bmpData.spiConfig.spiDevIdx = K_BMP390_SPI_BUS_IDX;
 
     // Get the SPI bus handler
-    s_p_bmpData->spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_p_bmpData->spiConfig.spiDevIdx);
+    s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
 
 
     // Init the SPI bus for the BMP390 sensor
-    (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_p_bmpData->spiConfig.spiDevIdx));
+    (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx));
 
     // TODO: review this function
     // if (ret == K_SPP_OK)
     // {
-    //     ret = SPP_HAL_GPIO_configInterrupt(s_p_bmpData->gpioConfig.intPin, s_p_bmpData->gpioConfig.intIntrType,
-    //                                        s_p_bmpData->gpioConfig.intPull);
+    //     ret = SPP_HAL_GPIO_configInterrupt(s_bmpData.gpioConfig.intPin, s_bmpData.gpioConfig.intIntrType,
+    //                                        s_bmpData.gpioConfig.intPull);
     // }
 
     // if (ret == K_SPP_OK)
     // {
-    //     ret = SPP_HAL_GPIO_registerIsr(s_p_bmpData->gpioConfig.intPin,
-    //                                    (volatile void *)&s_p_bmpData->gpioConfig.drdyFlag);
+    //     ret = SPP_HAL_GPIO_registerIsr(s_bmpData.gpioConfig.intPin,
+    //                                    (volatile void *)&s_bmpData.gpioConfig.drdyFlag);
     // }
 
     if (ret == K_SPP_OK)
     {
-        ret = SPP_SERVICES_BMP390_auxConfig(s_p_bmpData->spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_auxConfig(s_bmpData.spiConfig.p_spiHandler);
     }
 
     if (ret == K_SPP_OK)
     {
-        (void)SPP_SERVICES_BMP390_prepareMeasure(s_p_bmpData->spiConfig.p_spiHandler);
+        (void)SPP_SERVICES_BMP390_prepareMeasure(s_bmpData.spiConfig.p_spiHandler);
 
-        ret = SPP_SERVICES_BMP390_intEnableDrdy(s_p_bmpData->spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_intEnableDrdy(s_bmpData.spiConfig.p_spiHandler);
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;
@@ -730,27 +724,4 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler)
     spp_uint8_t buf[2] = {K_BMP390_REG_INT_CTRL, (spp_uint8_t)(K_BMP390_INT_CTRL_LEVEL | K_BMP390_INT_CTRL_DRDY_EN)};
 
     return SPP_HAL_SPI_transmit(p_spiHandler, buf, sizeof(buf));
-}
-
-/* ----------------------------------------------------------------
- * Service — callbacks
- * ---------------------------------------------------------------- */
-
-
-static SPP_RetVal_t bmp390Start(void *p_data)
-{
-    (void)p_data;
-    SPP_LOGI(k_svcTag, "Ready");
-    return K_SPP_OK;
-}
-
-static SPP_RetVal_t bmp390Stop(void *p_data)
-{
-    (void)p_data;
-    return K_SPP_OK;
-}
-static SPP_RetVal_t bmp390Deinit(void *p_data)
-{
-    (void)p_data;
-    return K_SPP_OK;
 }

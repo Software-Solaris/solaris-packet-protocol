@@ -18,7 +18,6 @@
 
 static const SPP_HalPort_t *s_p_halPort = {NULL}; /**< Pointer to the HAL ports struct. */
 
-
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */

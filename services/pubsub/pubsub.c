@@ -9,6 +9,10 @@
 #include "spp/services/log/log.h"
 #include "spp/core/error.h"
 
+
+//TODO: Tener una forma de guardar los data packets que te llegan
+//      Una forma de distribuir ese data packet por consumidores prioritarios
+//      Devolver el datapacketal bank
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
@@ -18,8 +22,8 @@ static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_M
 static spp_uint8_t s_registeredConsumers = 0U;
 
 /* ----------------------------------------------------------------
- * PUBLIC FUNCTIONS
- * ---------------------------------------------------------------- */
+* PUBLIC FUNCTIONS
+* ---------------------------------------------------------------- */
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData)
 {
@@ -64,6 +68,8 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerCont
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
+
+    //TODO: Call a function to order the consumer array based on priority
 
 
     if (s_registeredProducers > 0U)

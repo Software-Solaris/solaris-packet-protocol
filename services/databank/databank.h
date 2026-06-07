@@ -103,8 +103,7 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
  * @return K_SPP_ERROR_NULL_POINTER if @p p_packet or @p p_data is NULL.
  * @return K_SPP_ERROR_INVALID_PARAMETER if @p dataLen exceeds K_SPP_PKT_PAYLOAD_MAX.
  */
-SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
-                                              spp_uint16_t seq, const void *p_data,
-                                              spp_uint16_t dataLen);
+SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid, spp_uint16_t seq,
+                                              const void *p_data, spp_uint16_t dataLen);
 
 #endif /* SPP_DATABANK_H */

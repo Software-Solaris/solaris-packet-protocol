@@ -44,7 +44,7 @@
 /* SPI */
 #define K_BMP390_SPI_READ    0x80U /**< SPI read flag: OR with register address. */
 #define K_BMP390_SPI_WRITE   0x00U /**< SPI write flag: OR with register address. */
-#define K_BMP390_PIN_NUM_CS  18    /**< Chip-select GPIO pin (informational; set by HAL). */
+#define K_BMP390_PIN_NUM_CS  18U   /**< Chip-select GPIO pin (informational; set by HAL). */
 #define K_BMP390_SPI_BUS_IDX 1U    /**< SPI bus index (informational; set by HAL). */
 
 /* Identity and reset */
