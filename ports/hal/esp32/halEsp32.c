@@ -20,6 +20,7 @@
 #include "sdmmc_cmd.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "driver/uart.h"
 
 #include <string.h>
 
@@ -338,4 +339,24 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
     while ((SPP_PORTS_HAL_ESP32_getTimeMs() - start) < ms)
     { /* busy-wait */
     }
+}
+
+/* ----------------------------------------------------------------
+ * UART
+ * ---------------------------------------------------------------- */
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartBusInit(void)
+{
+    if (s_busInitialized == true)
+    {
+        return K_SPP_OK;
+    }
+
+    // uart_port_t portCfg = {
+    //     .baud_rate = 115200,
+    //     .data_bits = UART_DATA_8_BITS,
+    //     .parity = UART_PARITY_DISABLE,
+    //     .stop_bits = UART_STOP_BITS_1,
+    //     .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
+    //     .rx_flow_control_thresh = 122,
+    // };
 }
