@@ -49,4 +49,4 @@ typedef struct
   * 
   * @return K_SPP_OK on success.
   */
-SPP_RetVal_t SPP_HAL_UART_portInit(void);
+SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg);

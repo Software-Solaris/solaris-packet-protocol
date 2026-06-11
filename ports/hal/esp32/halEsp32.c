@@ -99,6 +99,7 @@ static const char *const k_tag = "SPP_HAL";
 static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
 static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
+static spp_bool_t s_portInitialized = false;
 
 static sdmmc_card_t *s_p_sdCard = NULL;
 static spp_bool_t s_sdMounted = false;
@@ -344,9 +345,9 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
 /* ----------------------------------------------------------------
  * UART
  * ---------------------------------------------------------------- */
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartBusInit(void)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void)
 {
-    if (s_busInitialized == true)
+    if (s_portInitialized == true)
     {
         return K_SPP_OK;
     }

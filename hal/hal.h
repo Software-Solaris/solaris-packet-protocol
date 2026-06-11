@@ -15,11 +15,9 @@
  * STRUCTS
  * ---------------------------------------------------------------- */
 
-
 /**
-    * @brief SPI bus struct that contains all the pointers to the SPI functions
-    *
-  */
+* @brief SPI bus struct that contains all the pointers to the SPI functions
+*/
 typedef struct
 {
     /**
@@ -67,6 +65,22 @@ typedef struct
     SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
 } SPP_HALSpi_t;
+
+/**
+* @brief UART port struct that contains all the pointers to the UART functions
+*/
+typedef struct
+{
+    /**
+     * @brief Initialise the UART port.
+     *
+     * @param[in] p_cfg Pointer to UART init configuration.
+     *
+     * @return K_SPP_OK on success.
+     */
+    SPP_RetVal_t (*uartPortInit)(void *p_cfg);
+
+} SPP_HALUart_t;
 
 /**
 * @brief GPIO struct that contains all the pointers to the GPIO functions
@@ -154,6 +168,8 @@ typedef struct
     SPP_HALGpio_t gpio;
     SPP_HALStorage_t storage;
     SPP_HALTime_t time;
+    SPP_HALUart_t uart;
+
 } SPP_HalPort_t;
 
 
