@@ -19,10 +19,10 @@
 #define K_UART_NUM 2 // hay que ver que puerto UART es el que esta libre en el ESP32
 
 
-#define K_E22MBL01_SERVICE_APID (0x0005U)
-#define K_BMP390_SERVICE_APID    (0x0004U)
+#define K_E22MBL01_SERVICE_APID    (0x0005U)
+#define K_BMP390_SERVICE_APID      (0x0004U)
 #define K_E22MBL01_TASK_TIMEOUT_MS 5000U
-#define K_E22MBL01_MAILBOX_SIZE 128
+#define K_E22MBL01_MAILBOX_SIZE    128
 
 /* -----------------------------------------
     STATIC FUNCTIONS DECLARATIONS
@@ -36,15 +36,16 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data);
 --------------------------------------------*/
 static SPP_Packet_t mailboxData[K_E22MBL01_MAILBOX_SIZE] = {0};
 
-static SPP_SERVICE_ConsumerContract_t e22Contract = {
-    .consumerID = K_E22MBL01_SERVICE_APID,
-    .priority = 0,
-    .p_nameConsumer = "e22-mbl01",
-    .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
-    .suscribeToApid = K_BMP390_SERVICE_APID,
-    .p_mailBox = mailboxData,
-    .init = SPP_SERVICES_E22MBL01_init,
-    .consumeData = SPP_SERVICES_E22MBL01_consumeData,
+static SPP_SERVICE_ConsumerContract_t e22Contract =
+    {
+        .consumerID = K_E22MBL01_SERVICE_APID,
+        .priority = 0,
+        .p_nameConsumer = "e22-mbl01",
+        .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
+        .suscribeToApid = K_BMP390_SERVICE_APID,
+        .p_mailBox = mailboxData,
+        .init = SPP_SERVICES_E22MBL01_init,
+        .consumeData = SPP_SERVICES_E22MBL01_consumeData,
 }
 
 static int s_frame_number = 1;
@@ -67,10 +68,10 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void)
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
-    
+
 
     SPP_RetVal_t ret = K_SPP_OK;
-    if(p_data == NULL)
+    if (p_data == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
