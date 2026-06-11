@@ -34,6 +34,7 @@ static const char *const k_tag = "DATALOGGER";
 SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger)
 {
     SPP_RetVal_t ret = SPP_HAL_storageMount(p_logger->p_storageCfg);
+
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_tag, "Mount failed");
@@ -41,6 +42,7 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger)
     }
 
     p_logger->p_file = fopen(p_logger->p_filePath, "w");
+
     if (p_logger->p_file == NULL)
     {
         SPP_LOGE(k_tag, "Cannot open %s", p_logger->p_filePath);
@@ -48,9 +50,14 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger)
         return K_SPP_ERROR;
     }
 
+    fprintf(p_logger->p_file, "DATALOGGER START\n");
+    fflush(p_logger->p_file);
+
     p_logger->is_open = true;
     p_logger->logged_packets = 0U;
+
     SPP_LOGI(k_tag, "Ready — logging to %s", p_logger->p_filePath);
+
     return K_SPP_OK;
 }
 
