@@ -16,18 +16,20 @@
 /* ----------------------------------------------------------------
  * CONSTANTS    
  * ---------------------------------------------------------------- */
-#define K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS (5U)
-#define K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS (5U)
-#define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE   (8U) /**< Internal packet buffer depth. */
-
+#define K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS    (5U)
+#define K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS    (5U)
+#define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (8U) /**< Internal packet buffer depth. */
+#define K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY (1U)
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
+    const SPP_SERVICE_ProducerContract_t *p_producerData);
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(
+    const SPP_SERVICE_ConsumerContract_t *p_consumerData);
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 
@@ -53,7 +55,25 @@ void SPP_SERVICES_PUBSUB_callProducers(void);
 /**
  * @brief  Routes all buffered packets to matching consumer mailboxes, then clears the buffer.
  */
+
 void SPP_SERVICES_PUBSUB_callConsumers(void);
 
+/**
+ * @brief  Returns the number of packets currently held in the internal FIFO buffer.
+ */
+spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
+
+/**
+ * @brief  Returns the cumulative number of packets dropped for a specific APID due to a full
+ */
+spp_uint32_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid);
+
+/**
+ * @brief  Signals that a producer has new data pending.
+ *
+ * Must be called from within acquireData() as soon as a DRDY flag is detected,
+ * so that callConsumers() can preempt consumers with priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY.
+ */
+void SPP_SERVICES_PUBSUB_signalProducerReady(void);
 
 #endif /* SPP_PUBSUB_H */

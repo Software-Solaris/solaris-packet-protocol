@@ -16,9 +16,11 @@
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
+static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {
+    NULL};
 static spp_uint8_t s_registeredProducers = 0U;
-static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
+static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {
+    NULL};
 static spp_uint8_t s_registeredConsumers = 0U;
 
 static SPP_Packet_t s_packetBuffer[K_SPP_SERVICES_PUBSUB_BUFFER_SIZE];
@@ -26,16 +28,20 @@ static spp_uint8_t s_bufferHead = 0U;
 static spp_uint8_t s_bufferTail = 0U;
 static spp_uint8_t s_bufferCount = 0U;
 
+static volatile spp_bool_t s_producerReady = false;
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static void SPP_SERVICES_PUBSUB_sendToMailbox(void);
+static void SPP_SERVICES_PUBSUB_sortConsumers(void);
 
 /* ----------------------------------------------------------------
 * PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
+    const SPP_SERVICE_ProducerContract_t *p_producerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_producerData == NULL)
@@ -55,7 +61,8 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
     return ret;
 }
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(
+    const SPP_SERVICE_ConsumerContract_t *p_consumerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_consumerData == NULL)
@@ -77,6 +84,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerCont
 
 void SPP_SERVICES_PUBSUB_callProducers(void)
 {
+    s_producerReady = false;
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
         (void)s_producers[i]->acquireData();
@@ -111,6 +119,53 @@ void SPP_SERVICES_PUBSUB_callConsumers(void)
 {
     // Sends the received data via de publish to the consumer mailbox
     SPP_SERVICES_PUBSUB_sendToMailbox();
+    for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
+    {
+        if (s_consumers[j]->consumeData == NULL)
+        {
+            continue;
+        }
+        if (!s_consumers[j]->isMailboxFull)
+        {
+            continue;
+        }
+        /* Preempt lower-priority consumers if a producer has new data pending. */
+        if (s_producerReady && (s_consumers[j]->priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY))
+        {
+            break;
+        }
+        (void)s_consumers[j]->consumeData(NULL);
+    }
+}
+
+spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void)
+{
+    return s_bufferCount;
+}
+spp_uint32_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid)
+{
+    spp_uint32_t total = 0U;
+    if (apid == K_SPP_APID_ALL)
+    {
+        for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
+        {
+            total += s_consumers[i]->overflowCount;
+        }
+        return total;
+    }
+    for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
+    {
+        if ((s_consumers[i]->suscribeToApid & apid) != 0U)
+        {
+            total += s_consumers[i]->overflowCount;
+        }
+    }
+    return total;
+}
+
+void SPP_SERVICES_PUBSUB_signalProducerReady(void)
+{
+    s_producerReady = true;
 }
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
@@ -158,22 +213,43 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
  */
 static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
 {
-    for (spp_uint8_t i = 0U; i < s_bufferCount; i++)
+    if (s_bufferCount == 0U)
     {
-        spp_uint8_t idx = (spp_uint8_t)((s_bufferHead + i) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
-        const SPP_Packet_t *p_pkt = &s_packetBuffer[idx];
-
-        for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
-        {
-            if ((s_consumers[j]->p_mailBox != NULL) &&
-                ((s_consumers[j]->suscribeToApid & p_pkt->primaryHeader.apid) != 0U))
-            {
-                *s_consumers[j]->p_mailBox = *p_pkt;
-            }
-        }
+        return;
     }
+    const SPP_Packet_t *p_pkt = &s_packetBuffer[s_bufferHead];
+    for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
+    {
+        if (s_consumers[j]->deliverToMailbox == NULL)
+        {
+            continue;
+        }
+        if ((s_consumers[j]->suscribeToApid & p_pkt->primaryHeader.apid) == 0U)
+        {
+            continue;
+        }
+        (void)s_consumers[j]->deliverToMailbox(p_pkt);
+    }
+    s_bufferHead = (spp_uint8_t)((s_bufferHead + 1U) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
+    s_bufferCount--;
+}
 
-    s_bufferHead = 0U;
-    s_bufferTail = 0U;
-    s_bufferCount = 0U;
+/**
+ * @brief  Sorts the registered consumer array in ascending priority order using
+ *         insertion sort.  Stable — consumers with equal priority retain their
+ *         registration order.  Called once during init before any dispatch.
+ */
+static void SPP_SERVICES_PUBSUB_sortConsumers(void)
+{
+    for (spp_uint8_t i = 1U; i < s_registeredConsumers; i++)
+    {
+        const SPP_SERVICE_ConsumerContract_t *key = s_consumers[i];
+        spp_int8_t j = (spp_int8_t)i - 1;
+        while ((j >= 0) && (s_consumers[(spp_uint8_t)j]->priority > key->priority))
+        {
+            s_consumers[(spp_uint8_t)(j + 1U)] = s_consumers[(spp_uint8_t)j];
+            j--;
+        }
+        s_consumers[(spp_uint8_t)(j + 1)] = key;
+    }
 }
