@@ -45,9 +45,7 @@ typedef struct
     const char *p_nameConsumer;  /**< Human-readable module name (for logging). */
     spp_uint16_t tiemoutMs;      /**< Timeout for the consumer to receive a packet */
     spp_uint16_t suscribeToApid; /**< APIDs to subscribe to */
-    volatile spp_bool_t isMailboxFull;
-    spp_uint32_t overflowCount;
-    SPP_RetVal_t (*init)(); /**< Initialise the module. */
+    SPP_RetVal_t (*init)();      /**< Initialise the module. */
     SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t *p_pkt);
     SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
 } SPP_SERVICE_ConsumerContract_t;
