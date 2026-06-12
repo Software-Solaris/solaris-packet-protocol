@@ -89,7 +89,7 @@ typedef struct
      *
      * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
      */
-    SPP_RetVal_t (*uartTransmit)(void *p_handle, const void *p_data, spp_uint32_t len);
+    SPP_RetVal_t (*uartTransmit)(const void *p_data, spp_uint32_t len);
 
 } SPP_HALUart_t;
 

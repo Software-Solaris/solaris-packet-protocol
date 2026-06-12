@@ -67,8 +67,8 @@ SPP_RetVal_t SPP_HAL_UART_transmit(const void *p_data, spp_uint16_t len)
         return ret;
     }
 
-    return p_port->uart.uartTransmit(NULL, encBuf, (spp_uint32_t)encLen);
+    return p_port->uart.uartTransmit(encBuf, (spp_uint32_t)encLen);
 #else
-    return p_port->uart.uartTransmit(NULL, p_data, len);
+    return p_port->uart.uartTransmit(p_data, len);
 #endif
 }

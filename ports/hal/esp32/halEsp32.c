@@ -44,7 +44,7 @@ static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void);
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uint32_t len);
 
 
 /* ----------------------------------------------------------------
@@ -399,8 +399,19 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void)
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uint32_t len)
 {
-    // TO-DO: finish the function
+    if ((p_data == NULL) || (len == 0U))
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    const int written = uart_write_bytes(K_ESP32_UART_PORT_ID, p_data, (size_t)len);
+
+    if (written != (int)len)
+    {
+        return K_SPP_ERROR;
+    }
+
     return K_SPP_OK;
 }
