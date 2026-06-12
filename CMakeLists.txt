@@ -8,10 +8,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ----------------------------------------------------------------
 # Feature flags
 # ----------------------------------------------------------------
-option(SPP_NO_MALLOC  "Disable dynamic memory allocation" OFF)
-option(SPP_NO_STORAGE "Disable storage HAL"               OFF)
+option(SPP_NO_MALLOC   "Disable dynamic memory allocation"             OFF)
+option(SPP_NO_STORAGE  "Disable storage HAL"                          OFF)
 option(SPP_BUILD_TESTS "Build Cgreen unit tests (requires host build)" OFF)
-option(SPP_PORT "Port to use: posix | freertos | baremetal" "posix")
+option(SPP_PORT        "Port to use: posix | freertos | baremetal"     "posix")
+option(SPP_ENCRYPTION  "Compile AES-128-GCM encryption module"         OFF)
 
 # ----------------------------------------------------------------
 # Services — opt-in (all ON by default)
@@ -49,10 +50,21 @@ if(SPP_SERVICE_DATALOGGER)
     list(APPEND SPP_CORE_SOURCES services/datalogger/datalogger.c)
 endif()
 
+if(SPP_ENCRYPTION)
+    list(APPEND SPP_CORE_SOURCES external/encryption/encryption.c)
+endif()
+
 add_library(spp STATIC ${SPP_CORE_SOURCES})
 
 # Include root is the parent of spp/ so #include "spp/core/packet.h" resolves correctly.
-target_include_directories(spp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(spp PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    $<$<BOOL:${SPP_ENCRYPTION}>:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+if(SPP_ENCRYPTION)
+    target_compile_definitions(spp PUBLIC SPP_ENCRYPTION=1)
+endif()
 
 if(SPP_NO_MALLOC)
     target_compile_definitions(spp PUBLIC SPP_NO_MALLOC=1)
