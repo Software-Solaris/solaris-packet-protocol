@@ -78,7 +78,7 @@ typedef struct
      *
      * @return K_SPP_OK on success.
      */
-    SPP_RetVal_t (*uartPortInit)(void *p_cfg);
+    SPP_RetVal_t (*uartPortInit)(void);
 
     /**
      * @brief Perform an UART transaction.

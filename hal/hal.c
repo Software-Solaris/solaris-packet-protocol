@@ -11,6 +11,7 @@
 #include "spp/core/returnTypes.h"
 #include "spp/hal/hal.h"
 #include "spp/hal/spi/spi.h"
+#include "spp/hal/uart/uart.h"
 
 /* ----------------------------------------------------------------
  * VARIABLES
@@ -38,6 +39,12 @@ SPP_RetVal_t SPP_HAL_init(const SPP_HalPort_t *p_port)
         ret = K_SPP_ERROR;
     }
     return K_SPP_OK;
+
+    ret = SPP_HAL_UART_portInit();
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
 }
 
 const SPP_HalPort_t *SPP_HAL_getPort(void)

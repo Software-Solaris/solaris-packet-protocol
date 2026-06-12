@@ -43,7 +43,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len);
 
 
@@ -353,7 +353,7 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
 /* ----------------------------------------------------------------
  * UART
  * ---------------------------------------------------------------- */
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void)
 {
     esp_err_t ret = ESP_OK;
     static spp_bool_t s_uartPortInitialized = false;
@@ -363,17 +363,10 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
         return K_SPP_OK;
     }
 
-    if (p_cfg == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
-
-    const SPP_UartInitCfg_t *p_uartCfg = (const SPP_UartInitCfg_t *)p_cfg;
-
-    const uart_port_t uart_num = (uart_port_t)p_uartCfg->portId;
+    const uart_port_t uart_num = K_ESP32_UART_PORT_ID;
 
     uart_config_t espUartPortCfg = {
-        .baud_rate = p_uartCfg->baudRate,
+        .baud_rate = K_ESP32_UART_BAUD_RATE,
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
@@ -387,14 +380,14 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
         return K_SPP_ERROR;
     }
 
-    ret = uart_set_pin(uart_num, p_uartCfg->txPin, p_uartCfg->rxPin, p_uartCfg->rtsPin, p_uartCfg->ctsPin);
+    ret = uart_set_pin(uart_num, K_ESP32_UART_TX_PIN, K_ESP32_UART_RX_PIN, K_ESP32_UART_RTS_PIN, K_ESP32_UART_CTS_PIN);
 
     if (ret != ESP_OK)
     {
         return K_SPP_ERROR;
     }
 
-    ret = uart_driver_install(uart_num, p_uartCfg->rxBufferSize, p_uartCfg->txBufferSize, 0, NULL, 0);
+    ret = uart_driver_install(uart_num, K_ESP32_UART_RX_BUFFER_SIZE, K_ESP32_UART_TX_BUFFER_SIZE, 0, NULL, 0);
 
     if (ret != ESP_OK)
     {
@@ -409,4 +402,5 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len)
 {
     // TO-DO: finish the function
+    return K_SPP_OK;
 }

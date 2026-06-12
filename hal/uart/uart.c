@@ -19,7 +19,7 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg)
+SPP_RetVal_t SPP_HAL_UART_portInit(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
@@ -36,13 +36,7 @@ SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg)
         return ret;
     }
 
-    if (p_cfg == NULL)
-    {
-        ret = K_SPP_ERROR;
-        return ret;
-    }
-
-    ret = p_port->uart.uartPortInit(p_cfg);
+    ret = p_port->uart.uartPortInit();
 
     return ret;
 }
