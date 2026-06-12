@@ -7,6 +7,7 @@
 
 #include "spp/hal/hal.h"
 #include "spp/hal/gpio/gpio.h"
+#include "spp/hal/uart/uart.h"
 #include "spp/core/returnTypes.h"
 #include "spp/core/types.h"
 #include "macrosEsp32.h"
@@ -42,6 +43,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg);
+
 /* ----------------------------------------------------------------
  * STATIC VARIABLES
  * ---------------------------------------------------------------- */
@@ -69,12 +72,17 @@ const static SPP_HALTime_t s_esp32HalTime = {
     .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
 
+const static SPP_HALUart_t s_esp32HalUart = {
+    .uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
+};
+
 
 static const SPP_HalPort_t s_esp32HalPorts = {
     .spi = s_esp32HalSpi,
     .gpio = s_esp32HalGpio,
     .storage = s_esp32HalStorage,
     .time = s_esp32HalTime,
+    .uart = s_esp32HalUart,
 };
 
 /* ----------------------------------------------------------------
@@ -99,7 +107,6 @@ static const char *const k_tag = "SPP_HAL";
 static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
 static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
-static spp_bool_t s_portInitialized = false;
 
 static sdmmc_card_t *s_p_sdCard = NULL;
 static spp_bool_t s_sdMounted = false;
@@ -345,19 +352,47 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
 /* ----------------------------------------------------------------
  * UART
  * ---------------------------------------------------------------- */
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
 {
-    if (s_portInitialized == true)
+    esp_err_t ret = ESP_OK;
+    static spp_bool_t s_uartPortInitialized = false;
+    if (s_uartPortInitialized == true)
     {
         return K_SPP_OK;
     }
 
-    // uart_port_t portCfg = {
-    //     .baud_rate = 115200,
-    //     .data_bits = UART_DATA_8_BITS,
-    //     .parity = UART_PARITY_DISABLE,
-    //     .stop_bits = UART_STOP_BITS_1,
-    //     .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
-    //     .rx_flow_control_thresh = 122,
-    // };
+    if (p_cfg == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    const SPP_UartInitCfg_t *p_uartCfg = (SPP_UartInitCfg_t *)p_cfg;
+
+    const uart_port_t uart_num = p_uartCfg->portId;
+    const uart_config_t espUartPortCfg = {
+        .baud_rate = (int)p_uartCfg->baudRate,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
+        .rx_flow_ctrl_thresh = 122,
+    };
+
+    ret = uart_param_config(uart_num, &espUartPortCfg);
+
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(k_tag, "UART param config error");
+        return K_SPP_ERROR;
+    }
+
+    ret = uart_set_pin(uart_num, p_uartCfg->txPin, p_uartCfg->rxPin, p_uartCfg->rtsPin, p_uartCfg->ctsPin);
+
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(k_tag, "UART set pin error");
+        return K_SPP_ERROR;
+    }
+
+    return K_SPP_ERROR; //not finished
 }

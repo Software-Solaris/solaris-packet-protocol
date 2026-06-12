@@ -14,7 +14,7 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_SPI_portInit(void *p_cfg)
+SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg)
 {
     SPP_RetVal_t ret = K_SPP_OK;
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
