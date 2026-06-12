@@ -38,6 +38,7 @@ set(SPP_CORE_SOURCES
     services/pubsub/pubsub.c
     services/log/log.c
     util/crc.c
+    hal/uart/uart.c
 )
 
 if(SPP_SERVICE_BMP390)
@@ -52,6 +53,7 @@ endif()
 
 if(SPP_ENCRYPTION)
     list(APPEND SPP_CORE_SOURCES external/encryption/encryption.c)
+    list(APPEND SPP_CORE_SOURCES external/encryption/cipher.c)
 endif()
 
 add_library(spp STATIC ${SPP_CORE_SOURCES})

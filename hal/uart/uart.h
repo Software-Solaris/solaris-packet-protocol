@@ -50,4 +50,4 @@ SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg);
   * 
   * @return K_SPP_OK on success.
   */
-SPP_RetVal_t SPP_HAL_UART_transmit(void *p_handle, const void *p_data, spp_uint32_t len);
+SPP_RetVal_t SPP_HAL_UART_transmit(const void *p_data, spp_uint16_t len);
