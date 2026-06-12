@@ -40,7 +40,7 @@
 /**
  * @brief Primary header — routing and framing information.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     spp_uint8_t version;     /**< Protocol version (= K_SPP_PKT_VERSION).        */
     spp_uint16_t apid;       /**< Application Process Identifier.                */
@@ -51,7 +51,7 @@ typedef struct
 /**
  * @brief Secondary header — timing and reliability metadata.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     spp_uint32_t timestampMs; /**< System timestamp at packet creation (ms). */
     spp_uint8_t dropCounter;  /**< Number of packets dropped since last reset. */
@@ -68,7 +68,7 @@ typedef struct
  * push the packet into the @c db_flow FIFO.  Consumers pop it, process it,
  * and return it to the databank.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     SPP_PacketPrimary_t primaryHeader;          /**< Routing / framing header.  */
     SPP_PacketSecondary_t secondaryHeader;      /**< Timing / metadata header.  */
