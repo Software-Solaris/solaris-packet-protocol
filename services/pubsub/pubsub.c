@@ -107,7 +107,8 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_pkt)
     else
     {
         s_packetBuffer[s_bufferTail] = *p_pkt;
-        s_bufferTail = (spp_uint8_t)((s_bufferTail + 1U) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
+        s_bufferTail = (spp_uint8_t)((s_bufferTail + K_SPP_SERVICES_PUBSUB_STEP) %
+                                     K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
         s_bufferCount++;
     }
 
