@@ -125,13 +125,10 @@ void SPP_SERVICES_PUBSUB_callConsumers(void)
         {
             continue;
         }
-        if (!s_consumers[j]->isMailboxFull)
-        {
-            continue;
-        }
         /* Preempt lower-priority consumers if a producer has new data pending. */
         if (s_producerReady && (s_consumers[j]->priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY))
         {
+            s_producerReady = false;
             break;
         }
         (void)s_consumers[j]->consumeData(NULL);
@@ -141,26 +138,6 @@ void SPP_SERVICES_PUBSUB_callConsumers(void)
 spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void)
 {
     return s_bufferCount;
-}
-spp_uint32_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid)
-{
-    spp_uint32_t total = 0U;
-    if (apid == K_SPP_APID_ALL)
-    {
-        for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
-        {
-            total += s_consumers[i]->overflowCount;
-        }
-        return total;
-    }
-    for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
-    {
-        if ((s_consumers[i]->suscribeToApid & apid) != 0U)
-        {
-            total += s_consumers[i]->overflowCount;
-        }
-    }
-    return total;
 }
 
 void SPP_SERVICES_PUBSUB_signalProducerReady(void)
@@ -172,7 +149,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
-    //TODO: Call a function to order the consumer array based on priority
+    SPP_SERVICES_PUBSUB_sortConsumers();
 
 
     if (s_registeredProducers > 0U)
@@ -224,13 +201,14 @@ static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
         {
             continue;
         }
-        if ((s_consumers[j]->suscribeToApid & p_pkt->primaryHeader.apid) == 0U)
+        if ((s_consumers[j]->suscribeToApid) && (p_pkt->primaryHeader.apid) == 0U)
         {
             continue;
         }
         (void)s_consumers[j]->deliverToMailbox(p_pkt);
     }
-    s_bufferHead = (spp_uint8_t)((s_bufferHead + 1U) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
+    s_bufferHead = (spp_uint8_t)((s_bufferHead + K_SPP_SERVICES_PUBSUB_STEP) %
+                                 K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
     s_bufferCount--;
 }
 
@@ -241,15 +219,17 @@ static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
  */
 static void SPP_SERVICES_PUBSUB_sortConsumers(void)
 {
-    for (spp_uint8_t i = 1U; i < s_registeredConsumers; i++)
+    for (spp_uint8_t i = K_SPP_SERVICES_PUBSUB_SORT_START_INDEX; i < s_registeredConsumers; i++)
     {
         const SPP_SERVICE_ConsumerContract_t *key = s_consumers[i];
-        spp_int8_t j = (spp_int8_t)i - 1;
-        while ((j >= 0) && (s_consumers[(spp_uint8_t)j]->priority > key->priority))
+        spp_int8_t j = (spp_int8_t)i - (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET;
+        while ((j >= K_SPP_SERVICES_PUBSUB_ZERO_INDEX) &&
+               (s_consumers[(spp_uint8_t)j]->priority > key->priority))
         {
-            s_consumers[(spp_uint8_t)(j + 1U)] = s_consumers[(spp_uint8_t)j];
+            s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)] =
+                s_consumers[(spp_uint8_t)j];
             j--;
         }
-        s_consumers[(spp_uint8_t)(j + 1)] = key;
+        s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)] = key;
     }
 }

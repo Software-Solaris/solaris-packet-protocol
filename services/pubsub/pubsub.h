@@ -21,6 +21,11 @@
 #define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (8U) /**< Internal packet buffer depth. */
 #define K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY (1U)
 
+#define K_SPP_SERVICES_PUBSUB_STEP             (1U) /**< Step to increment circular buffer index. */
+#define K_SPP_SERVICES_PUBSUB_SORT_START_INDEX (1U) /**< Starting index for insertion sort. */
+#define K_SPP_SERVICES_PUBSUB_OFFSET           (1U) /**< Array index offset. */
+#define K_SPP_SERVICES_PUBSUB_ZERO_INDEX       (0)  /**< Zero index/value for comparisons. */
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
@@ -62,11 +67,6 @@ void SPP_SERVICES_PUBSUB_callConsumers(void);
  * @brief  Returns the number of packets currently held in the internal FIFO buffer.
  */
 spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
-
-/**
- * @brief  Returns the cumulative number of packets dropped for a specific APID due to a full
- */
-spp_uint32_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid);
 
 /**
  * @brief  Signals that a producer has new data pending.
