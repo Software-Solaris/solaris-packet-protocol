@@ -16,11 +16,9 @@
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {
-    NULL};
+static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
 static spp_uint8_t s_registeredProducers = 0U;
-static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {
-    NULL};
+static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
 static spp_uint8_t s_registeredConsumers = 0U;
 
 static SPP_Packet_t s_packetBuffer[K_SPP_SERVICES_PUBSUB_BUFFER_SIZE];
@@ -30,6 +28,7 @@ static spp_uint8_t s_bufferCount = 0U;
 
 static volatile spp_bool_t s_producerReady = false;
 
+static int K_SPP_APID_ALL = 1;
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
@@ -40,8 +39,7 @@ static void SPP_SERVICES_PUBSUB_sortConsumers(void);
 * PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
-    const SPP_SERVICE_ProducerContract_t *p_producerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_producerData == NULL)
@@ -61,8 +59,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
     return ret;
 }
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(
-    const SPP_SERVICE_ConsumerContract_t *p_consumerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_consumerData == NULL)

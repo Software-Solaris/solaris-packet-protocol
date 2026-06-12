@@ -28,15 +28,8 @@ typedef struct
     spp_int32_t rtsPin;
     spp_int32_t ctsPin;
 
-    spp_uint8_t dataBits;
-    spp_uint8_t stopBits;
-    spp_uint8_t parity;
-
     spp_uint32_t rxBufferSize;
     spp_uint32_t txBufferSize;
-
-    spp_uint32_t queueSize;
-    spp_uint32_t flags;
 
 } SPP_UartInitCfg_t;
 
@@ -50,3 +43,11 @@ typedef struct
   * @return K_SPP_OK on success.
   */
 SPP_RetVal_t SPP_HAL_UART_portInit(void *p_cfg);
+
+
+/**
+  * @brief Perform UART transaction.
+  * 
+  * @return K_SPP_OK on success.
+  */
+SPP_RetVal_t SPP_HAL_UART_transmit(void *p_handle, const void *p_data, spp_uint32_t len);

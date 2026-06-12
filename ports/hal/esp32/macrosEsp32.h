@@ -57,4 +57,18 @@
 /** @brief SPI device index for the ICM20948. */
 #define K_ESP32_SPI_IDX_ICM (1U)
 
+/* ----------------------------------------------------------------
+ * UART port assignments
+ * ---------------------------------------------------------------- */
+#define K_ESP32_UART_PORT_ID   UART_NUM_2
+#define K_ESP32_UART_BAUD_RATE 115200
+
+#define K_ESP32_UART_TX_PIN  1
+#define K_ESP32_UART_RX_PIN  0
+#define K_ESP32_UART_RTS_PIN -1 // Not used
+#define K_ESP32_UART_CTS_PIN -1 // Not used
+
+#define K_ESP32_UART_RX_BUFFER_SIZE 1024
+#define K_ESP32_UART_TX_BUFFER_SIZE 1024
+
 #endif /* SPP_MACROS_ESP32_H */

@@ -44,6 +44,8 @@ static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len);
+
 
 /* ----------------------------------------------------------------
  * STATIC VARIABLES
@@ -72,9 +74,8 @@ const static SPP_HALTime_t s_esp32HalTime = {
     .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
 
-const static SPP_HALUart_t s_esp32HalUart = {
-    .uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
-};
+const static SPP_HALUart_t s_esp32HalUart = {.uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
+                                             .uartTransmit = SPP_PORTS_HAL_ESP32_uartTransmit};
 
 
 static const SPP_HalPort_t s_esp32HalPorts = {
@@ -356,6 +357,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
 {
     esp_err_t ret = ESP_OK;
     static spp_bool_t s_uartPortInitialized = false;
+
     if (s_uartPortInitialized == true)
     {
         return K_SPP_OK;
@@ -366,23 +368,22 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    const SPP_UartInitCfg_t *p_uartCfg = (SPP_UartInitCfg_t *)p_cfg;
+    const SPP_UartInitCfg_t *p_uartCfg = (const SPP_UartInitCfg_t *)p_cfg;
 
-    const uart_port_t uart_num = p_uartCfg->portId;
-    const uart_config_t espUartPortCfg = {
-        .baud_rate = (int)p_uartCfg->baudRate,
+    const uart_port_t uart_num = (uart_port_t)p_uartCfg->portId;
+
+    uart_config_t espUartPortCfg = {
+        .baud_rate = p_uartCfg->baudRate,
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
-        .rx_flow_ctrl_thresh = 122,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .rx_flow_ctrl_thresh = 0,
     };
 
     ret = uart_param_config(uart_num, &espUartPortCfg);
-
     if (ret != ESP_OK)
     {
-        ESP_LOGE(k_tag, "UART param config error");
         return K_SPP_ERROR;
     }
 
@@ -390,9 +391,22 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void *p_cfg)
 
     if (ret != ESP_OK)
     {
-        ESP_LOGE(k_tag, "UART set pin error");
         return K_SPP_ERROR;
     }
 
-    return K_SPP_ERROR; //not finished
+    ret = uart_driver_install(uart_num, p_uartCfg->rxBufferSize, p_uartCfg->txBufferSize, 0, NULL, 0);
+
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    s_uartPortInitialized = true;
+
+    return K_SPP_OK;
+}
+
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(void *p_handle, const void *p_data, spp_uint32_t len)
+{
+    // TO-DO: finish the function
 }

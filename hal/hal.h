@@ -80,6 +80,17 @@ typedef struct
      */
     SPP_RetVal_t (*uartPortInit)(void *p_cfg);
 
+    /**
+     * @brief Perform an UART transaction.
+     *
+     * @param[in,out] p_handle  SPI device handle.
+     * @param[in,out] p_data    TX data in, RX data out.
+     * @param[in]     length    Number of bytes in the transaction.
+     *
+     * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
+     */
+    SPP_RetVal_t (*uartTransmit)(void *p_handle, const void *p_data, spp_uint32_t len);
+
 } SPP_HALUart_t;
 
 /**

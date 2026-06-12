@@ -22,6 +22,7 @@
 
 /* HAL dispatch API */
 #include "spp/hal/spi/spi.h"
+#include "spp/hal/uart/uart.h"
 #include "spp/hal/gpio/gpio.h"
 #include "spp/hal/storage/storage.h"
 #include "spp/hal/time/time.h"
