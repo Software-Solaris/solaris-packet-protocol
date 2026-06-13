@@ -33,7 +33,7 @@
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
-static SPP_RetVal_t SPP_BMP390_acquireData(void);
+static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
@@ -58,8 +58,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.producerID = {.value = K_BMP390_SERVICE_APID},
-                                                                        .p_nameProducer = "bmp390",
+static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.p_nameProducer = "bmp390",
                                                                         .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
                                                                         .init = SPP_SERVICES_BMP390_init,
                                                                         .acquireData = SPP_BMP390_acquireData};
@@ -139,7 +138,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
  *
  * @param  p_data  Pointer to the BMP390_t sensor instance.
  */
-static SPP_RetVal_t SPP_BMP390_acquireData(void)
+static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
 {
     BMP390_t *p_bmpData = &s_bmpData;
     float altitude = 0.0f;
@@ -176,7 +175,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(void)
 
 
     float payload[3] = {altitude, pressure, temperature};
-    ret = SPP_SERVICES_DATABANK_packetData(p_packet, K_BMP390_SERVICE_APID, p_bmpData->seq++, payload,
+    ret = SPP_SERVICES_DATABANK_packetData(p_packet, kpid.value, p_bmpData->seq++, payload,
                                            (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {

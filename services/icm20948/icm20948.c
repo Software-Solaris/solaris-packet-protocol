@@ -80,7 +80,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data);
 static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx);
 static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm);
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void);
-static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void);
+static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid);
 
 /* ----------------------------------------------------------------
  * VARIABLES
@@ -93,7 +93,6 @@ static const spp_uint8_t s_dmp3Image[] = {
 static ICM20948_t s_icmData;
 
 static const SPP_SERVICE_ProducerContract_t s_icm20948ProducerContract = {
-    .producerID = {.value = K_ICM20948_SERVICE_APID},
     .p_nameProducer = "icm20948",
     .tiemoutMs = K_ICM20948_TASK_TIMEOUT_MS,
     .init = SPP_SERVICES_ICM20948_init,
@@ -172,7 +171,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
  *
  * @return K_SPP_OK on success or no data; K_SPP_ERROR if packet allocation or packing fails.
  */
-static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void)
+static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
 {
     ICM20948_t *p_ctx = &s_icmData;
 
@@ -211,8 +210,8 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(void)
            p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy, p_ctx->lastData.gz,
            p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz);
 
-    SPP_RetVal_t ret = SPP_SERVICES_DATABANK_packetData(p_pkt, K_ICM20948_SERVICE_APID, p_ctx->seq++, payload,
-                                                        (spp_uint16_t)sizeof(payload));
+    SPP_RetVal_t ret =
+        SPP_SERVICES_DATABANK_packetData(p_pkt, kpid.value, p_ctx->seq++, payload, (spp_uint16_t)sizeof(payload));
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
