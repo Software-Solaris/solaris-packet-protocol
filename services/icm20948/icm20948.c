@@ -93,7 +93,7 @@ static const spp_uint8_t s_dmp3Image[] = {
 static ICM20948_t s_icmData;
 
 static const SPP_SERVICE_ProducerContract_t s_icm20948ProducerContract = {
-    .producerID = K_ICM20948_SERVICE_APID,
+    .producerID = {.value = K_ICM20948_SERVICE_APID},
     .p_nameProducer = "icm20948",
     .tiemoutMs = K_ICM20948_TASK_TIMEOUT_MS,
     .init = SPP_SERVICES_ICM20948_init,

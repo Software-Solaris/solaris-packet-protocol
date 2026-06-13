@@ -8,6 +8,7 @@
 #include "spp/util/macros.h"
 #include "spp/services/log/log.h"
 #include "spp/core/error.h"
+#include "spp/services/kpid.h"
 
 
 //TODO: Tener una forma de guardar los data packets que te llegan
@@ -16,9 +17,23 @@
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
-static spp_uint8_t s_registeredProducers = 0U;
-static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
+typedef struct
+{
+    const SPP_SERVICE_ProducerContract_t *p_contract;
+    SPP_Kpid_t kpid;
+
+} SPP_SERVICES_PUBSUB_Producer_t;
+
+typedef struct
+{
+    const SPP_SERVICE_ConsumerContract_t *p_contract;
+    SPP_Kpid_t subcription;
+
+} SPP_SERVICES_PUBSUB_Consumer_t;
+
+static SPP_SERVICES_PUBSUB_Producer_t s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {0};
+static spp_uint16_t s_registeredProducers = 0U;
+static SPP_SERVICES_PUBSUB_Consumer_t s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {0};
 static spp_uint8_t s_registeredConsumers = 0U;
 
 static SPP_Packet_t s_packetBuffer[K_SPP_SERVICES_PUBSUB_BUFFER_SIZE];
@@ -28,7 +43,6 @@ static spp_uint8_t s_bufferCount = 0U;
 
 static volatile spp_bool_t s_producerReady = false;
 
-static int K_SPP_APID_ALL = 1;
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
@@ -39,10 +53,11 @@ static void SPP_SERVICES_PUBSUB_sortConsumers(void);
 * PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                  SPP_Kpid_t *p_assignedKpid)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
-    if (p_producerData == NULL)
+    if (p_producerData == NULL || p_assignedKpid == NULL)
     {
         ret = K_SPP_ERROR_NULL_POINTER;
     }
@@ -52,14 +67,27 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
     }
     else
     {
-        s_producers[s_registeredProducers] = p_producerData;
+        s_producers[s_registeredProducers].p_contract = p_producerData;
+
+        s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers));
+        /*
+        * with s_registeredProducers = 0 -> producer 0: 0000 0001
+        * with s_registeredProducers = 1 -> producer 1: 0000 0010
+        *
+        * Then u can do an OR:
+        * producer[X].kpid.value | producer[Y].kpid.value
+        */
+
+        *p_assignedKpid = s_producers[s_registeredProducers].kpid;
         s_registeredProducers++;
+
         ret = K_SPP_OK;
     }
     return ret;
 }
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                  SPP_Kpid_t subscription)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_consumerData == NULL)
@@ -72,7 +100,10 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerCont
     }
     else
     {
-        s_consumers[s_registeredConsumers] = p_consumerData;
+        s_consumers[s_registeredConsumers].p_contract = p_consumerData;
+        s_consumers[s_registeredConsumers].subcription = subscription;
+
+
         s_registeredConsumers++;
         ret = K_SPP_OK;
     }
@@ -84,7 +115,7 @@ void SPP_SERVICES_PUBSUB_callProducers(void)
     s_producerReady = false;
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        (void)s_producers[i]->acquireData();
+        (void)s_producers[i].p_contract->acquireData();
     }
 }
 
@@ -104,8 +135,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_pkt)
     else
     {
         s_packetBuffer[s_bufferTail] = *p_pkt;
-        s_bufferTail = (spp_uint8_t)((s_bufferTail + K_SPP_SERVICES_PUBSUB_STEP) %
-                                     K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
+        s_bufferTail = (spp_uint8_t)((s_bufferTail + K_SPP_SERVICES_PUBSUB_STEP) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
         s_bufferCount++;
     }
 
@@ -119,17 +149,17 @@ void SPP_SERVICES_PUBSUB_callConsumers(void)
     SPP_SERVICES_PUBSUB_sendToMailbox();
     for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
     {
-        if (s_consumers[j]->consumeData == NULL)
+        if (s_consumers[j].p_contract->consumeData == NULL)
         {
             continue;
         }
         /* Preempt lower-priority consumers if a producer has new data pending. */
-        if (s_producerReady && (s_consumers[j]->priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY))
+        if (s_producerReady && (s_consumers[j].p_contract->priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY))
         {
             s_producerReady = false;
             break;
         }
-        (void)s_consumers[j]->consumeData(NULL);
+        (void)s_consumers[j].p_contract->consumeData(NULL);
     }
 }
 
@@ -155,7 +185,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
         //Call the init function for each of the producers registered
         for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
         {
-            ret = s_producers[i]->init();
+            ret = s_producers[i].p_contract->init();
         }
     }
     else if (s_registeredConsumers > 0U)
@@ -163,7 +193,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
         //Call the init function for each of the consumers registered
         for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
         {
-            ret = s_consumers[i]->init();
+            ret = s_consumers[i].p_contract->init();
         }
     }
     else
@@ -195,18 +225,17 @@ static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
     const SPP_Packet_t *p_pkt = &s_packetBuffer[s_bufferHead];
     for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
     {
-        if (s_consumers[j]->deliverToMailbox == NULL)
+        if (s_consumers[j].p_contract->deliverToMailbox == NULL)
         {
             continue;
         }
-        if ((s_consumers[j]->suscribeToApid) && (p_pkt->primaryHeader.apid) == 0U)
+        if ((s_consumers[j].subcription.value) && (p_pkt->primaryHeader.apid) == 0U)
         {
             continue;
         }
-        (void)s_consumers[j]->deliverToMailbox(p_pkt);
+        (void)s_consumers[j].p_contract->deliverToMailbox(p_pkt);
     }
-    s_bufferHead = (spp_uint8_t)((s_bufferHead + K_SPP_SERVICES_PUBSUB_STEP) %
-                                 K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
+    s_bufferHead = (spp_uint8_t)((s_bufferHead + K_SPP_SERVICES_PUBSUB_STEP) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
     s_bufferCount--;
 }
 
@@ -219,15 +248,14 @@ static void SPP_SERVICES_PUBSUB_sortConsumers(void)
 {
     for (spp_uint8_t i = K_SPP_SERVICES_PUBSUB_SORT_START_INDEX; i < s_registeredConsumers; i++)
     {
-        const SPP_SERVICE_ConsumerContract_t *key = s_consumers[i];
+        const SPP_SERVICE_ConsumerContract_t *key = s_consumers[i].p_contract;
         spp_int8_t j = (spp_int8_t)i - (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET;
         while ((j >= K_SPP_SERVICES_PUBSUB_ZERO_INDEX) &&
-               (s_consumers[(spp_uint8_t)j]->priority > key->priority))
+               (s_consumers[(spp_uint8_t)j].p_contract->priority > key->priority))
         {
-            s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)] =
-                s_consumers[(spp_uint8_t)j];
+            s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)] = s_consumers[(spp_uint8_t)j];
             j--;
         }
-        s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)] = key;
+        s_consumers[(spp_uint8_t)(j + (spp_int8_t)K_SPP_SERVICES_PUBSUB_OFFSET)].p_contract = key;
     }
 }

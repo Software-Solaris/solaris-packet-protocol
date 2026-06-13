@@ -58,7 +58,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.producerID = K_BMP390_SERVICE_APID,
+static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.producerID = {.value = K_BMP390_SERVICE_APID},
                                                                         .p_nameProducer = "bmp390",
                                                                         .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
                                                                         .init = SPP_SERVICES_BMP390_init,

@@ -30,11 +30,10 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
-    const SPP_SERVICE_ProducerContract_t *p_producerData);
-
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(
-    const SPP_SERVICE_ConsumerContract_t *p_consumerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                  SPP_Kpid_t *p_assignedKpid);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                  SPP_Kpid_t subscription);
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 

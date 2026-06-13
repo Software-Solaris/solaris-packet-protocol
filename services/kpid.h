@@ -1,3 +1,5 @@
+#ifndef SPP_SERVICES_KPID_H
+#define SPP_SERVICES_KPID_H
 /**
  * @file kpid.h
  * @brief SPP service union with bitmap.
@@ -45,3 +47,5 @@ typedef union
  * kpid.value = 0x0006; // 0x0004|0x0002
  * Then: kpid.bits.bit1 = 1 & kpid.bits.bit2 = 1
  */
+
+#endif /* SPP_SERVICES_KPID_H */
