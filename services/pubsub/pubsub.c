@@ -139,29 +139,24 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
-    //TODO: Call a function to order the consumer array based on priority
+    SPP_SERVICES_PUBSUB_sortConsumers();
 
-
-    if (s_registeredProducers > 0U)
+    for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        //Call the init function for each of the producers registered
-        for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
+        if (s_producers[i]->init != NULL)
         {
             ret = s_producers[i]->init();
         }
     }
-    else if (s_registeredConsumers > 0U)
+
+    for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
     {
-        //Call the init function for each of the consumers registered
-        for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
+        if (s_consumers[i]->init != NULL)
         {
             ret = s_consumers[i]->init();
         }
     }
-    else
-    {
-        //No producers or consumers registered
-    }
+
     return ret;
 }
 
