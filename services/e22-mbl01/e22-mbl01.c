@@ -45,6 +45,7 @@ static SPP_Packet_t mailboxData[K_E22MBL01_MAILBOX_SIZE] = {0};
 static spp_uint8_t mailboxHead = 0;
 static spp_uint8_t mailboxTail = 0;
 static spp_uint8_t mailboxCount = 0;
+static spp_uint32_t s_frame_number = 1;
 
 static SPP_SERVICE_ConsumerContract_t e22Contract = {
     .consumerID = K_E22MBL01_SERVICE_APID,
@@ -52,14 +53,10 @@ static SPP_SERVICE_ConsumerContract_t e22Contract = {
     .p_nameConsumer = "e22-mbl01",
     .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
     .suscribeToApid = K_BMP390_SERVICE_APID | K_ICM20948_SERVICE_APID,
-    .isMailboxFull = false,
-    .overflowCount = 0,
     .init = SPP_SERVICES_E22MBL01_init,
     .deliverToMailbox = SPP_SERVICES_E22MBL01_deliverToMailbox,
     .consumeData = SPP_SERVICES_E22MBL01_consumeData,
 };
-
-static spp_uint32_t s_frame_number = 1;
 
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
@@ -84,16 +81,12 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t *p
     if (mailboxCount < K_E22MBL01_MAILBOX_SIZE){
         mailboxData[mailboxTail] = *p_pqt;
         mailboxTail = (spp_uint8_t)((mailboxTail + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular
-        mailboxCount++;
-        e22Contract.isMailboxFull = true;
+        mailboxCount++; // usaremos mailboxCount para saber cuantos paquetes tendremos que enviar luego
         return K_SPP_OK;
     }
     else{
-        e22Contract.overflowCount++;
         return K_SPP_ERROR;
     }
-
-    return K_SPP_OK;
 }
 
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
@@ -101,13 +94,13 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
     char strBMP390[64];
     char strICM20948[128];
 
-    sprintf(strBMP390, "BMP390:-");
-    sprintf(strICM20948, "ICM20948:-");
-
-    while (mailboxCount > 0){
+    while (mailboxCount > 0){ // si mailboxCount llega a 0 --> no hay mas paquetes que enviar
         SPP_Packet_t packet = mailboxData[mailboxHead];
-        mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular
+        mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular: 0, 1, ...,MAX_SIZE, 0, 1, 2...
         mailboxCount--;
+
+        sprintf(strBMP390, "BMP390:-");
+        sprintf(strICM20948, "ICM20948:-");
 
         spp_uint8_t packetAPID = packet.primaryHeader.apid;
         if (packetAPID == K_BMP390_SERVICE_APID){
@@ -123,7 +116,6 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
         s_frame_number++;
     }
 
-    e22Contract.isMailboxFull = false;
     return K_SPP_OK;
 }
 
