@@ -16,9 +16,28 @@
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t *s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {NULL};
-static spp_uint8_t s_registeredProducers = 0U;
-static const SPP_SERVICE_ConsumerContract_t *s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {NULL};
+
+// TO-DO: eliminate SPP_SERVICES_PUBSUB_Producer/Consumer_t structs
+//        add kpid and subscription variables to SPP_SERVICE_Producer/Consumer Contract_t structs
+//        change the structs to not be constant
+//        refactor pubsub.c, init.c and others files related to this changes.
+typedef struct
+{
+    const SPP_SERVICE_ProducerContract_t *p_contract;
+    SPP_Kpid_t kpid;
+
+} SPP_SERVICES_PUBSUB_Producer_t;
+
+typedef struct
+{
+    const SPP_SERVICE_ConsumerContract_t *p_contract;
+    SPP_Kpid_t subcription;
+
+} SPP_SERVICES_PUBSUB_Consumer_t;
+
+static SPP_SERVICES_PUBSUB_Producer_t s_producers[K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS] = {0};
+static spp_uint16_t s_registeredProducers = 0U;
+static SPP_SERVICES_PUBSUB_Consumer_t s_consumers[K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS] = {0};
 static spp_uint8_t s_registeredConsumers = 0U;
 
 static SPP_Packet_t *s_packetBuffer[K_SPP_SERVICES_PUBSUB_BUFFER_SIZE];
