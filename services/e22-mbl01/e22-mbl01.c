@@ -8,19 +8,22 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "HAL/uart.h"
+#include "spp/services/e22-mbl01/e22-mbl01.h"
 #include "spp/core/types.h"
-
+#include "spp/core/packet.h"
+#include "spp/core/returnTypes.h"
 
 /* -----------------------------------------
     DEFINES
 --------------------------------------------*/
 
-#define K_UART_NUM 2 // hay que ver que puerto UART es el que esta libre en el ESP32
+#define K_UART_NUM 2
 
+#define K_E22MBL01_SERVICE_APID (0x0005U)
 
-#define K_E22MBL01_SERVICE_APID    (0x0005U)
-#define K_BMP390_SERVICE_APID      (0x0004U)
+#define K_BMP390_SERVICE_APID   (0x0004U)
+#define K_ICM20948_SERVICE_APID (0x0002U)
+
 #define K_E22MBL01_TASK_TIMEOUT_MS 5000U
 #define K_E22MBL01_MAILBOX_SIZE    128
 
@@ -29,86 +32,152 @@
 --------------------------------------------*/
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void);
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data);
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t *p_pkt);
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data);
 
+static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
+static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
 
 /* -----------------------------------------
     VARIABLES
 --------------------------------------------*/
 static SPP_Packet_t mailboxData[K_E22MBL01_MAILBOX_SIZE] = {0};
+static spp_uint8_t mailboxHead = 0;
+static spp_uint8_t mailboxTail = 0;
+static spp_uint8_t mailboxCount = 0;
 
-static SPP_SERVICE_ConsumerContract_t e22Contract =
-    {
-        .consumerID = K_E22MBL01_SERVICE_APID,
-        .priority = 0,
-        .p_nameConsumer = "e22-mbl01",
-        .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
-        .suscribeToApid = K_BMP390_SERVICE_APID,
-        .p_mailBox = mailboxData,
-        .init = SPP_SERVICES_E22MBL01_init,
-        .consumeData = SPP_SERVICES_E22MBL01_consumeData,
-}
+static SPP_SERVICE_ConsumerContract_t e22Contract = {
+    .consumerID = K_E22MBL01_SERVICE_APID,
+    .priority = 1,
+    .p_nameConsumer = "e22-mbl01",
+    .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
+    .suscribeToApid = K_BMP390_SERVICE_APID | K_ICM20948_SERVICE_APID,
+    .isMailboxFull = false,
+    .overflowCount = 0,
+    .init = SPP_SERVICES_E22MBL01_init,
+    .deliverToMailbox = SPP_SERVICES_E22MBL01_deliverToMailbox,
+    .consumeData = SPP_SERVICES_E22MBL01_consumeData,
+};
 
-static int s_frame_number = 1;
+static spp_uint32_t s_frame_number = 1;
 
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
 --------------------------------------------*/
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void)
-{
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void){
     SPP_RetVal_t ret = K_SPP_OK;
 
-    spp_uint8_t testInitData[3U] = {0xFA, 0xBA, 0xDA};
-    ret = SPP_HAL_UART_transmit(testInitData, sizeof(testInitData));
-    if (ret != K_SPP_OK)
-    {
+    spp_uint8_t testData[3] = {0xFA, 0xBA, 0xDA};
+    ret = SPP_HAL_UART_transmit(testData, sizeof(testData));
+    if (ret != K_SPP_OK){
         return ret;
     }
+    
+    return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void)
-{
-    SPP_RetVal_t ret = K_SPP_OK;
-
-
-    SPP_RetVal_t ret = K_SPP_OK;
-    if (p_data == NULL)
-    {
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t *p_pqt){
+    if (p_pqt == NULL){
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    SPP_Packet_t *p_packet = (SPP_Packet_t *)p_data;
-
-    // hay que extraer los datos del paquete y llamar a enviar trama
-
-    SPP_E22MBL01_send_frame(s_frame_number, data);
-    s_frame_number++;
+    if (mailboxCount < K_E22MBL01_MAILBOX_SIZE){
+        mailboxData[mailboxTail] = *p_pqt;
+        mailboxTail = (spp_uint8_t)((mailboxTail + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular
+        mailboxCount++;
+        e22Contract.isMailboxFull = true;
+        return K_SPP_OK;
+    }
+    else{
+        e22Contract.overflowCount++;
+        return K_SPP_ERROR;
+    }
 
     return K_SPP_OK;
 }
 
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
+    char sensorsStr[256];
+    char strBMP390[64];
+    char strICM20948[128];
 
-static void SPP_SERVICES_E22MBL01_send_frame(int frame_number, char *data)
-{
-    if (frame_number > 99999)
-    { // suponiendo una trama cada segundo: tiempo sobradamente para cubrir todo el vuelo
-        return;
+    sprintf(strBMP390, "BMP390:-");
+    sprintf(strICM20948, "ICM20948:-");
+
+    while (mailboxCount > 0){
+        SPP_Packet_t packet = mailboxData[mailboxHead];
+        mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular
+        mailboxCount--;
+
+        spp_uint8_t packetAPID = packet.primaryHeader.apid;
+        if (packetAPID == K_BMP390_SERVICE_APID){
+            SPP_SERVICES_E22MBL01_bmpPacket_to_text(&packet, strBMP390);
+        }
+        else if(packetAPID == K_ICM20948_SERVICE_APID){
+            SPP_SERVICES_E22MBL01_icmPacket_to_text(&packet, strICM20948);
+        }
+
+        sprintf(sensorsStr, "%s,%s,", strBMP390, strICM20948);
+
+        SPP_SERVICES_E22MBL01_send_frame(s_frame_number, sensorsStr);
+        s_frame_number++;
     }
 
-    // le añadimos un identificador unico a cada mensaje
+    e22Contract.isMailboxFull = false;
+    return K_SPP_OK;
+}
+
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data){
+    // FORMATO DEL MENSAJE: "TX_UV_{identificador} DATA_{lon_datos_bytes} {SENSOR}:{VALOR|VALOR|VALOR...},{SENSOR}={VALOR|VALOR|VALOR...}...\n"
+    SPP_RetVal_t ret;
+
+    if (frame_number > 99999){
+        // suponiendo una trama cada segundo: tiempo sobradamente para cubrir todo el vuelo
+        return K_SPP_ERROR;
+    }
+
     const char *prefix_identifier = "TX_UV_";
 
     char identifier[16];
-    sprintf(identifier, "%s%d", prefix_identifier, frame_number);
+    sprintf(identifier, "%s%u", prefix_identifier, frame_number);
 
-    // añadimos los datos
-    char message[128];
-    sprintf(mesagge, "%s DATOS_%d %s\n", identifier, strlen(data), data);
+    char message[256];
+    sprintf(message, "%s DATA_%d %s\n", identifier, (int)strlen(data), data);
 
-    // vaciar buffers de la UART antes de transmitir
-    SPP_uart_flush_input(K_UART_NUM);
+    ret = SPP_HAL_UART_transmit(message, strlen(message));
+    if (ret != K_SPP_OK){
+        return ret;
+    }
 
-    // Transmitir string al devkit
-    SPP_uart_write_bytes(K_UART_NUM, mesagge, strlen(mesagge));
+    return K_SPP_OK;
+}
 
-    // FORMATO DEL MENSAJE: "TX_UV_{identificador} DATOS_{lon_datos_bytes} {SENSOR}={VALOR},{SENSOR}={VALOR}...\n"
+static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr){
+    float *payload = (float *)p_pkt->payload;
+
+    float altitude = payload[0];
+    float pressure = payload[1];
+    float temperature = payload[2];
+
+    sprintf(dataStr, "BMP390:alt=%.1f|P=%.1f|T=%.2f", altitude, pressure, temperature);
+    
+    return;
+}
+
+static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr){
+    float *payload = (float *)p_pkt->payload;
+
+    float ax = payload[0];
+    float ay = payload[1];
+    float az = payload[2];
+    float gx = payload[3];
+    float gy = payload[4];
+    float gz = payload[5];
+    float mx = payload[6];
+    float my = payload[7];
+    float mz = payload[8];
+
+    sprintf(dataStr, "ICM20948:ax=%.2f|ay=%.2f|az=%.2f|gx=%.2f|gy=%.2f|gz=%.2f|mx=%.2f|my=%.2f|mz=%.2f", ax, ay, az, gx, gy, gz, mx, my, mz);
+
+    return;
 }
