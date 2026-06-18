@@ -1,184 +1,234 @@
 /**
  * @file datalogger.c
- * @brief SD card packet logger — writes every published packet to a text file.
+ * @brief SD card packet logger — SPP consumer service implementation.
  *
- * This module is a pure consumer: it has no produce() function and never reads
- * hardware directly.  It receives packets through pub/sub at PRIO_LOW, meaning
- * callConsumers() dispatches it one call at a time so SD card writes never
- * delay sensor reads.
+ * This module is a pure consumer: it subscribes to K_SPP_APID_ALL through the
+ * pub/sub router and writes every received packet to a text file on the SD card.
+ * It never reads hardware directly and has no produce() function.
  *
  * Log format:
  *   Log messages:   "[I] TAG: message text"
  *   Sensor packets: "ts=12345 apid=0x0004 seq=7 len=12 payload_hex=44 9A ..."
- *
- * Flush strategy: fflush() is called every K_FLUSH_EVERY packets.  Buffering
- * the writes in the C library reduces the number of physical SD card sectors
- * written per packet, which is the main bottleneck on a microSD card.
  */
 
 #include "spp/services/datalogger/datalogger.h"
 
-#include "spp/hal/storage.h"
+#include "spp/hal/storage/storage.h"
+#include "spp/hal/spi/spi.h"
 #include "spp/core/packet.h"
 #include "spp/services/log/log.h"
 #include "spp/core/types.h"
 
-#define K_FLUSH_EVERY (20U)
+#include <string.h>
 
+/* ----------------------------------------------------------------
+ * CONSTANTS
+ * ---------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC FUNCTIONS DECLARATIONS
+ * ---------------------------------------------------------------- */
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void);
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_deliverToMailbox(const SPP_Packet_t *p_pkt);
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_consumeData(void *p_data);
+static SPP_RetVal_t SDC_cmdGoIdleState(void);
+static SPP_RetVal_t SDC_cmdSendIfCond(void);
+
+/* ----------------------------------------------------------------
+ * VARIABLES
+ * ---------------------------------------------------------------- */
+static const SPP_SERVICE_ConsumerContract_t g_dataloggerConsumerContract = {
+    .consumerID = K_DATALOGGER_CONSUMER_ID,
+    .priority = K_DATALOGGER_CONSUMER_PRIO,
+    .p_nameConsumer = "datalogger",
+    .tiemoutMs = K_DATALOGGER_TIMEOUT_MS,
+    .suscribeToApid = 0U,
+    .init = SPP_SERVICES_DATALOGGER_init,
+    .deliverToMailbox = SPP_SERVICES_DATALOGGER_deliverToMailbox,
+    .consumeData = SPP_SERVICES_DATALOGGER_consumeData,
+};
+
+static Datalogger_t s_datalogger;
 static const char *const k_tag = "DATALOGGER";
 
 /* ----------------------------------------------------------------
- * Mount / open / close
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
-
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(Datalogger_t *p_logger)
+const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_DATALOGGER_getConsumerContract(void)
 {
-    SPP_RetVal_t ret = SPP_HAL_STORAGE_mount(p_logger->p_storageCfg);
+    return &g_dataloggerConsumerContract;
+}
+
+/* ----------------------------------------------------------------
+ * STATIC FUNCTIONS
+ * ---------------------------------------------------------------- */
+/**
+ * @brief Initialise the SD card and open the log file for writing.
+ * @return K_SPP_OK on success, K_SPP_ERROR on mount or file-open failure.
+ */
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
+{
+    /* Init SPI for SD card */
+    s_datalogger.p_spiHandler = SPP_HAL_SPI_getHandle(K_DATALOGGER_SPI_DEV_IDX);
+    SPP_RetVal_t ret = SPP_HAL_SPI_deviceInit(s_datalogger.p_spiHandler);
     if (ret != K_SPP_OK)
     {
-        SPP_LOGE(k_tag, "Mount failed");
+        SPP_LOGE(k_tag, "SPI device init failed");
         return ret;
     }
 
-    p_logger->p_file = fopen(p_logger->p_filePath, "w");
-    if (p_logger->p_file == NULL)
+    ret = SDC_cmdGoIdleState();
+    if (ret != K_SPP_OK)
     {
-        SPP_LOGE(k_tag, "Cannot open %s", p_logger->p_filePath);
-        (void)SPP_HAL_STORAGE_unmount(p_logger->p_storageCfg);
-        return K_SPP_ERROR;
+        SPP_LOGE(k_tag, "CMD0 failed");
+        return ret;
     }
 
-    p_logger->is_open = true;
-    p_logger->logged_packets = 0U;
-    SPP_LOGI(k_tag, "Ready — logging to %s", p_logger->p_filePath);
+    ret = SDC_cmdSendIfCond();
+    if (ret != K_SPP_OK)
+    {
+        SPP_LOGE(k_tag, "CMD8 failed");
+        return ret;
+    }
+
     return K_SPP_OK;
 }
 
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_flush(Datalogger_t *p_logger)
+/**
+ * @brief  Sends 10 dummy bytes (CS HIGH) then CMD0 and reads up to 8 bytes for R1.
+ *         CMD0 resets the card and puts it in SPI mode (CS must be LOW during the command).
+ * @return K_SPP_OK if R1 = 0x01 (in_idle_state), K_SPP_ERROR otherwise.
+ */
+static SPP_RetVal_t SDC_cmdGoIdleState(void)
 {
-    if (!p_logger->is_open)
-        return K_SPP_ERROR;
-
-    if (fflush(p_logger->p_file) != 0)
+    /* 10 dummy bytes with CS HIGH: ≥74 clock cycles, MOSI HIGH (spec §6.4.1) */
+    spp_uint8_t dummy[10];
+    memset(dummy, 0xFF, sizeof(dummy));
+    SPP_RetVal_t ret = SPP_HAL_SPI_transmit(s_datalogger.p_spiHandler, dummy, sizeof(dummy));
+    if (ret != K_SPP_OK)
     {
-        SPP_LOGE(k_tag, "fflush failed");
+        return ret;
+    }
+
+    /* CMD0 + read 8 bytes for R1 (NCR: card may take up to 8 byte-clocks to respond) */
+    spp_uint8_t buf[14] = {
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x95,            /* CMD0: GO_IDLE_STATE, CRC=0x95 */
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* dummy bytes to clock in R1 */
+    };
+    ret = SPP_HAL_SPI_transmit(s_datalogger.p_spiHandler, buf, sizeof(buf));
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    /* R1 is the first non-0xFF byte in the NCR window (bytes 6-13).
+     * Bytes 0-5 are the transmitted CMD0 and may contain MOSI coupling noise. */
+    spp_uint8_t r1 = 0xFF;
+    for (spp_uint8_t i = 6U; i < (spp_uint8_t)sizeof(buf); i++)
+    {
+        if (buf[i] != 0xFFU)
+        {
+            r1 = buf[i];
+            break;
+        }
+    }
+
+    SPP_LOGI(k_tag, "CMD0 R1=0x%02X", r1);
+    return (r1 == 0x01U) ? K_SPP_OK : K_SPP_ERROR;
+}
+
+/**
+ * @brief  Sends CMD8 (SEND_IF_COND) and parses the R7 response.
+ *         Determines whether the card is SD v2+ (SDHC/SDXC capable) or SD v1/MMC.
+ *         - R1=0x01 + echo match  → SD v2+, card supports 2.7-3.6V
+ *         - R1=0x05 (illegal cmd) → SD v1 or MMC, continue with v1 init path
+ * @return K_SPP_OK on success or v1 detection, K_SPP_ERROR on voltage mismatch.
+ */
+static SPP_RetVal_t SDC_cmdSendIfCond(void)
+{
+    /* CMD8: VHS=0x01 (2.7–3.6 V), check pattern=0xAA, CRC=0x87 (spec §7.3.2.6) */
+    spp_uint8_t buf[20] = {
+        0x48, 0x00, 0x00, 0x01, 0xAA, 0x87,             /* CMD8 */
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* NCR  */
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF              /* R7   */
+    };
+    SPP_RetVal_t ret = SPP_HAL_SPI_transmit(s_datalogger.p_spiHandler, buf, sizeof(buf));
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    /* Find R1 in the NCR window (bytes 6-19); bytes 0-5 are CMD8 and may carry coupling noise */
+    spp_uint8_t r1 = 0xFFU;
+    spp_uint8_t r1Idx = 0xFFU;
+    for (spp_uint8_t i = 6U; i < (spp_uint8_t)sizeof(buf); i++)
+    {
+        if (buf[i] != 0xFFU)
+        {
+            r1 = buf[i];
+            r1Idx = i;
+            if (r1 == 0x01U || r1 == 0x05U)
+            {
+                break;
+            }
+        }
+    }
+
+    SPP_LOGI(k_tag, "CMD8 R1=0x%02X", r1);
+
+    if (r1 == 0x05U)
+    {
+        /* Illegal command → SD v1 or MMC card */
+        SPP_LOGW(k_tag, "CMD8 illegal command — SD v1 or MMC detected");
+        return K_SPP_OK;
+    }
+    if (r1 != 0x01U)
+    {
         return K_SPP_ERROR;
     }
+
+    /* R7 = R1 + 4 bytes: [reserved 2B][VHS 1B][check pattern 1B] */
+    if ((spp_uint8_t)(r1Idx + 4U) >= (spp_uint8_t)sizeof(buf))
+    {
+        SPP_LOGE(k_tag, "CMD8 R7 truncated");
+        return K_SPP_ERROR;
+    }
+    spp_uint8_t vhs = buf[r1Idx + 3U];
+    spp_uint8_t pattern = buf[r1Idx + 4U];
+    SPP_LOGI(k_tag, "CMD8 R7: VHS=0x%02X pattern=0x%02X", vhs, pattern);
+
+    if ((vhs != 0x01U) || (pattern != 0xAAU))
+    {
+        SPP_LOGE(k_tag, "CMD8 voltage or pattern mismatch");
+        return K_SPP_ERROR;
+    }
+
     return K_SPP_OK;
 }
 
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_deinit(Datalogger_t *p_logger)
+/**
+ * @brief Receive a packet from the pub/sub router into the consumer mailbox.
+ * @param  p_pkt  Packet dispatched by the router.
+ * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if p_pkt is NULL.
+ */
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_deliverToMailbox(const SPP_Packet_t *p_pkt)
 {
-    if (p_logger == NULL)
+    if (p_pkt == NULL)
+    {
         return K_SPP_ERROR_NULL_POINTER;
-
-    if (p_logger->is_open)
-    {
-        (void)fflush(p_logger->p_file);
-        fclose(p_logger->p_file);
-        p_logger->p_file = NULL;
-        p_logger->is_open = false;
     }
 
-    if (p_logger->p_storageCfg != NULL)
-    {
-        SPP_RetVal_t ret = SPP_HAL_STORAGE_unmount(p_logger->p_storageCfg);
-        if (ret != K_SPP_OK)
-        {
-            SPP_LOGE(k_tag, "Unmount failed");
-            return ret;
-        }
-    }
-
-    SPP_LOGI(k_tag, "Closed");
     return K_SPP_OK;
 }
 
-/* ----------------------------------------------------------------
- * Write one packet to the file
- * ---------------------------------------------------------------- */
-
-SPP_RetVal_t SPP_SERVICES_DATALOGGER_logPacket(Datalogger_t *p_logger, const SPP_Packet_t *p_packet)
+/**
+ * @brief Consume a packet from the mailbox and write it to the SD card log file.
+ * @param  p_data  Unused (context pointer reserved for future use).
+ * @return K_SPP_OK on success, K_SPP_ERROR if the file is not open or write fails.
+ */
+static SPP_RetVal_t SPP_SERVICES_DATALOGGER_consumeData(void *p_data)
 {
-    if (!p_logger->is_open)
-        return K_SPP_ERROR;
+    (void)p_data;
 
-    int n;
-
-    if (p_packet->primaryHeader.apid == K_SPP_APID_LOG)
-    {
-        /* Log message — payload is a null-terminated string, write as-is. */
-        n = fprintf(p_logger->p_file, "%.*s\n", (int)p_packet->primaryHeader.payloadLen,
-                    (const char *)p_packet->payload);
-    }
-    else
-    {
-        /* Sensor packet — write header fields then payload bytes as hex. */
-        n = fprintf(p_logger->p_file, "ts=%lu apid=0x%04X seq=%u len=%u payload_hex=",
-                    (unsigned long)p_packet->secondaryHeader.timestampMs,
-                    (unsigned)p_packet->primaryHeader.apid, (unsigned)p_packet->primaryHeader.seq,
-                    (unsigned)p_packet->primaryHeader.payloadLen);
-        if (n < 0)
-            return K_SPP_ERROR;
-
-        for (spp_uint16_t i = 0U; i < p_packet->primaryHeader.payloadLen; i++)
-        {
-            (void)fprintf(p_logger->p_file, "%s%02X", (i > 0U) ? " " : "",
-                          (unsigned)p_packet->payload[i]);
-        }
-        n = fprintf(p_logger->p_file, "\n");
-    }
-
-    if (n < 0)
-        return K_SPP_ERROR;
-
-    p_logger->logged_packets++;
     return K_SPP_OK;
 }
-
-/* ----------------------------------------------------------------
- * Module descriptor — called by register(), never by main.c directly
- * ---------------------------------------------------------------- */
-
-static void dataloggerOnPacket(const SPP_Packet_t *p_packet, void *p_ctx)
-{
-    Datalogger_t *p_logger = (Datalogger_t *)p_ctx;
-
-    (void)SPP_SERVICES_DATALOGGER_logPacket(p_logger, p_packet);
-
-    /* Flush to SD card every K_FLUSH_EVERY packets.  Infrequent flushing lets
-     * the C library buffer multiple writes, reducing microSD sector pressure. */
-    if ((p_logger->logged_packets % K_FLUSH_EVERY) == 0U)
-    {
-        (void)SPP_SERVICES_DATALOGGER_flush(p_logger);
-    }
-}
-
-static SPP_RetVal_t dataloggerInit(void *p_ctx)
-{
-    return SPP_SERVICES_DATALOGGER_init((Datalogger_t *)p_ctx);
-}
-
-static SPP_RetVal_t dataloggerStop(void *p_ctx)
-{
-    return SPP_SERVICES_DATALOGGER_flush((Datalogger_t *)p_ctx);
-}
-
-static SPP_RetVal_t dataloggerDeinit(void *p_ctx)
-{
-    return SPP_SERVICES_DATALOGGER_deinit((Datalogger_t *)p_ctx);
-}
-
-const SPP_Module_t g_sdLoggerModule = {
-    .p_name = "sd_logger",
-    .apid = K_SPP_APID_NONE, /* produces nothing          */
-    .ctxSize = sizeof(Datalogger_t),
-    .init = dataloggerInit,
-    .start = NULL,
-    .stop = dataloggerStop, /* flush on stop             */
-    .deinit = dataloggerDeinit,
-    .produce = NULL,                /* consumer only — no sensor */
-    .consumesApid = K_SPP_APID_ALL, /* receives every packet     */
-    .onPacket = dataloggerOnPacket,
-    .onPacketPrio = K_SPP_PUBSUB_PRIO_LOW, /* deferred — never blocks sensors */
-};

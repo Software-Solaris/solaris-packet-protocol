@@ -14,22 +14,22 @@
 /* ----------------------------------------------------------------
  * APID assignments  (one bit per producer, must not repeat)
  * ---------------------------------------------------------------- */
-#define K_SPP_KPID_LOG      (0x0001U)  /* bit  0 - reserved for log */
-#define K_SPP_KPID_ICM20948 (0x0002U)  /* bit  1                    */
-#define K_SPP_KPID_BMP390   (0x0004U)  /* bit  2                    */
-#define K_SPP_KPID_UART     (0x0008U)  /* bit  3                    */
-#define K_SPP_KPID_RESERVED4  (0x0010U)  /* bit  4 - reserved       */
-#define K_SPP_KPID_RESERVED5  (0x0020U)  /* bit  5 - reserved       */
-#define K_SPP_KPID_RESERVED6  (0x0040U)  /* bit  6 - reserved       */
-#define K_SPP_KPID_RESERVED7  (0x0080U)  /* bit  7 - reserved       */
-#define K_SPP_KPID_RESERVED8  (0x0100U)  /* bit  8 - reserved       */
-#define K_SPP_KPID_RESERVED9  (0x0200U)  /* bit  9 - reserved       */
-#define K_SPP_KPID_RESERVED10 (0x0400U)  /* bit 10 - reserved       */
-#define K_SPP_KPID_RESERVED11 (0x0800U)  /* bit 11 - reserved       */
-#define K_SPP_KPID_RESERVED12 (0x1000U)  /* bit 12 - reserved       */
-#define K_SPP_KPID_RESERVED13 (0x2000U)  /* bit 13 - reserved       */
-#define K_SPP_KPID_RESERVED14 (0x4000U)  /* bit 14 - reserved       */
-#define K_SPP_KPID_RESERVED15 (0x8000U)  /* bit 15 - reserved       */
+#define K_SPP_KPID_LOG        (0x0001U) /* bit  0 - reserved for log */
+#define K_SPP_KPID_ICM20948   (0x0002U) /* bit  1                    */
+#define K_SPP_KPID_BMP390     (0x0004U) /* bit  2                    */
+#define K_SPP_KPID_UART       (0x0008U) /* bit  3                    */
+#define K_SPP_KPID_RESERVED4  (0x0010U) /* bit  4 - reserved       */
+#define K_SPP_KPID_RESERVED5  (0x0020U) /* bit  5 - reserved       */
+#define K_SPP_KPID_RESERVED6  (0x0040U) /* bit  6 - reserved       */
+#define K_SPP_KPID_RESERVED7  (0x0080U) /* bit  7 - reserved       */
+#define K_SPP_KPID_RESERVED8  (0x0100U) /* bit  8 - reserved       */
+#define K_SPP_KPID_RESERVED9  (0x0200U) /* bit  9 - reserved       */
+#define K_SPP_KPID_RESERVED10 (0x0400U) /* bit 10 - reserved       */
+#define K_SPP_KPID_RESERVED11 (0x0800U) /* bit 11 - reserved       */
+#define K_SPP_KPID_RESERVED12 (0x1000U) /* bit 12 - reserved       */
+#define K_SPP_KPID_RESERVED13 (0x2000U) /* bit 13 - reserved       */
+#define K_SPP_KPID_RESERVED14 (0x4000U) /* bit 14 - reserved       */
+#define K_SPP_KPID_RESERVED15 (0x8000U) /* bit 15 - reserved       */
 
 /* ----------------------------------------------------------------
  * KPID type

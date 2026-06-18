@@ -66,6 +66,16 @@ SPP_RetVal_t SPP_HAL_SPI_deviceInit(void *p_handle)
     return ret;
 }
 
+SPP_RetVal_t SPP_HAL_SPI_deviceSetSpeed(void *p_handle, spp_uint32_t speedHz)
+{
+    const SPP_HalPort_t *p_port = SPP_HAL_getPort();
+    if ((p_port == NULL) || (p_port->spi.spiDeviceSetSpeed == NULL))
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+    return p_port->spi.spiDeviceSetSpeed(p_handle, speedHz);
+}
+
 SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;

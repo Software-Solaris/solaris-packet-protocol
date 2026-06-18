@@ -33,6 +33,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void);
 static void *SPP_PORTS_HAL_ESP32_spiGetHandle(spp_uint8_t deviceIdx);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx);
@@ -56,6 +57,7 @@ const static SPP_HALSpi_t s_esp32HalSpi = {
     .spiGetHandle = SPP_PORTS_HAL_ESP32_spiGetHandle,
     .spiDeviceInit = SPP_PORTS_HAL_ESP32_spiDeviceInit,
     .spiTransmit = SPP_PORTS_HAL_ESP32_spiTransmit,
+    .spiDeviceSetSpeed = SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed,
 };
 
 const static SPP_HALGpio_t s_esp32HalGpio = {
@@ -123,6 +125,18 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         return K_SPP_OK;
     }
 
+    /* Diagnostic: test MISO pin level before SPI takes control of it */
+    gpio_config_t misoCfg = {
+        .pin_bit_mask = (1ULL << K_ESP32_PIN_MISO),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    // gpio_config(&misoCfg);
+    // int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
+    // ESP_LOGI(k_tag, "MISO GPIO%d pre-SPI level = %d", K_ESP32_PIN_MISO, misoLevel);
+
     spi_bus_config_t busCfg = {
         .miso_io_num = K_ESP32_PIN_MISO,
         .mosi_io_num = K_ESP32_PIN_MOSI,
@@ -132,7 +146,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         .max_transfer_sz = 0,
     };
 
-    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_CH_AUTO);
+    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_DISABLED);
     if (ret != ESP_OK)
     {
         ESP_LOGE(k_tag, "SPI bus init failed: %s", esp_err_to_name(ret));
@@ -180,6 +194,13 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
         devCfg.queue_size = 1;
     }
+    else if (s_spiDevCount == K_ESP32_SPI_IDX_SDC)
+    {
+        devCfg.clock_speed_hz = 400 * 1000; /* 400 kHz — max allowed during SD init (spec §7.2.1) */
+        devCfg.mode = 0;                    /* SPI Mode 0: CPOL=0, CPHA=0 (spec §7) */
+        devCfg.spics_io_num = K_ESP32_PIN_CS_SDC;
+        devCfg.queue_size = 1;
+    }
     else
     {
         ESP_LOGE(k_tag, "Unexpected device index %u", s_spiDevCount);
@@ -210,31 +231,39 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t 
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    spp_uint8_t i = 0U;
-    while (i < length)
+    spi_transaction_t trans = {0};
+    trans.length = 8U * (size_t)length;
+    trans.tx_buffer = p_data;
+    trans.rx_buffer = p_data;
+
+    esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
+    return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR_ON_SPI_TRANSACTION;
+}
+
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz)
+{
+    if (p_handle == NULL)
     {
-        spi_transaction_t trans = {0};
-
-        if (p_data[i] & 0x80U)
-        {
-            trans.length = 8U * 3U;
-            trans.tx_buffer = &p_data[i];
-            trans.rx_buffer = &p_data[i];
-            i += 3U;
-        }
-        else
-        {
-            trans.length = 8U * 2U;
-            trans.tx_buffer = &p_data[i];
-            i += 2U;
-        }
-
-        esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
-        if (ret != ESP_OK)
-        {
-            return K_SPP_ERROR_ON_SPI_TRANSACTION;
-        }
+        return K_SPP_ERROR_NULL_POINTER;
     }
+
+    spi_device_handle_t *p_h = (spi_device_handle_t *)p_handle;
+
+    spi_bus_remove_device(*p_h);
+
+    spi_device_interface_config_t devCfg = {0};
+    devCfg.clock_speed_hz = (int)speedHz;
+    devCfg.mode = 0;
+    devCfg.spics_io_num = K_ESP32_PIN_CS_SDC;
+    devCfg.queue_size = 1;
+
+    esp_err_t ret = spi_bus_add_device(K_ESP32_SPI_HOST, &devCfg, p_h);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(k_tag, "spiDeviceSetSpeed failed: %s", esp_err_to_name(ret));
+        return K_SPP_ERROR;
+    }
+
     return K_SPP_OK;
 }
 

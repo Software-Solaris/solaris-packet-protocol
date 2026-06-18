@@ -93,4 +93,18 @@ SPP_RetVal_t SPP_HAL_SPI_deviceInit(void *p_handle);
  */
 SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
+/**
+ * @brief Remove and re-add a SPI device with a new clock speed.
+ *
+ * Intended for devices that require a lower speed during initialisation
+ * and a higher speed for normal operation (e.g. SD cards: 400 kHz init,
+ * up to 25 MHz normal operation).
+ *
+ * @param[in] p_handle  Handle returned by @ref SPP_HAL_SPI_getHandle().
+ * @param[in] speedHz   New clock frequency in Hz.
+ *
+ * @return K_SPP_OK on success, K_SPP_ERROR on failure.
+ */
+SPP_RetVal_t SPP_HAL_SPI_deviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
+
 #endif /* SPP_HAL_SPI_H */

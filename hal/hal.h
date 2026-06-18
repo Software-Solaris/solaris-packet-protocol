@@ -64,6 +64,19 @@ typedef struct
      */
     SPP_RetVal_t (*spiTransmit)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
+    /**
+     * @brief Remove and re-add a SPI device with a new clock speed.
+     *
+     * Intended for devices that require a lower speed during initialisation
+     * and a higher speed for normal operation (e.g. SD cards).
+     *
+     * @param[in] p_handle  Handle returned by @c spiGetHandle.
+     * @param[in] speedHz   New clock frequency in Hz.
+     *
+     * @return K_SPP_OK on success, K_SPP_ERROR on failure.
+     */
+    SPP_RetVal_t (*spiDeviceSetSpeed)(void *p_handle, spp_uint32_t speedHz);
+
 } SPP_HALSpi_t;
 
 /**
