@@ -17,33 +17,13 @@
     DEFINES
 --------------------------------------------*/
 
-#define K_UART_NUM 2
-
-#define K_E22MBL01_SERVICE_APID (0x0005U)
-
-#define K_BMP390_SERVICE_APID   (0x0004U)
-#define K_ICM20948_SERVICE_APID (0x0002U)
-
 #define K_E22MBL01_TASK_TIMEOUT_MS 5000U
-#define K_E22MBL01_MAILBOX_SIZE    128
-
-/* -----------------------------------------
-    STATIC FUNCTIONS DECLARATIONS
---------------------------------------------*/
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void);
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data);
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t *p_pkt);
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data);
-
-static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
-static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
+#define K_E22MBL01_MAILBOX_SIZE    128U
 
 /* -----------------------------------------
     VARIABLES
 --------------------------------------------*/
 static SPP_Packet_t mailboxData[K_E22MBL01_MAILBOX_SIZE] = {0};
-static spp_uint8_t mailboxHead = 0;
-static spp_uint8_t mailboxTail = 0;
 static spp_uint8_t mailboxCount = 0;
 static spp_uint32_t s_frame_number = 1;
 
@@ -57,6 +37,18 @@ static SPP_SERVICE_ConsumerContract_t e22Contract = {
     .deliverToMailbox = SPP_SERVICES_E22MBL01_deliverToMailbox,
     .consumeData = SPP_SERVICES_E22MBL01_consumeData,
 };
+
+/* -----------------------------------------
+    STATIC FUNCTIONS DECLARATIONS
+--------------------------------------------*/
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void);
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data);
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t p_pkt);
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data);
+
+static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
+static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr);
+
 
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
@@ -73,10 +65,8 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void){
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t *p_pqt){
-    if (p_pqt == NULL){
-        return K_SPP_ERROR_NULL_POINTER;
-    }
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t p_pqt){
+    static spp_uint8_t mailboxTail = 0;
 
     if (mailboxCount < K_E22MBL01_MAILBOX_SIZE){
         mailboxData[mailboxTail] = *p_pqt;
@@ -94,10 +84,8 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
     char strBMP390[64];
     char strICM20948[128];
 
-    while (mailboxCount > 0){ // si mailboxCount llega a 0 --> no hay mas paquetes que enviar
-        SPP_Packet_t packet = mailboxData[mailboxHead];
-        mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular: 0, 1, ...,MAX_SIZE, 0, 1, 2...
-        mailboxCount--;
+    for(spp_uint_8_t indice = 0; indice < mailboxCount; indice++){
+        SPP_Packet_t packet = mailboxData[indice];
 
         sprintf(strBMP390, "BMP390:-");
         sprintf(strICM20948, "ICM20948:-");
@@ -115,6 +103,7 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
         SPP_SERVICES_E22MBL01_send_frame(s_frame_number, sensorsStr);
         s_frame_number++;
     }
+    mailboxCount = 0;
 
     return K_SPP_OK;
 }
