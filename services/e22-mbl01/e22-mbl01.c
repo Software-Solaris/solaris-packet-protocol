@@ -38,6 +38,7 @@ static SPP_SERVICE_ConsumerContract_t e22Contract = {
     .consumeData = SPP_SERVICES_E22MBL01_consumeData,
 };
 
+
 /* -----------------------------------------
     STATIC FUNCTIONS DECLARATIONS
 --------------------------------------------*/
@@ -53,48 +54,57 @@ static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *d
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
 --------------------------------------------*/
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void){
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void)
+{
     SPP_RetVal_t ret = K_SPP_OK;
 
     spp_uint8_t testData[3] = {0xFA, 0xBA, 0xDA};
     ret = SPP_HAL_UART_transmit(testData, sizeof(testData));
-    if (ret != K_SPP_OK){
+    if (ret != K_SPP_OK)
+    {
         return ret;
     }
-    
+
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t p_pqt){
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t p_pqt)
+{
     static spp_uint8_t mailboxTail = 0;
 
-    if (mailboxCount < K_E22MBL01_MAILBOX_SIZE){
+    if (mailboxCount < K_E22MBL01_MAILBOX_SIZE)
+    {
         mailboxData[mailboxTail] = *p_pqt;
         mailboxTail = (spp_uint8_t)((mailboxTail + 1U) % K_E22MBL01_MAILBOX_SIZE); // suma circular
         mailboxCount++; // usaremos mailboxCount para saber cuantos paquetes tendremos que enviar luego
         return K_SPP_OK;
     }
-    else{
+    else
+    {
         return K_SPP_ERROR;
     }
 }
 
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data)
+{
     char sensorsStr[256];
     char strBMP390[64];
     char strICM20948[128];
 
-    for(spp_uint_8_t indice = 0; indice < mailboxCount; indice++){
+    for (spp_uint_8_t indice = 0; indice < mailboxCount; indice++)
+    {
         SPP_Packet_t packet = mailboxData[indice];
 
         sprintf(strBMP390, "BMP390:-");
         sprintf(strICM20948, "ICM20948:-");
 
         spp_uint8_t packetAPID = packet.primaryHeader.apid;
-        if (packetAPID == K_BMP390_SERVICE_APID){
+        if (packetAPID == K_BMP390_SERVICE_APID)
+        {
             SPP_SERVICES_E22MBL01_bmpPacket_to_text(&packet, strBMP390);
         }
-        else if(packetAPID == K_ICM20948_SERVICE_APID){
+        else if (packetAPID == K_ICM20948_SERVICE_APID)
+        {
             SPP_SERVICES_E22MBL01_icmPacket_to_text(&packet, strICM20948);
         }
 
@@ -108,11 +118,13 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data){
     return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data){
+static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, const char *data)
+{
     // FORMATO DEL MENSAJE: "TX_UV_{identificador} DATA_{lon_datos_bytes} {SENSOR}:{VALOR|VALOR|VALOR...},{SENSOR}={VALOR|VALOR|VALOR...}...\n"
     SPP_RetVal_t ret;
 
-    if (frame_number > 99999){
+    if (frame_number > 99999)
+    {
         // suponiendo una trama cada segundo: tiempo sobradamente para cubrir todo el vuelo
         return K_SPP_ERROR;
     }
@@ -126,14 +138,21 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_send_frame(spp_uint32_t frame_number, 
     sprintf(message, "%s DATA_%d %s\n", identifier, (int)strlen(data), data);
 
     ret = SPP_HAL_UART_transmit(message, strlen(message));
-    if (ret != K_SPP_OK){
+    if (ret != K_SPP_OK)
+    {
         return ret;
     }
 
     return K_SPP_OK;
 }
 
-static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr){
+static SPP_SERVICE_ConsumerContract_t SPP_SERVICES_E22MBL01_getConsumerContract()
+{
+    return &e22Contract;
+}
+
+static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr)
+{
     float *payload = (float *)p_pkt->payload;
 
     float altitude = payload[0];
@@ -141,11 +160,12 @@ static void SPP_SERVICES_E22MBL01_bmpPacket_to_text(SPP_Packet_t *p_pkt, char *d
     float temperature = payload[2];
 
     sprintf(dataStr, "BMP390:alt=%.1f|P=%.1f|T=%.2f", altitude, pressure, temperature);
-    
+
     return;
 }
 
-static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr){
+static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *dataStr)
+{
     float *payload = (float *)p_pkt->payload;
 
     float ax = payload[0];
@@ -158,7 +178,8 @@ static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *d
     float my = payload[7];
     float mz = payload[8];
 
-    sprintf(dataStr, "ICM20948:ax=%.2f|ay=%.2f|az=%.2f|gx=%.2f|gy=%.2f|gz=%.2f|mx=%.2f|my=%.2f|mz=%.2f", ax, ay, az, gx, gy, gz, mx, my, mz);
+    sprintf(dataStr, "ICM20948:ax=%.2f|ay=%.2f|az=%.2f|gx=%.2f|gy=%.2f|gz=%.2f|mx=%.2f|my=%.2f|mz=%.2f", ax, ay, az, gx,
+            gy, gz, mx, my, mz);
 
     return;
 }
