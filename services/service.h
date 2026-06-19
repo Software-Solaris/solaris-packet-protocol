@@ -26,9 +26,9 @@
 */
 typedef struct
 {
-    const char *p_nameProducer;                   /**< Human-readable module name (for logging). */
-    spp_uint16_t tiemoutMs;                       /**< Timeout for the producer to send a packet */
-    SPP_RetVal_t (*init)();                       /**< Initialise the module. */
+    const char *p_nameProducer;    /**< Human-readable module name (for logging). */
+    spp_uint16_t tiemoutMs;        /**< Timeout for the producer to send a packet */
+    SPP_RetVal_t (*init)();        /**< Initialise the module. */
     SPP_RetVal_t (*acquireData)(); /**< Acquire data from the module. */
 } SPP_SERVICE_ProducerContract_t;
 
@@ -47,7 +47,7 @@ typedef struct
     spp_uint16_t tiemoutMs;      /**< Timeout for the consumer to receive a packet */
     spp_uint16_t suscribeToApid; /**< APID subscription bitmask */
     SPP_RetVal_t (*init)();      /**< Initialise the module. */
-    SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t *p_pkt);
+    SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t packet);
     SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
 } SPP_SERVICE_ConsumerContract_t;
 

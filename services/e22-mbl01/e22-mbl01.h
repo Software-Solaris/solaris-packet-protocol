@@ -9,6 +9,6 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-static SPP_SERVICE_ConsumerContract_t SPP_SERVICES_E22MBL01_getConsumerContract();
+SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_E22MBL01_getConsumerContract();
 
-#endif /* SPP_DATALOGGER_H */
+#endif

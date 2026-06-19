@@ -64,10 +64,10 @@
  * UART port assignments
  * ---------------------------------------------------------------- */
 #define K_ESP32_UART_PORT_ID   UART_NUM_2
-#define K_ESP32_UART_BAUD_RATE 115200
+#define K_ESP32_UART_BAUD_RATE 9600
 
-#define K_ESP32_UART_TX_PIN  1
-#define K_ESP32_UART_RX_PIN  0
+#define K_ESP32_UART_TX_PIN  5
+#define K_ESP32_UART_RX_PIN  6
 #define K_ESP32_UART_RTS_PIN -1 // Not used
 #define K_ESP32_UART_CTS_PIN -1 // Not used
 

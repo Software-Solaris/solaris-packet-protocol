@@ -21,15 +21,19 @@
 #define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (8U) /**< Internal packet buffer depth. */
 #define K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY (1U)
 
+#define K_SPP_SERVICES_PUBSUB_STEP             (1U) /**< Step to increment circular buffer index. */
+#define K_SPP_SERVICES_PUBSUB_SORT_START_INDEX (1U) /**< Starting index for insertion sort. */
+#define K_SPP_SERVICES_PUBSUB_OFFSET           (1U) /**< Array index offset. */
+#define K_SPP_SERVICES_PUBSUB_ZERO_INDEX       (0)  /**< Zero index/value for comparisons. */
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(
-    const SPP_SERVICE_ProducerContract_t *p_producerData);
-
-SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(
-    const SPP_SERVICE_ConsumerContract_t *p_consumerData);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                  SPP_Kpid_t *p_assignedKpid);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                  SPP_Kpid_t subscription);
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 

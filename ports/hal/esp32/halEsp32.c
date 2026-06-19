@@ -435,7 +435,9 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uin
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    const int written = uart_write_bytes(K_ESP32_UART_PORT_ID, p_data, (size_t)len);
+    const spp_uint8_t *p_dataToTransmit = (spp_uint8_t *)p_data;
+
+    const int written = uart_write_bytes(K_ESP32_UART_PORT_ID, (void *)p_dataToTransmit, (size_t)len);
 
     if (written != (int)len)
     {
