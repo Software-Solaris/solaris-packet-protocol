@@ -1,7 +1,7 @@
 /**
  * @file storage.c
  * @brief HAL storage implementation that dispatches operations to the registered port.
-
+*/
 
 /* ----------------------------------------------------------------
  * INCLUDES
@@ -15,7 +15,7 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_STORAGE_init(void *p_handle)
+SPP_RetVal_t SPP_HAL_STORAGE_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
@@ -26,7 +26,7 @@ SPP_RetVal_t SPP_HAL_STORAGE_init(void *p_handle)
     }
     else
     {
-        ret = p_port->storage.storageInit(p_handle);
+        ret = p_port->storage.storageInit();
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;
@@ -35,7 +35,7 @@ SPP_RetVal_t SPP_HAL_STORAGE_init(void *p_handle)
     return ret;
 }
 
-SPP_RetVal_t SPP_HAL_STORAGE_write(void *p_handle, const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
+SPP_RetVal_t SPP_HAL_STORAGE_write(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
@@ -46,7 +46,7 @@ SPP_RetVal_t SPP_HAL_STORAGE_write(void *p_handle, const void *p_buffer, spp_uin
     }
     else
     {
-        ret = p_port->storage.storageWrite(p_handle, p_buffer, first_block, count);
+        ret = p_port->storage.storageWrite(p_buffer, first_block, count);
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;

@@ -13,8 +13,8 @@
  * Public API
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_STORAGE_init(void *p_handle);
-SPP_RetVal_t SPP_HAL_STORAGE_write(void *p_handle, const void *p_buffer, spp_uint32_t first_block,
+SPP_RetVal_t SPP_HAL_STORAGE_init(void);
+SPP_RetVal_t SPP_HAL_STORAGE_write(const void *p_buffer, spp_uint32_t first_block,
                                    spp_uint16_t count); // size = 512 x count
 
 #endif /* SPP_HAL_STORAGE_H */

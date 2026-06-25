@@ -146,7 +146,7 @@ typedef struct
      *
      * @return K_SPP_OK on success, K_SPP_ERROR on failure.
      */
-    SPP_RetVal_t (*storageInit)(void *p_handle);
+    SPP_RetVal_t (*storageInit)(void);
 
     /**
      * @brief Write consecutive blocks to the storage device.
@@ -158,7 +158,7 @@ typedef struct
      *
      * @return K_SPP_OK on success, K_SPP_ERROR on failure.
      */
-    SPP_RetVal_t (*storageWrite)(void *p_handle, const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count);
+    SPP_RetVal_t (*storageWrite)(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count);
 
 } SPP_HALStorage_t;
 

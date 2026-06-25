@@ -37,8 +37,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_ui
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx);
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void *p_handle);
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(void *p_handle, const void *p_buffer, spp_uint32_t first_block,
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block,
                                                      spp_uint16_t count);
 
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
@@ -109,9 +109,6 @@ static const char *const k_tag = "SPP_HAL";
 static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
 static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
-
-static sdmmc_card_t *s_p_sdCard = NULL;
-static spp_bool_t s_sdMounted = false;
 
 /* ----------------------------------------------------------------
  * SPI
@@ -315,13 +312,58 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
  * Storage
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void *p_handle)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
 {
+    if (s_busInitialized == false)
+    {
+        return K_SPP_ERROR;
+    }
+
+    // sdspi_device_config_t sdCfg = {
+    //     .host_id = K_ESP32_SPI_HOST,
+    //     .gpio_cs = K_ESP32_PIN_CS_SDC,
+    //     .gpio_wp_polarity = 1,
+    //     .duty_cycle_pos = 0,
+    //     .wait_for_miso = 0,
+    // };
+
+    sdspi_device_config_t sdCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
+    sdCfg.host_id = K_ESP32_SPI_HOST;
+    sdCfg.gpio_cs = K_ESP32_PIN_CS_SDC;
+
+    esp_err_t ret = sdspi_host_init();
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    sdspi_dev_handle_t sdHandle;
+
+    ret = sdspi_host_init_device(&sdCfg, &sdHandle);
+    if (ret != ESP_OK)
+    {
+        (void)sdspi_host_deinit();
+        return K_SPP_ERROR;
+    }
+
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT(); // revisar
+    host.slot = sdHandle;
+
+    sdmmc_card_t card;
+
+    ret = sdmmc_card_init(&host, &card);
+    if (ret != ESP_OK)
+    {
+        ret = sdspi_host_remove_device(sdHandle);
+        ret = sdspi_host_deinit();
+        return K_SPP_ERROR;
+    }
+    return K_SPP_OK;
 }
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(void *p_handle, const void *p_buffer, spp_uint32_t first_block,
-                                                     spp_uint16_t count)
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
 {
+    return K_SPP_OK;
 }
 
 /* ----------------------------------------------------------------
