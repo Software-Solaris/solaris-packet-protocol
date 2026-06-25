@@ -1,7 +1,6 @@
 /**
- * @file spi.c
- * @brief HAL SPI functions implementation. Calls the function pointer and returns the result.
- */
+ * @file storage.c
+ * @brief HAL storage implementation that dispatches operations to the registered port.
 
 
 /* ----------------------------------------------------------------
@@ -16,9 +15,10 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_STORAGE_mount(void *p_cfg)
+SPP_RetVal_t SPP_HAL_STORAGE_init(void *p_handle)
 {
-    SPP_RetVal_t ret = K_SPP_ERROR;
+    SPP_RetVal_t ret = K_SPP_OK;
+
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
     if (p_port == NULL)
     {
@@ -26,7 +26,7 @@ SPP_RetVal_t SPP_HAL_STORAGE_mount(void *p_cfg)
     }
     else
     {
-        ret = p_port->storage.storageMount(p_cfg);
+        ret = p_port->storage.storageInit(p_handle);
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;
@@ -35,17 +35,18 @@ SPP_RetVal_t SPP_HAL_STORAGE_mount(void *p_cfg)
     return ret;
 }
 
-SPP_RetVal_t SPP_HAL_STORAGE_unmount(void *p_cfg)
+SPP_RetVal_t SPP_HAL_STORAGE_write(void *p_handle, const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
 {
-    SPP_RetVal_t ret = K_SPP_ERROR;
+    SPP_RetVal_t ret = K_SPP_OK;
+
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
-    if (p_port == NULL)
+    if (p_port == NULL || p_buffer == NULL)
     {
         ret = K_SPP_ERROR_NULL_POINTER;
     }
     else
     {
-        ret = p_port->storage.storageUnmount(p_cfg);
+        ret = p_port->storage.storageWrite(p_handle, p_buffer, first_block, count);
         if (ret != K_SPP_OK)
         {
             ret = K_SPP_ERROR;

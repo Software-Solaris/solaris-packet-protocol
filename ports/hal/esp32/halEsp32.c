@@ -17,7 +17,6 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "driver/sdspi_host.h"
-#include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -38,8 +37,9 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_ui
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx);
 
-// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageMount(void *p_cfg);
-// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageUnmount(void *p_cfg);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void *p_handle);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(void *p_handle, const void *p_buffer, spp_uint32_t first_block,
+                                                     spp_uint16_t count);
 
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
@@ -65,10 +65,9 @@ const static SPP_HALGpio_t s_esp32HalGpio = {
     .gpioRegisterIsr = SPP_PORTS_HAL_ESP32_gpioRegisterIsr,
 };
 
-// TODO: Change this when storage mount is working again
 const static SPP_HALStorage_t s_esp32HalStorage = {
-    .storageMount = NULL,
-    .storageUnmount = NULL,
+    .storageInit = SPP_PORTS_HAL_ESP32_storageInit,
+    .storageWrite = SPP_PORTS_HAL_ESP32_storageWrite,
 };
 
 const static SPP_HALTime_t s_esp32HalTime = {
@@ -316,51 +315,14 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
  * Storage
  * ---------------------------------------------------------------- */
 
-// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageMount(void *p_cfg)
-// {
-//     if (s_sdMounted)
-//     {
-//         return K_SPP_OK;
-//     }
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void *p_handle)
+{
+}
 
-//     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
-
-//     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-//     sdspi_device_config_t slotCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
-//     slotCfg.gpio_cs = (gpio_num_t)p_c->pinCs;
-//     slotCfg.host_id = (spi_host_device_t)p_c->spiHostId;
-
-//     esp_vfs_fat_mount_config_t mountCfg = {
-//         .format_if_mount_failed = (bool)p_c->formatIfMountFailed,
-//         .max_files = (int)p_c->maxFiles,
-//         .allocation_unit_size = (size_t)p_c->allocationUnitSize,
-//     };
-
-//     esp_err_t ret = esp_vfs_fat_sdspi_mount(p_c->p_basePath, &host, &slotCfg, &mountCfg, &s_p_sdCard);
-//     if (ret != ESP_OK)
-//     {
-//         s_p_sdCard = NULL;
-//         ESP_LOGE(k_tag, "SD mount failed: %s", esp_err_to_name(ret));
-//         return K_SPP_ERROR;
-//     }
-
-//     s_sdMounted = true;
-//     return K_SPP_OK;
-// }
-
-// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageUnmount(void *p_cfg)
-// {
-//     if (!s_sdMounted)
-//     {
-//         return K_SPP_OK;
-//     }
-
-//     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
-//     esp_err_t ret = esp_vfs_fat_sdcard_unmount(p_c->p_basePath, s_p_sdCard);
-//     s_sdMounted = false;
-//     s_p_sdCard = NULL;
-//     return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR;
-// }
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(void *p_handle, const void *p_buffer, spp_uint32_t first_block,
+                                                     spp_uint16_t count)
+{
+}
 
 /* ----------------------------------------------------------------
  * Time
