@@ -40,11 +40,11 @@ SPP_RetVal_t SPP_HAL_init(const SPP_HalPort_t *p_port)
     }
 
     /* Init the SPI bus */
-    // ret = SPP_HAL_SPI_busInit();
-    // if (ret != K_SPP_OK)
-    // {
-    //     ret = K_SPP_ERROR;
-    // }
+    ret = SPP_HAL_SPI_busInit();
+    if (ret != K_SPP_OK)
+    {
+        ret = K_SPP_ERROR;
+    }
     return K_SPP_OK;
 }
 
