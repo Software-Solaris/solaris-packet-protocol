@@ -1,5 +1,5 @@
-#ifndef SPP_BMP390_H
-#define SPP_BMP390_H
+#ifndef SPP_E22MBL01_H
+#define SPP_E22MBL01_H
 
 #include "spp/core/returnTypes.h"
 #include "spp/core/packet.h"
@@ -11,4 +11,4 @@
 
 SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_E22MBL01_getConsumerContract();
 
-#endif
+#endif /* SPP_E22MBL01 */
