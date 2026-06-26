@@ -110,6 +110,10 @@ static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
 static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
 
+static sdspi_dev_handle_t sdHandle;
+static sdmmc_card_t sdCard;
+static spp_bool_t s_storageInitialized = false;
+
 /* ----------------------------------------------------------------
  * SPI
  * ---------------------------------------------------------------- */
@@ -337,8 +341,6 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
         return K_SPP_ERROR;
     }
 
-    sdspi_dev_handle_t sdHandle;
-
     ret = sdspi_host_init_device(&sdCfg, &sdHandle);
     if (ret != ESP_OK)
     {
@@ -349,20 +351,36 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     sdmmc_host_t host = SDSPI_HOST_DEFAULT(); // revisar
     host.slot = sdHandle;
 
-    sdmmc_card_t card;
-
-    ret = sdmmc_card_init(&host, &card);
+    ret = sdmmc_card_init(&host, &sdCard);
     if (ret != ESP_OK)
     {
         ret = sdspi_host_remove_device(sdHandle);
         ret = sdspi_host_deinit();
         return K_SPP_ERROR;
     }
+
+    s_storageInitialized = true;
     return K_SPP_OK;
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
 {
+    if (s_storageInitialized == false || count == 0)
+    {
+        return K_SPP_ERROR;
+    }
+
+    if (p_buffer == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    if (sdCard.csd.capacity <= first_block || sdCard.csd.capacity - first_block < count)
+    {
+        return K_SPP_ERROR;
+    }
+
+
     return K_SPP_OK;
 }
 
