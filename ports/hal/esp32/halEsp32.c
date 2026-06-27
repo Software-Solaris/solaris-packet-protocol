@@ -380,6 +380,12 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
         return K_SPP_ERROR;
     }
 
+    esp_err_t ret = sdmmc_write_sectors(&sdCard, p_buffer, first_block, count);
+
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
 
     return K_SPP_OK;
 }
