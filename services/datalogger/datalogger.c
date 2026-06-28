@@ -41,7 +41,7 @@ static const SPP_SERVICE_ConsumerContract_t g_dataloggerConsumerContract = {
 };
 
 static Datalogger_t s_datalogger;
-static const char *const k_tag = "DATALOGGER";
+//static const char *const k_tag = "DATALOGGER";
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
