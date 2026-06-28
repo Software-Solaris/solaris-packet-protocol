@@ -1,23 +1,6 @@
 /**
  * @file datalogger.h
  * @brief SD card packet logger service.
- *
- * Provides a consumer service that receives published packets through the
- * pub/sub router and writes them to a file on the SD card.
- *
- * The service follows a two-step workflow:
- * 1. Initialise the SD card and open the log file (SPP_SERVICES_DATALOGGER_init).
- * 2. Receive packets via the consumer contract (deliverToMailbox / consumeData).
- *
- * To use the SPP service registry, obtain the consumer contract via
- * SPP_SERVICES_DATALOGGER_getConsumerContract() and pass it to
- * SPP_SERVICES_PUBSUB_registerConsumer().
- *
- * Naming conventions used in this file:
- * - Constants/macros:  K_DATALOGGER_*
- * - Types:             Datalogger_*_t
- * - Public functions:  SPP_SERVICES_DATALOGGER_*()
- * - Pointer params:    p_*
  */
 
 #ifndef SPP_DATALOGGER_H
@@ -31,11 +14,14 @@
  * DEFINES
  * ---------------------------------------------------------------- */
 
-#define K_DATALOGGER_CONSUMER_ID       (0x01U)   /**< Unique consumer ID for the datalogger. */
-#define K_DATALOGGER_CONSUMER_PRIO     (0)        /**< Consumer priority (0 = lowest). */
-#define K_DATALOGGER_TIMEOUT_MS        (1000U)    /**< Mailbox receive timeout in ms. */
-#define K_DATALOGGER_FLUSH_EVERY       (20U)      /**< Flush to SD every N packets. */
-#define K_DATALOGGER_SPI_DEV_IDX       (2U)       /**< SPI device index for the SD card. */
+#define K_DATALOGGER_CONSUMER_ID   (0x01U) /**< Unique consumer ID for the datalogger. */
+#define K_DATALOGGER_CONSUMER_PRIO (0)     /**< Consumer priority (0 = lowest). */
+#define K_DATALOGGER_TIMEOUT_MS    (1000U) /**< Mailbox receive timeout in ms. */
+#define K_DATALOGGER_FLUSH_EVERY   (20U)   /**< Flush to SD every N packets. */
+#define K_DATALOGGER_SPI_DEV_IDX   (2U)    /**< SPI device index for the SD card. */
+#define K_DATALOGGER_QUEUE_SIZE    (16U)
+#define K_DATALOGGER_SECTOR_SIZE   (512U)
+#define K_DATALOGGER_BUFFER_SIZE   (2U * K_DATALOGGER_SECTOR_SIZE)
 
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS
@@ -51,12 +37,15 @@
  */
 typedef struct
 {
-    void       *p_storageCfg;    /**< Pointer to SPP_StorageInitCfg_t.       */
-    const char *p_filePath;      /**< Absolute path of the file to write.    */
-    void       *p_spiHandler;    /**< SPI device handle for the SD card.     */
-    void       *p_file;          /**< Open file handle, NULL if not open.    */
-    spp_bool_t  isOpen;          /**< true once mounted and file is open.    */
-    spp_uint32_t loggedPackets;  /**< Number of packets written so far.      */
+    void *p_spiHandler;                           /* SD handler */
+    spp_uint8_t buffer[K_DATALOGGER_BUFFER_SIZE]; /* Ping-pong buffer for packet accumulation */
+    spp_uint16_t writeIndex;                      /* Current write position in buffer */
+    spp_uint32_t currentSector;                   /* Next SD sector to write */
+    spp_bool_t txInProgress;                      /* SD write in progress flag */
+    spp_bool_t halfPending;                       /* Indicates a half-buffer is being flushed */
+    spp_uint8_t pendingHalf;                      /* 0 = first half, 1 = second half */
+    spp_uint32_t loggedPackets;                   /* Total packets successfully logged */
+
 } Datalogger_t;
 
 /* ----------------------------------------------------------------
