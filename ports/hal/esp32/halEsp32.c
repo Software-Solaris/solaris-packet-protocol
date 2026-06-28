@@ -146,7 +146,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         .max_transfer_sz = 0,
     };
 
-    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_DISABLED);
+    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK)
     {
         ESP_LOGE(k_tag, "SPI bus init failed: %s", esp_err_to_name(ret));
@@ -318,6 +318,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
 {
+    esp_err_t ret;
+
     if (s_busInitialized == false)
     {
         return K_SPP_ERROR;
@@ -335,7 +337,9 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     sdCfg.host_id = K_ESP32_SPI_HOST;
     sdCfg.gpio_cs = K_ESP32_PIN_CS_SDC;
 
-    esp_err_t ret = sdspi_host_init();
+    ret = sdspi_host_deinit();
+
+    ret = sdspi_host_init();
     if (ret != ESP_OK)
     {
         return K_SPP_ERROR;
