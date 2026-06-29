@@ -24,6 +24,7 @@
 
 #include <string.h>
 
+#include "stdio.h"
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DEFINITIONS
  * ---------------------------------------------------------------- */
@@ -133,9 +134,9 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
-    // gpio_config(&misoCfg);
-    // int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
-    // ESP_LOGI(k_tag, "MISO GPIO%d pre-SPI level = %d", K_ESP32_PIN_MISO, misoLevel);
+    gpio_config(&misoCfg);
+    int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
+    printf("MISO GPIO%d pre-SPI level = %d", K_ESP32_PIN_MISO, misoLevel);
 
     spi_bus_config_t busCfg = {
         .miso_io_num = K_ESP32_PIN_MISO,
@@ -358,6 +359,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     ret = sdmmc_card_init(&host, &sdCard);
     if (ret != ESP_OK)
     {
+        printf("sdmmc_card_init failed: %s\n", esp_err_to_name(ret));
         ret = sdspi_host_remove_device(sdHandle);
         ret = sdspi_host_deinit();
         return K_SPP_ERROR;
@@ -369,6 +371,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
 {
+    esp_err_t ret;
+
     if (s_storageInitialized == false || count == 0)
     {
         return K_SPP_ERROR;
@@ -384,8 +388,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
         return K_SPP_ERROR;
     }
 
-    esp_err_t ret = sdmmc_write_sectors(&sdCard, p_buffer, first_block, count);
-
+    ret = sdmmc_write_sectors(&sdCard, p_buffer, first_block, count);
     if (ret != ESP_OK)
     {
         return K_SPP_ERROR;
