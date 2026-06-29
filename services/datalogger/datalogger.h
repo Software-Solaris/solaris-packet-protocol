@@ -14,38 +14,27 @@
  * DEFINES
  * ---------------------------------------------------------------- */
 
-#define K_DATALOGGER_CONSUMER_ID   (0x01U) /**< Unique consumer ID for the datalogger. */
-#define K_DATALOGGER_CONSUMER_PRIO (0)     /**< Consumer priority (0 = lowest). */
-#define K_DATALOGGER_TIMEOUT_MS    (1000U) /**< Mailbox receive timeout in ms. */
-#define K_DATALOGGER_FLUSH_EVERY   (20U)   /**< Flush to SD every N packets. */
-#define K_DATALOGGER_SPI_DEV_IDX   (2U)    /**< SPI device index for the SD card. */
-#define K_DATALOGGER_QUEUE_SIZE    (16U)
+#define K_DATALOGGER_CONSUMER_ID   (0x01U)
+#define K_DATALOGGER_CONSUMER_PRIO (0)
+#define K_DATALOGGER_TIMEOUT_MS    (1000U)
+#define K_DATALOGGER_SPI_DEV_IDX   (2U)
 #define K_DATALOGGER_SECTOR_SIZE   (512U)
+#define K_DATALOGGER_FIRST_SECTOR  (16384U)
 #define K_DATALOGGER_BUFFER_SIZE   (2U * K_DATALOGGER_SECTOR_SIZE)
+#define K_DATALOGGER_NO_PENDING    (0xFFU)
 
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS
  * ---------------------------------------------------------------- */
 
-/**
- * @brief Datalogger instance.
- *
- * Declare one static instance with the storage config fields filled in, then
- * pass SPP_SERVICES_DATALOGGER_getConsumerContract() to
- * SPP_SERVICES_PUBSUB_registerConsumer(). All other fields are zero-initialised
- * by the compiler and filled in by the init callback.
- */
 typedef struct
 {
-    void *p_spiHandler;                           /* SD handler */
-    spp_uint8_t buffer[K_DATALOGGER_BUFFER_SIZE]; /* Ping-pong buffer for packet accumulation */
-    spp_uint16_t writeIndex;                      /* Current write position in buffer */
-    spp_uint32_t currentSector;                   /* Next SD sector to write */
-    spp_bool_t txInProgress;                      /* SD write in progress flag */
-    spp_bool_t halfPending;                       /* Indicates a half-buffer is being flushed */
-    spp_uint8_t pendingHalf;                      /* 0 = first half, 1 = second half */
-    spp_uint32_t loggedPackets;                   /* Total packets successfully logged */
-
+    spp_uint8_t buffer[K_DATALOGGER_BUFFER_SIZE];
+    spp_uint8_t activeHalf;
+    spp_uint16_t writeIndex;
+    spp_uint32_t currentSector;
+    spp_uint8_t pendingHalf;
+    spp_uint32_t loggedPackets;
 } Datalogger_t;
 
 /* ----------------------------------------------------------------
