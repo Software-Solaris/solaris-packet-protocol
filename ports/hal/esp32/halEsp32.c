@@ -24,7 +24,6 @@
 
 #include <string.h>
 
-#include "stdio.h"
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DEFINITIONS
  * ---------------------------------------------------------------- */
@@ -136,7 +135,6 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
     };
     gpio_config(&misoCfg);
     int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
-    printf("MISO GPIO%d pre-SPI level = %d", K_ESP32_PIN_MISO, misoLevel);
 
     spi_bus_config_t busCfg = {
         .miso_io_num = K_ESP32_PIN_MISO,
@@ -153,22 +151,6 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         ESP_LOGE(k_tag, "SPI bus init failed: %s", esp_err_to_name(ret));
         return K_SPP_ERROR;
     }
-
-    // gpio_config_t csConfig = {
-    //     .pin_bit_mask = (1ULL << K_ESP32_PIN_CS_BMP) | (1ULL << K_ESP32_PIN_CS_ICM),
-    //     .mode = GPIO_MODE_OUTPUT,
-    //     .pull_up_en = GPIO_PULLUP_ENABLE,
-    //     .pull_down_en = GPIO_PULLDOWN_DISABLE,
-    //     .intr_type = GPIO_INTR_DISABLE,
-    // };
-
-    // if (gpio_config(&csConfig) != ESP_OK)
-    // {
-    //     return K_SPP_ERROR;
-    // }
-
-    // gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
-    // gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
 
     s_busInitialized = true;
     return K_SPP_OK;
@@ -209,13 +191,6 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
         devCfg.clock_speed_hz = 500 * 1000;
         devCfg.mode = 0;
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
-        devCfg.queue_size = 1;
-    }
-    else if (s_spiDevCount == K_ESP32_SPI_IDX_SDC)
-    {
-        devCfg.clock_speed_hz = 400 * 1000; /* 400 kHz — max allowed during SD init (spec §7.2.1) */
-        devCfg.mode = 0;                    /* SPI Mode 0: CPOL=0, CPHA=0 (spec §7) */
-        devCfg.spics_io_num = K_ESP32_PIN_CS_SDC;
         devCfg.queue_size = 1;
     }
     else
@@ -367,19 +342,15 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
         return K_SPP_ERROR;
     }
 
-    // sdspi_device_config_t sdCfg = {
-    //     .host_id = K_ESP32_SPI_HOST,
-    //     .gpio_cs = K_ESP32_PIN_CS_SDC,
-    //     .gpio_wp_polarity = 1,
-    //     .duty_cycle_pos = 0,
-    //     .wait_for_miso = 0,
-    // };
-
     sdspi_device_config_t sdCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
     sdCfg.host_id = K_ESP32_SPI_HOST;
     sdCfg.gpio_cs = K_ESP32_PIN_CS_SDC;
 
     ret = sdspi_host_deinit();
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
 
     gpio_set_direction(K_ESP32_PIN_CS_BMP, GPIO_MODE_OUTPUT);
     gpio_set_direction(K_ESP32_PIN_CS_ICM, GPIO_MODE_OUTPUT);
@@ -388,7 +359,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
 
     ret = sdspi_host_init();
-    printf("sdmmc_card_init: %s\n", esp_err_to_name(ret));
+
     if (ret != ESP_OK)
     {
         return K_SPP_ERROR;
@@ -407,7 +378,6 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     ret = sdmmc_card_init(&host, &sdCard);
     if (ret != ESP_OK)
     {
-        printf("sdmmc_card_init failed: %s\n", esp_err_to_name(ret));
         ret = sdspi_host_remove_device(sdHandle);
         ret = sdspi_host_deinit();
         return K_SPP_ERROR;

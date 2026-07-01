@@ -20,7 +20,6 @@
 #ifdef SPP_DEBUG_PRINT
 #include <stdio.h>
 #endif
-#include <stdio.h>
 
 
 /* ----------------------------------------------------------------
@@ -239,7 +238,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler)
     }
 
     SPP_LOGI(k_tag, "ID: 0x%02X", buf[8]);
-    printf("BMP ID 0x%02X\n", buf[8]);
 
     if (buf[8] != 0x60U)
     {

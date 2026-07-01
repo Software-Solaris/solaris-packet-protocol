@@ -23,14 +23,9 @@
 #include <stdio.h>
 #endif
 
-#include <stdio.h>
-
 
 #include <string.h>
 #include <math.h>
-#ifdef SPP_DEBUG_PRINT
-#include <stdio.h>
-#endif
 
 /* ----------------------------------------------------------------
  * CONSTANTS
