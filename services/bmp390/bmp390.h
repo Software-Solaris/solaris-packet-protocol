@@ -44,8 +44,8 @@
 /* SPI */
 #define K_BMP390_SPI_READ    0x80U /**< SPI read flag: OR with register address. */
 #define K_BMP390_SPI_WRITE   0x00U /**< SPI write flag: OR with register address. */
-#define K_BMP390_PIN_NUM_CS  21U   /**< Chip-select GPIO pin (informational; set by HAL). */
-#define K_BMP390_SPI_BUS_IDX 1U    /**< SPI bus index (informational; set by HAL). */
+#define K_BMP390_PIN_NUM_CS  18U   /**< Chip-select GPIO pin (informational; set by HAL). */
+#define K_BMP390_SPI_BUS_IDX 0U    /**< SPI bus index (informational; set by HAL). */
 
 /* Identity and reset */
 #define K_BMP390_CHIP_ID_REG    0x00 /**< Chip ID register address. */
@@ -83,7 +83,7 @@
 #define K_BMP390_REG_INT_CTRL     0x19 /**< Interrupt control register address. */
 #define K_BMP390_INT_CTRL_DRDY_EN 0x40 /**< Interrupt control: enable data-ready interrupt. */
 #define K_BMP390_INT_CTRL_LEVEL   0x02 /**< Interrupt control: active-high level. */
-#define K_BMP390_INT_PIN_NUM      10U  /**< Interrupt GPIO pin */
+#define K_BMP390_INT_PIN_NUM      3U   /**< Interrupt GPIO pin */
 #define K_BMP390_INT_INTR_TYPE    1U   /**< Interrupt trigger type (1=rising). */
 #define K_BMP390_INT_PULL         0U   /**< Pull resistor: 0=none 1=up 2=down. */
 

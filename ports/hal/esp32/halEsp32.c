@@ -154,6 +154,22 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         return K_SPP_ERROR;
     }
 
+    // gpio_config_t csConfig = {
+    //     .pin_bit_mask = (1ULL << K_ESP32_PIN_CS_BMP) | (1ULL << K_ESP32_PIN_CS_ICM),
+    //     .mode = GPIO_MODE_OUTPUT,
+    //     .pull_up_en = GPIO_PULLUP_ENABLE,
+    //     .pull_down_en = GPIO_PULLDOWN_DISABLE,
+    //     .intr_type = GPIO_INTR_DISABLE,
+    // };
+
+    // if (gpio_config(&csConfig) != ESP_OK)
+    // {
+    //     return K_SPP_ERROR;
+    // }
+
+    // gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
+    // gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
+
     s_busInitialized = true;
     return K_SPP_OK;
 }
@@ -191,7 +207,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     else if (s_spiDevCount == K_ESP32_SPI_IDX_BMP)
     {
         devCfg.clock_speed_hz = 500 * 1000;
-        devCfg.mode = 3;
+        devCfg.mode = 0;
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
         devCfg.queue_size = 1;
     }
@@ -227,18 +243,43 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t 
     }
 
     spi_device_handle_t hDev = *(spi_device_handle_t *)p_handle;
+
     if (hDev == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    spi_transaction_t trans = {0};
-    trans.length = 8U * (size_t)length;
-    trans.tx_buffer = p_data;
-    trans.rx_buffer = p_data;
+    spp_uint8_t i = 0U;
 
-    esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
-    return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR_ON_SPI_TRANSACTION;
+    while (i < length)
+    {
+        spi_transaction_t trans = {0};
+
+        if ((p_data[i] & 0x80U) != 0U)
+        {
+            trans.length = 8U * 3U;
+            trans.tx_buffer = &p_data[i];
+            trans.rx_buffer = &p_data[i];
+
+            i += 3U;
+        }
+        else
+        {
+            trans.length = 8U * 2U;
+            trans.tx_buffer = &p_data[i];
+
+            i += 2U;
+        }
+
+        esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
+
+        if (ret != ESP_OK)
+        {
+            return K_SPP_ERROR_ON_SPI_TRANSACTION;
+        }
+    }
+
+    return K_SPP_OK;
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz)
@@ -340,7 +381,14 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
 
     ret = sdspi_host_deinit();
 
+    gpio_set_direction(K_ESP32_PIN_CS_BMP, GPIO_MODE_OUTPUT);
+    gpio_set_direction(K_ESP32_PIN_CS_ICM, GPIO_MODE_OUTPUT);
+
+    gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
+    gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
+
     ret = sdspi_host_init();
+    printf("sdmmc_card_init: %s\n", esp_err_to_name(ret));
     if (ret != ESP_OK)
     {
         return K_SPP_ERROR;
