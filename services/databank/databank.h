@@ -91,7 +91,7 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
  * fields, copies @p p_data into the payload, and computes a CRC-16/CCITT
  * checksum over every byte of the packet except the @c crc field itself.
  *
- * The timestamp is captured automatically via @ref SPP_HAL_getTimeMs().
+ * The timestamp is captured automatically via @ref SPP_HAL_TIME_getTimeMs().
  *
  * @param[out] p_packet  Packet previously acquired from @ref SPP_SERVICES_DATABANK_getPacket().
  * @param[in]  apid      Application Process Identifier.
@@ -103,8 +103,13 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
  * @return K_SPP_ERROR_NULL_POINTER if @p p_packet or @p p_data is NULL.
  * @return K_SPP_ERROR_INVALID_PARAMETER if @p dataLen exceeds K_SPP_PKT_PAYLOAD_MAX.
  */
+<<<<<<< HEAD
 SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid,
                                               spp_uint16_t seq, const void *p_data,
                                               spp_uint16_t dataLen);
+=======
+SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16_t apid, spp_uint16_t seq,
+                                              const void *p_data, spp_uint16_t dataLen);
+>>>>>>> dev/spp-refactor-code
 
 #endif /* SPP_DATABANK_H */

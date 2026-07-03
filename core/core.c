@@ -13,44 +13,24 @@
 #include "spp/services/pubsub/pubsub.h"
 #include "spp/services/log/log.h"
 
-#include <stdio.h>
+/* ----------------------------------------------------------------
+* VARIABLES
+* ---------------------------------------------------------------- */
+static spp_uint16_t s_logSeq = 0U;
+static spp_bool_t s_logBusy = false;
+
 
 /* ----------------------------------------------------------------
- * Private state
- * ---------------------------------------------------------------- */
-
-static const SPP_HalPort_t *s_p_halPort = NULL;
-
-/* ----------------------------------------------------------------
- * Port registration
- * ---------------------------------------------------------------- */
-
-SPP_RetVal_t SPP_CORE_setHalPort(const SPP_HalPort_t *p_port)
-{
-    if (p_port == NULL)
-    {
-        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
-    }
-    s_p_halPort = p_port;
-    return K_SPP_OK;
-}
-
-const SPP_HalPort_t *SPP_CORE_getHalPort(void)
-{
-    return s_p_halPort;
-}
+* STATIC FUNCTIONS DECLARATIONS
+* ---------------------------------------------------------------- */
+static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p_message);
 
 /* ----------------------------------------------------------------
- * Core initialisation
- * ---------------------------------------------------------------- */
+* PUBLIC FUNCTIONS
+* ---------------------------------------------------------------- */
 
 SPP_RetVal_t SPP_CORE_init(void)
 {
-    if (s_p_halPort == NULL)
-    {
-        SPP_ERR_RETURN(K_SPP_ERROR_NOT_INITIALIZED);
-    }
-
     SPP_RetVal_t ret = SPP_SERVICES_LOG_init();
     if (ret != K_SPP_OK)
     {
@@ -63,6 +43,7 @@ SPP_RetVal_t SPP_CORE_init(void)
         return ret;
     }
 
+<<<<<<< HEAD
     SPP_SERVICES_PUBSUB_init();
 
     SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR,
@@ -107,17 +88,19 @@ static void coreLogOutput(const char *p_tag, SPP_LogLevel_t level, const char *p
 SPP_RetVal_t SPP_CORE_boot(const SPP_HalPort_t *p_port)
 {
     SPP_RetVal_t ret = SPP_CORE_setHalPort(p_port);
+=======
+    // Init all the producers and consumer init functions
+    ret = SPP_SERVICES_PUBSUB_init();
+>>>>>>> dev/spp-refactor-code
     if (ret != K_SPP_OK)
     {
         return ret;
     }
 
-    ret = SPP_CORE_init();
-    if (ret != K_SPP_OK)
-    {
-        return ret;
-    }
+    // SPP_SERVICES_LOG_setOutput(coreLogOutput);
 
-    SPP_SERVICES_LOG_setOutput(coreLogOutput);
+    SPP_LOGI("SPP_CORE", "SPP core initialised (v%u.%u.%u)", K_SPP_VERSION_MAJOR, K_SPP_VERSION_MINOR,
+             K_SPP_VERSION_PATCH);
+
     return K_SPP_OK;
 }

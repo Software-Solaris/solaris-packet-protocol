@@ -38,7 +38,7 @@
 #define K_ESP32_PIN_CS_ICM (21)
 
 /** @brief SD card chip-select GPIO. */
-#define K_ESP32_PIN_CS_SDC (8)
+#define K_ESP32_PIN_CS_SDC (43)
 
 /* ----------------------------------------------------------------
  * Device table constants
@@ -51,10 +51,27 @@
  * Device index assignments
  * ---------------------------------------------------------------- */
 
-/** @brief SPI device index for the ICM20948. */
-#define K_ESP32_SPI_IDX_ICM (0U)
-
 /** @brief SPI device index for the BMP390. */
-#define K_ESP32_SPI_IDX_BMP (1U)
+#define K_ESP32_SPI_IDX_BMP (0U)
+
+/** @brief SPI device index for the ICM20948. */
+#define K_ESP32_SPI_IDX_ICM (1U)
+
+/** @brief SPI device index for the SD card. */
+#define K_ESP32_SPI_IDX_SDC (2U)
+
+/* ----------------------------------------------------------------
+ * UART port assignments
+ * ---------------------------------------------------------------- */
+#define K_ESP32_UART_PORT_ID   UART_NUM_2
+#define K_ESP32_UART_BAUD_RATE 9600
+
+#define K_ESP32_UART_TX_PIN  5
+#define K_ESP32_UART_RX_PIN  6
+#define K_ESP32_UART_RTS_PIN -1 // Not used
+#define K_ESP32_UART_CTS_PIN -1 // Not used
+
+#define K_ESP32_UART_RX_BUFFER_SIZE 1024
+#define K_ESP32_UART_TX_BUFFER_SIZE 1024
 
 #endif /* SPP_MACROS_ESP32_H */

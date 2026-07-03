@@ -24,7 +24,9 @@
 #define K_SPP_PKT_VERSION (1U)
 
 /** @brief Maximum payload size in bytes per packet. */
-#define K_SPP_PKT_PAYLOAD_MAX (48U)
+#define K_SPP_PKT_PAYLOAD_MAX (50U)
+
+#define K_SPP_TOTAL_PACKET_SIZE (64U) /**< Total packet size in bytes. Multiple of 8 bytes. */
 
 /* ----------------------------------------------------------------
  * Reserved APIDs
@@ -40,7 +42,7 @@
 /**
  * @brief Primary header — routing and framing information.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     spp_uint8_t version;     /**< Protocol version (= K_SPP_PKT_VERSION).        */
     spp_uint16_t apid;       /**< Application Process Identifier.                */
@@ -51,7 +53,7 @@ typedef struct
 /**
  * @brief Secondary header — timing and reliability metadata.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     spp_uint32_t timestampMs; /**< System timestamp at packet creation (ms). */
     spp_uint8_t dropCounter;  /**< Number of packets dropped since last reset. */
@@ -68,12 +70,16 @@ typedef struct
  * push the packet into the @c db_flow FIFO.  Consumers pop it, process it,
  * and return it to the databank.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     SPP_PacketPrimary_t primaryHeader;          /**< Routing / framing header.  */
     SPP_PacketSecondary_t secondaryHeader;      /**< Timing / metadata header.  */
     spp_uint8_t payload[K_SPP_PKT_PAYLOAD_MAX]; /**< Raw payload bytes. */
+<<<<<<< HEAD
     spp_uint16_t crc; /**< CRC-16 over the full packet (0 = not computed). */
+=======
+    spp_uint16_t crc;                           /**< CRC-16 over the full packet (0 = not computed). */
+>>>>>>> dev/spp-refactor-code
 } SPP_Packet_t;
 
 #endif /* SPP_PACKET_H */

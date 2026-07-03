@@ -1,16 +1,6 @@
 /**
  * @file pubsub.h
  * @brief Publish-subscribe packet router.
- *
- * How it works:
- *   1. A producer calls publish(packet).
- *   2. SYNC subscribers (prio = K_SPP_PUBSUB_PRIO_SYNC) run immediately inside
- *      publish() before it returns — use this only for very fast operations.
- *   3. All other subscribers are queued and dispatched one-per-call by
- *      SPP_SERVICES_PUBSUB_callConsumers() from the superloop.
- *
- * A subscriber receives a packet when (subscriber.apid & packet.apid) != 0,
- * or when subscriber.apid == K_SPP_APID_ALL (receives everything).
  */
 
 #ifndef SPP_PUBSUB_H
@@ -19,145 +9,70 @@
 #include "spp/core/packet.h"
 #include "spp/core/types.h"
 #include "spp/core/returnTypes.h"
+#include "spp/services/service.h"
 #include "spp/util/macros.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ----------------------------------------------------------------
- * Subscriber dispatch priorities
+ * CONSTANTS    
  * ---------------------------------------------------------------- */
+#define K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS    (5U)
+#define K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS    (5U)
+#define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (8U) /**< Internal packet buffer depth. */
+#define K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY (1U)
 
-/** @brief Run inside publish() — blocks the producer until the handler returns.
- *  Only use for very fast operations (e.g. copying a value to a buffer). */
-#define K_SPP_PUBSUB_PRIO_SYNC   (0U)
-
-/** @brief Deferred — dispatched by callConsumers(), before NORMAL. */
-#define K_SPP_PUBSUB_PRIO_HIGH   (1U)
-
-/** @brief Deferred — dispatched by callConsumers(). */
-#define K_SPP_PUBSUB_PRIO_NORMAL (2U)
-
-/** @brief Deferred — dispatched by callConsumers(), last. Good for slow operations
- *  like SD card writes that must not delay sensor reads. */
-#define K_SPP_PUBSUB_PRIO_LOW    (3U)
+#define K_SPP_SERVICES_PUBSUB_STEP             (1U) /**< Step to increment circular buffer index. */
+#define K_SPP_SERVICES_PUBSUB_SORT_START_INDEX (1U) /**< Starting index for insertion sort. */
+#define K_SPP_SERVICES_PUBSUB_OFFSET           (1U) /**< Array index offset. */
+#define K_SPP_SERVICES_PUBSUB_ZERO_INDEX       (0)  /**< Zero index/value for comparisons. */
 
 /* ----------------------------------------------------------------
- * Constants
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-/** @brief Wildcard APID — subscriber receives packets for every APID. */
-#define K_SPP_APID_ALL  (0xFFFFU)
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                  SPP_Kpid_t *p_assignedKpid);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                  SPP_Kpid_t subscription);
 
-/* ----------------------------------------------------------------
- * Types
- * ---------------------------------------------------------------- */
-
-/**
- * @brief Subscriber callback signature.
- *
- * For CRITICAL subscribers, called synchronously inside
- * @ref SPP_SERVICES_PUBSUB_publish().  For all other priorities, called from
- * @ref SPP_SERVICES_PUBSUB_callConsumers().  The packet pointer is valid only for the
- * duration of the call — do not store it.
- *
- * @param[in] p_packet  Published packet (read-only).
- * @param[in] p_ctx     Caller-supplied context pointer.
- */
-typedef void (*SPP_PubSub_Handler_t)(const SPP_Packet_t *p_packet, void *p_ctx);
-
-/* ----------------------------------------------------------------
- * API
- * ---------------------------------------------------------------- */
+SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 
 /**
- * @brief Initialise the pub/sub registry.
+ * @brief  Copies a packet into the internal buffer and returns it to the databank.
  *
- * Clears all subscriptions and resets the deferred queue.  Safe to call
- * multiple times.
+ * Called by producers after filling a packet.  The packet is copied by value
+ * into the next free slot of the internal circular buffer; the original is
+ * returned to the databank pool immediately.  Returns K_SPP_ERROR if the
+ * buffer is full (packet is still returned to the pool).
+ *
+ * @param  p_pkt  Packet to publish (ownership transferred — do not use after this call).
+ * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if p_pkt is NULL,
+ *         K_SPP_ERROR if the buffer is full.
  */
-void SPP_SERVICES_PUBSUB_init(void);
+SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_pkt);
 
 /**
- * @brief Register a subscriber for a given APID bitmask.
- *
- * Subscribers are stored sorted by @p prio (ascending), so CRITICAL
- * subscribers are always dispatched first.
- *
- * @param[in] apid     Bitmask of APIDs to subscribe to.  A packet matches
- *                     when (apid & packet.apid) != 0.  Use @ref K_SPP_APID_ALL
- *                     to receive every packet, or @ref K_SPP_APID_NONE for none.
- * @param[in] prio     Dispatch priority (@ref K_SPP_PUBSUB_PRIO_SYNC …
- *                     @ref K_SPP_PUBSUB_PRIO_LOW).
- * @param[in] handler  Callback invoked on each matching publish.
- * @param[in] p_ctx    Context pointer forwarded unchanged to the callback.
- *
- * @return K_SPP_OK on success, or an error code otherwise.
+ * @brief  Calls acquireData on every registered producer.
  */
-SPP_RetVal_t SPP_SERVICES_PUBSUB_subscribe(spp_uint16_t apid, spp_uint8_t prio,
-                                            SPP_PubSub_Handler_t handler, void *p_ctx);
+void SPP_SERVICES_PUBSUB_callProducers(void);
 
 /**
- * @brief Publish a filled packet to all matching subscribers.
- *
- * CRITICAL subscribers are called synchronously before this function returns.
- * All other matching subscribers are enqueued; call @ref SPP_SERVICES_PUBSUB_callConsumers()
- * repeatedly to drain them.  The packet is returned to the databank only when
- * all deferred subscribers have been dispatched.
- *
- * On queue overflow the packet is discarded immediately and the per-APID
- * overflow counter is incremented.
- *
- * @param[in] p_packet  Filled packet from @ref SPP_SERVICES_DATABANK_getPacket().
- *
- * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if @p p_packet is NULL.
+ * @brief  Routes all buffered packets to matching consumer mailboxes, then clears the buffer.
  */
-SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_packet);
 
-/**
- * @brief Dispatch the next pending deferred subscriber.
- *
- * Processes exactly one subscriber from the deferred queue per call.
- * Call this once per superloop iteration — it returns immediately when
- * the queue is empty.
- *
- * One-per-call is intentional: slow consumers (SD card writes) are spread
- * across loop iterations so they never block sensor reads.
- */
 void SPP_SERVICES_PUBSUB_callConsumers(void);
 
 /**
- * @brief Return the accumulated overflow count for a given APID bitmask.
- *
- * Counts how many packets matching @p apid were dropped because the deferred
- * queue was full at the time of publish.
- *
- * @param[in] apid  APID bitmask (same format as in subscribe).
- *
- * @return Cumulative number of dropped packets for the matching APIDs.
- */
-spp_uint16_t SPP_SERVICES_PUBSUB_overflowCount(spp_uint16_t apid);
-
-/**
- * @brief Return the number of currently registered subscribers.
- *
- * @return Subscriber count.
- */
-spp_uint8_t SPP_SERVICES_PUBSUB_subscriberCount(void);
-
-/**
- * @brief Return the number of packets currently sitting in the deferred queue.
- *
- * Useful for debug: if this grows without bound, callConsumers() is not keeping
- * up with publish() — either increase call rate or reduce publish rate.
- *
- * @return Deferred queue depth (0 … K_SPP_PUBSUB_QUEUE_SIZE).
+ * @brief  Returns the number of packets currently held in the internal FIFO buffer.
  */
 spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
 
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @brief  Signals that a producer has new data pending.
+ *
+ * Must be called from within acquireData() as soon as a DRDY flag is detected,
+ * so that callConsumers() can preempt consumers with priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY.
+ */
+void SPP_SERVICES_PUBSUB_signalProducerReady(void);
 
 #endif /* SPP_PUBSUB_H */
