@@ -184,35 +184,61 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
         return K_SPP_OK;
     }
 
-    SPP_Packet_t *p_pkt = SPP_SERVICES_DATABANK_getPacket();
-    if (p_pkt == NULL)
+    SPP_Packet_t *p_pkt1 = SPP_SERVICES_DATABANK_getPacket();
+    if (p_pkt1 == NULL)
     {
+#ifdef SPP_DEBUG_PRINT
         SPP_LOGI(K_ICM20948_LOG_TAG, "No free packet");
+#endif
         return K_SPP_ERROR;
     }
 
-    float payload[9] = {
-        p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy,
-        p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz,
-    };
-
+    SPP_Packet_t *p_pkt2 = SPP_SERVICES_DATABANK_getPacket();
+    if (p_pkt2 == NULL)
+    {
 #ifdef SPP_DEBUG_PRINT
-    printf("[ICM] ax=%.2f ay=%.2f az=%.2f gx=%.2f gy=%.2f gz=%.2f mx=%.2f my=%.2f mz=%.2f\n", p_ctx->lastData.ax,
-           p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy, p_ctx->lastData.gz,
-           p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz);
+        SPP_LOGI(K_ICM20948_LOG_TAG, "No free packet");
 #endif
-    printf("[ICM] ax=%.2f ay=%.2f az=%.2f gx=%.2f gy=%.2f gz=%.2f mx=%.2f my=%.2f mz=%.2f\n", p_ctx->lastData.ax,
-           p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy, p_ctx->lastData.gz,
-           p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz);
+        return K_SPP_ERROR;
+    }
+
+    float payload1[12] = {p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx,
+                          p_ctx->lastData.gy, p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my,
+                          p_ctx->lastData.mz, p_ctx->lastData.qw, p_ctx->lastData.qx, p_ctx->lastData.qy};
+
+    float payload2[4U] = {p_ctx->lastData.qz, p_ctx->lastData.accuracy};
+#ifdef SPP_DEBUG_PRINT
+    SPP_LOGI(K_ICM20948_LOG_TAG,
+             "[ICM] A:[%.2f %.2f %.2f]g G:[%.1f %.1f %.1f]dps M:[%.1f %.1f "
+             "%.1f]uT"
+             " Q:[w=%.3f x=%.3f y=%.3f z=%.3f] ACC:%f\n",
+             p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx, p_ctx->lastData.gy,
+             p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my, p_ctx->lastData.mz, p_ctx->lastData.qw,
+             p_ctx->lastData.qx, p_ctx->lastData.qy, p_ctx->lastData.qz, p_ctx->lastData.accuracy);
+#endif
 
     SPP_RetVal_t ret =
-        SPP_SERVICES_DATABANK_packetData(p_pkt, kpid.value, p_ctx->seq++, payload, (spp_uint16_t)sizeof(payload));
+        SPP_SERVICES_DATABANK_packetData(p_pkt1, kpid.value, p_ctx->seq++, payload1, (spp_uint16_t)sizeof(payload1));
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt1);
         return ret;
     }
+
+    SPP_RetVal_t ret2 =
+        SPP_SERVICES_DATABANK_packetData(p_pkt2, kpid.value, p_ctx->seq++, payload2, (spp_uint16_t)sizeof(payload2));
+    if (ret2 != K_SPP_OK)
+    {
+        SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
+        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt2);
+        return ret;
+    }
+
+
+    // Publish the packet 1 and packet2
+    (void)SPP_SERVICES_PUBSUB_publish(p_pkt1);
+    (void)SPP_SERVICES_PUBSUB_publish(p_pkt2);
 
     // (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
     return K_SPP_OK;
@@ -647,9 +673,9 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
     {
         return ret;
     }
-
+#ifdef SPP_DEBUG_PRINT
     SPP_LOGI(K_ICM20948_LOG_TAG, "WHO_AM_I = 0x%02X (expect 0xEA)", whoAmIValue);
-
+#endif
     if (whoAmIValue != K_ICM20948_WHO_AM_I_VALUE)
     {
         return K_SPP_ERROR;
@@ -1714,7 +1740,7 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             spp_int32_t q3Raw = ((spp_int32_t)fifoBuffer[34] << 24) |
                                                 ((spp_int32_t)fifoBuffer[35] << 16) |
                                                 ((spp_int32_t)fifoBuffer[36] << 8) | (spp_int32_t)fifoBuffer[37];
-                            spp_int16_t accuracy = (spp_int16_t)(((spp_uint16_t)fifoBuffer[38] << 8) | fifoBuffer[39]);
+                            float accuracy = (spp_int16_t)(((spp_uint16_t)fifoBuffer[38] << 8) | fifoBuffer[39]);
 
                             float ax = accelX / 8192.0f;
                             float ay = accelY / 8192.0f;
@@ -1731,13 +1757,6 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             float qwSq = 1.0f - (qx * qx) - (qy * qy) - (qz * qz);
                             float qw = (qwSq > 0.0f) ? sqrtf(qwSq) : 0.0f;
 
-#ifdef SPP_DEBUG_PRINT
-                            printf("[ICM] A:[%.2f %.2f %.2f]g G:[%.1f %.1f %.1f]dps M:[%.1f %.1f "
-                                   "%.1f]uT"
-                                   " Q:[w=%.3f x=%.3f y=%.3f z=%.3f] ACC:%d\n",
-                                   ax, ay, az, gx, gy, gz, mx, my, mz, qw, qx, qy, qz, accuracy);
-#endif
-
                             p_ctx->lastData.ax = ax;
                             p_ctx->lastData.ay = ay;
                             p_ctx->lastData.az = az;
@@ -1747,6 +1766,11 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             p_ctx->lastData.mx = mx;
                             p_ctx->lastData.my = my;
                             p_ctx->lastData.mz = mz;
+                            p_ctx->lastData.qw = qw;
+                            p_ctx->lastData.qx = qx;
+                            p_ctx->lastData.qy = qy;
+                            p_ctx->lastData.qz = qz;
+                            p_ctx->lastData.accuracy = accuracy;
                             p_ctx->lastData.dataReady = true;
                         }
                     }

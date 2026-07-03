@@ -27,6 +27,8 @@
  * ---------------------------------------------------------------- */
 #define K_BMP390_TASK_TIMEOUT_MS 5000U
 #define K_BMP390_SERVICE_APID    (0x0004U)
+#define K_BMP390_LOG_TAG         "BMP390"
+
 
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
@@ -167,15 +169,20 @@ static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
     }
 
 #ifdef SPP_DEBUG_PRINT
-    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+    SPP_LOGI(K_BMP390_LOG_TAG, "[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
 #endif
 
-    printf("[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
 
-
-    float payload[3] = {altitude, pressure, temperature};
+    spp_float32_t payload[3] = {altitude, pressure, temperature};
     ret = SPP_SERVICES_DATABANK_packetData(p_packet, kpid.value, p_bmpData->seq++, payload,
                                            (spp_uint16_t)sizeof(payload));
+
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     spp_uint32_t bits;
+    //     memcpy(&bits, &payload[i], sizeof(bits)); // reinterpreta los bits sin convertir el valor
+    //     printf("payload[%d] = 0x%08lX\n", i, bits);
+    // }
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "packetData failed ret=%d", (int)ret);
@@ -183,7 +190,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
         return ret;
     }
 
-    // TODO: review when this is implemented
+    // Publish the packet
     (void)SPP_SERVICES_PUBSUB_publish(p_packet);
     return K_SPP_OK;
 }

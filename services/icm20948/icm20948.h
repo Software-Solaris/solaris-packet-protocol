@@ -52,9 +52,9 @@
 #define K_ICM20948_EMPTY_MESSAGE 0x00U /**< Dummy byte clocked out during SPI reads. */
 
 /* Interrupt */
-#define K_ICM20948_INT_PIN_NUM   4U /**< GPIO interrupt pin. */
-#define K_ICM20948_INT_INTR_TYPE 1U /**< Interrupt trigger type (1=rising). */
-#define K_ICM20948_INT_PULL      0U /**< Pull resistor: 0=none, 1=up, 2=down. */
+#define K_ICM20948_INT_PIN_NUM   17U /**< GPIO interrupt pin. */
+#define K_ICM20948_INT_INTR_TYPE 1U  /**< Interrupt trigger type (1=rising). */
+#define K_ICM20948_INT_PULL      0U  /**< Pull resistor: 0=none, 1=up, 2=down. */
 
 /* Register bank select */
 #define K_ICM20948_REG_BANK_SEL 0x7FU /**< Register bank select register address. */
@@ -543,6 +543,11 @@ typedef struct
     float mx;             /**< Magnetometer X (uT)   */
     float my;             /**< Magnetometer Y (uT)   */
     float mz;             /**< Magnetometer Z (uT)   */
+    float qw;             /**< Quaternion W (uT)     */
+    float qx;             /**< Quaternion X (uT)     */
+    float qy;             /**< Quaternion Y (uT)     */
+    float qz;             /**< Quaternion Z (uT)     */
+    float accuracy;       /**< Quaternion accuracy   */
     spp_bool_t dataReady; /**< Set when a FIFO packet has been parsed. */
 } ICM20948_SensorData_t;
 

@@ -83,7 +83,7 @@
 #define K_BMP390_REG_INT_CTRL     0x19 /**< Interrupt control register address. */
 #define K_BMP390_INT_CTRL_DRDY_EN 0x40 /**< Interrupt control: enable data-ready interrupt. */
 #define K_BMP390_INT_CTRL_LEVEL   0x02 /**< Interrupt control: active-high level. */
-#define K_BMP390_INT_PIN_NUM      3U   /**< Interrupt GPIO pin */
+#define K_BMP390_INT_PIN_NUM      10U  /**< Interrupt GPIO pin */
 #define K_BMP390_INT_INTR_TYPE    1U   /**< Interrupt trigger type (1=rising). */
 #define K_BMP390_INT_PULL         0U   /**< Pull resistor: 0=none 1=up 2=down. */
 

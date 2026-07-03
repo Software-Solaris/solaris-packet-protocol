@@ -233,7 +233,7 @@ static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
         {
             continue;
         }
-        (void)s_consumers[j].p_contract->deliverToMailbox(&packet);
+        (void)s_consumers[j].p_contract->deliverToMailbox(packet);
     }
     s_bufferHead = (spp_uint8_t)((s_bufferHead + K_SPP_SERVICES_PUBSUB_STEP) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);
     s_bufferCount--;

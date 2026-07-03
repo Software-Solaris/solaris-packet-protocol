@@ -38,7 +38,7 @@
 #define K_ESP32_PIN_CS_ICM (21)
 
 /** @brief SD card chip-select GPIO. */
-#define K_ESP32_PIN_CS_SDC (46)
+#define K_ESP32_PIN_CS_SDC (43)
 
 /* ----------------------------------------------------------------
  * Device table constants

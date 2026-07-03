@@ -401,7 +401,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    if (sdCard.csd.capacity <= first_block || sdCard.csd.capacity - first_block < count)
+    if (sdCard.csd.capacity <= first_block || (sdCard.csd.capacity - first_block) < count)
     {
         return K_SPP_ERROR;
     }
