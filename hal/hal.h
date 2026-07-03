@@ -133,29 +133,35 @@ typedef struct
     SPP_RetVal_t (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
 } SPP_HALGpio_t;
 
+
 /**
-* @brief Storage struct that contains all the pointers to the Storage functions
-*/
+ * @brief Storage struct that contains all the pointers to the storage functions
+ */
 typedef struct
 {
     /**
-     * @brief Mount the storage filesystem.  NULL if storage is not used.
+     * @brief Initialize the storage device.
      *
-     * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t.
+     * @param[in,out] p_handle Hardware-specific storage context.
      *
      * @return K_SPP_OK on success, K_SPP_ERROR on failure.
      */
-    SPP_RetVal_t (*storageMount)(void *p_cfg);
+    SPP_RetVal_t (*storageInit)(void);
 
     /**
-     * @brief Unmount the storage filesystem.  NULL if storage is not used.
+     * @brief Write consecutive blocks to the storage device.
      *
-     * @param[in] p_cfg  Pointer to @ref SPP_StorageInitCfg_t.
+     * @param[in,out] p_handle    Hardware-specific storage context.
+     * @param[in]     p_buffer    Data to write.
+     * @param[in]     first_block First logical block to write.
+     * @param[in]     count       Number of blocks to write.
      *
-     * @return K_SPP_OK on success.
+     * @return K_SPP_OK on success, K_SPP_ERROR on failure.
      */
-    SPP_RetVal_t (*storageUnmount)(void *p_cfg);
+    SPP_RetVal_t (*storageWrite)(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count);
+
 } SPP_HALStorage_t;
+
 
 /**
 * @brief Time struct that contains all the pointers to the Time functions

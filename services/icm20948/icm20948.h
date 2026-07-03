@@ -543,6 +543,11 @@ typedef struct
     float mx;             /**< Magnetometer X (uT)   */
     float my;             /**< Magnetometer Y (uT)   */
     float mz;             /**< Magnetometer Z (uT)   */
+    float qw;             /**< Quaternion W (uT)     */
+    float qx;             /**< Quaternion X (uT)     */
+    float qy;             /**< Quaternion Y (uT)     */
+    float qz;             /**< Quaternion Z (uT)     */
+    float accuracy;       /**< Quaternion accuracy   */
     spp_bool_t dataReady; /**< Set when a FIFO packet has been parsed. */
 } ICM20948_SensorData_t;
 

@@ -127,7 +127,7 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16
     }
 
     /* Zero the whole struct so padding bytes are deterministic. */
-    memset(p_packet, 0, sizeof(SPP_Packet_t));
+    memset(p_packet, 0xFF, sizeof(SPP_Packet_t));
 
     p_packet->primaryHeader.version = K_SPP_PKT_VERSION;
     p_packet->primaryHeader.apid = apid;

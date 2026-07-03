@@ -24,7 +24,9 @@
 #define K_SPP_PKT_VERSION (1U)
 
 /** @brief Maximum payload size in bytes per packet. */
-#define K_SPP_PKT_PAYLOAD_MAX (48U)
+#define K_SPP_PKT_PAYLOAD_MAX (50U)
+
+#define K_SPP_TOTAL_PACKET_SIZE (64U) /**< Total packet size in bytes. Multiple of 8 bytes. */
 
 /* ----------------------------------------------------------------
  * Reserved APIDs
