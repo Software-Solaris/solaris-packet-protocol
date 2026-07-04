@@ -36,7 +36,7 @@ spp_uint32_t   SPP_SERVICES_DATABANK_freeCount(void);
 Fills all packet fields in one call:
 - Zeroes the full packet struct (ensures deterministic CRC over padding bytes)
 - Sets `primaryHeader`: version, apid, seq, payloadLen
-- Sets `secondaryHeader.timestampMs` from `SPP_HAL_TIME_getTimeMs()`
+- Sets `secondaryHeader.timestampMs` from `SPP_HAL_getTimeMs()`
 - Copies `dataLen` bytes from `p_data` into `payload`
 - Computes CRC-16/CCITT over the full packet minus the CRC field and stores it in `p_packet->crc`
 

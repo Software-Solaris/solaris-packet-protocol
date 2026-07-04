@@ -18,14 +18,13 @@
 #include "spp/core/core.h"
 
 /* Port contracts */
-#include "spp/hal/hal.h"
+#include "spp/hal/port.h"
 
 /* HAL dispatch API */
-#include "spp/hal/spi/spi.h"
-#include "spp/hal/uart/uart.h"
-#include "spp/hal/gpio/gpio.h"
-#include "spp/hal/storage/storage.h"
-#include "spp/hal/time/time.h"
+#include "spp/hal/spi.h"
+#include "spp/hal/gpio.h"
+#include "spp/hal/storage.h"
+#include "spp/hal/time.h"
 
 /* Services */
 #include "spp/services/service.h"

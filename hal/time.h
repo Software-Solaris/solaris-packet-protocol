@@ -20,13 +20,13 @@
  *
  * @return Elapsed time in ms (monotonically non-decreasing).
  */
-spp_uint32_t SPP_HAL_TIME_getTimeMs(void);
+spp_uint32_t SPP_HAL_getTimeMs(void);
 
 /**
  * @brief Block for the requested number of milliseconds.
  *
  * @param[in] ms  Number of milliseconds to delay.
  */
-void SPP_HAL_TIME_delayMs(spp_uint32_t ms);
+void SPP_HAL_delayMs(spp_uint32_t ms);
 
 #endif /* SPP_HAL_TIME_H */

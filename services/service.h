@@ -1,55 +1,167 @@
 /**
-* @file service.h
-* @brief SPP module descriptor and registry API.
-*/
+ * @file service.h
+ * @brief SPP module descriptor and registry API.
+ *
+ * A module is any producer or consumer of @ref SPP_Packet_t data (sensor
+ * driver, telemetry downlink, SD logger, antenna control, …).  Each module
+ * describes itself with a static @ref SPP_Module_t and registers via
+ * @ref SPP_SERVICES_register().
+ *
+ * Registration automatically wires up pub/sub subscriptions: if a module
+ * sets @c onPacket != NULL, @ref SPP_SERVICES_register() calls
+ * @ref SPP_SERVICES_PUBSUB_subscribe() with @c consumesApid and @c onPacketPrio.
+ *
+ * @ref SPP_SERVICES_callProducers() iterates every registered module and calls its
+ * @c produce, replacing the per-sensor DRDY checks in the superloop.
+ *
+ * Naming conventions used in this file:
+ * - Constants/macros: K_SPP_*
+ * - Types: SPP_Module_t
+ * - Public functions: SPP_SERVICES_*()
+ * - Pointer parameters: p_*
+ */
 
 #ifndef SPP_SERVICE_H
 #define SPP_SERVICE_H
 
 #include "spp/core/types.h"
 #include "spp/core/returnTypes.h"
-#include "spp/core/packet.h"
-#include "spp/services/kpid.h"
+#include "spp/util/macros.h"
+#include "spp/services/pubsub/pubsub.h"
 
 /* ----------------------------------------------------------------
- * STRUCTS AND ENUMS
+ * Module descriptor
  * ---------------------------------------------------------------- */
 
 /**
-
-* @brief Describes the contract of a producer module. This module needs to have:
-*   - a producer ID
-*   - a name
-*   - a timeout
-*   - an init function
-*   - an acquireData function
-*/
+ * @brief Describes a module — filled in by the module implementer.
+ *
+ * Declare one @c const instance per module and pass a pointer to
+ * @ref SPP_SERVICES_register().
+ *
+ * @code
+ * // In bmp390.c:
+ * const SPP_Module_t g_bmp390Module = {
+ *     .p_name       = "bmp390",
+ *     .apid         = K_BMP390_SERVICE_APID,
+ *     .ctxSize      = sizeof(BMP390_t),
+ *     .init         = bmp390Init,
+ *     .start        = bmp390Start,
+ *     .stop         = bmp390Stop,
+ *     .deinit       = bmp390Deinit,
+ *     .produce      = bmp390Task,
+ *     .consumesApid = K_SPP_APID_NONE,
+ *     .onPacket     = NULL,
+ *     .onPacketPrio = 0U,
+ * };
+ * @endcode
+ */
 typedef struct
 {
-    const char *p_nameProducer;    /**< Human-readable module name (for logging). */
-    spp_uint16_t tiemoutMs;        /**< Timeout for the producer to send a packet */
-    SPP_RetVal_t (*init)();        /**< Initialise the module. */
-    SPP_RetVal_t (*acquireData)(); /**< Acquire data from the module. */
-} SPP_SERVICE_ProducerContract_t;
+    const char   *p_name;  /**< Human-readable module name (for logging). */
+    spp_uint16_t  apid;    /**< APID bitmask produced by this module (single bit, or K_SPP_APID_NONE). */
+    size_t        ctxSize; /**< sizeof(module-private context struct). */
+
+    /**
+     * @brief Initialise the module.
+     * @param[out] p_ctx  Module's opaque context buffer.
+     * @return K_SPP_OK on success.
+     */
+    SPP_RetVal_t (*init)(void *p_ctx);
+
+    /**
+     * @brief Start the module.
+     * @param[in] p_ctx  Module context.
+     * @return K_SPP_OK on success.
+     */
+    SPP_RetVal_t (*start)(void *p_ctx);
+
+    /**
+     * @brief Stop the module gracefully.
+     * @param[in] p_ctx  Module context.
+     * @return K_SPP_OK on success.
+     */
+    SPP_RetVal_t (*stop)(void *p_ctx);
+
+    /**
+     * @brief Release all resources held by the module.
+     * @param[in] p_ctx  Module context.
+     * @return K_SPP_OK on success.
+     */
+    SPP_RetVal_t (*deinit)(void *p_ctx);
+
+    /**
+     * @brief Per-iteration producer task — called by @ref SPP_SERVICES_callProducers().
+     *
+     * For sensor modules: check the DRDY flag and, if set, read the sensor
+     * and call publish().  Must return quickly when no data is ready.
+     *
+     * @param[in] p_ctx  Module context.
+     */
+    void (*produce)(void *p_ctx);
+
+    /**
+     * @brief APID bitmask this module subscribes to.
+     *
+     * Use @ref K_SPP_APID_ALL for all packets, @ref K_SPP_APID_NONE if this
+     * module does not consume packets.  Ignored when @c onPacket is NULL.
+     */
+    spp_uint16_t consumesApid;
+
+    /**
+     * @brief Subscription handler (NULL if this module is a producer only).
+     *
+     * When non-NULL, @ref SPP_SERVICES_register() automatically registers
+     * this handler with the pub/sub bus using @c consumesApid and @c onPacketPrio.
+     *
+     * @param[in] p_packet  Received packet (read-only, valid for call duration).
+     * @param[in] p_ctx     Module context pointer.
+     */
+    SPP_PubSub_Handler_t onPacket;
+
+    /** @brief Dispatch priority for @c onPacket (@ref K_SPP_PUBSUB_PRIO_SYNC … @ref K_SPP_PUBSUB_PRIO_LOW). */
+    spp_uint8_t onPacketPrio;
+
+} SPP_Module_t;
+
+/* ----------------------------------------------------------------
+ * Registry API
+ * ---------------------------------------------------------------- */
 
 /**
-* @brief Describes the contract of a consumer module. This module needs to have:
-*   - a consumer ID
-*   - a name
-*   - a timeout (optional)
-*   - a consumeData function
-*/
-typedef struct
-{
-    spp_uint8_t consumerID;
-    spp_int8_t priority;         /**< Priority of the consumer */
-    const char *p_nameConsumer;  /**< Human-readable module name (for logging). */
-    spp_uint16_t tiemoutMs;      /**< Timeout for the consumer to receive a packet */
-    spp_uint16_t suscribeToApid; /**< APID subscription bitmask */
-    SPP_RetVal_t (*init)();      /**< Initialise the module. */
-    SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t packet);
-    SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
-} SPP_SERVICE_ConsumerContract_t;
+ * @brief Register a module: runs init(), runs start(), and wires up pub/sub.
+ *
+ * @param[in] p_module  Pointer to the static module descriptor.
+ * @param[in] p_ctx     Pointer to the caller-allocated context buffer.
+ *
+ * @return K_SPP_OK on success, K_SPP_ERROR_REGISTRY_FULL if the registry is full.
+ */
+SPP_RetVal_t SPP_SERVICES_register(const SPP_Module_t *p_module, void *p_ctx);
 
+/**
+ * @brief Call @c produce on every registered module that has one.
+ *
+ * Replaces per-sensor DRDY checks in the superloop.  Each module's produce
+ * is responsible for checking its own DRDY flag and returning immediately when
+ * no data is ready.
+ *
+ * @return K_SPP_OK always.
+ */
+SPP_RetVal_t SPP_SERVICES_callProducers(void);
+
+/**
+ * @brief Dispatch the next pending deferred subscriber.
+ *
+ * Thin wrapper around @ref SPP_SERVICES_PUBSUB_callConsumers().  Call once per
+ * superloop iteration alongside @ref SPP_SERVICES_callProducers().
+ */
+void SPP_SERVICES_callConsumers(void);
+
+/**
+ * @brief Return the number of currently registered modules.
+ *
+ * @return Module count.
+ */
+spp_uint32_t SPP_SERVICES_count(void);
 
 #endif /* SPP_SERVICE_H */

@@ -115,11 +115,6 @@ const char *SPP_CORE_errToStringR(SPP_RetVal_t err, char *p_buf, size_t bufLen)
 
     if (p_buf != NULL)
     {
-        if (bufLen == 0U)
-        {
-            return p_buf;
-        }
-
         strncpy(p_buf, p_str, bufLen - 1U);
         p_buf[bufLen - 1U] = '\0';
         return p_buf;

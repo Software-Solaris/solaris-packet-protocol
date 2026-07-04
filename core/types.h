@@ -32,7 +32,6 @@ typedef uint32_t spp_uint32_t; /**< Unsigned 32-bit integer. */
 typedef int32_t spp_int32_t;   /**< Signed 32-bit integer.   */
 typedef uint64_t spp_uint64_t; /**< Unsigned 64-bit integer. */
 typedef int64_t spp_int64_t;   /**< Signed 64-bit integer.   */
-<<<<<<< HEAD
 typedef bool spp_bool_t;       /**< Boolean type.            */
 
 /* ----------------------------------------------------------------
@@ -95,10 +94,5 @@ typedef struct
     spp_uint32_t allocationUnitSize; /**< FAT allocation unit size in bytes. */
     spp_bool_t formatIfMountFailed;  /**< Auto-format if mount fails.        */
 } SPP_StorageInitCfg_t;
-=======
-typedef float spp_float32_t;   /**< Single-precision float.  */
-typedef bool spp_bool_t;       /**< Boolean type.            */
-
->>>>>>> dev/spp-refactor-code
 
 #endif /* SPP_TYPES_H */

@@ -11,10 +11,10 @@ Hardware Abstraction Layer. Defines the **contract** that any hardware port must
 | File | Description |
 |---|---|
 | `port.h` | `SPP_HalPort_t` — the full contract struct with all function pointer signatures |
-| `spi.h` | `SPP_HAL_SPI_busInit()`, `SPP_HAL_SPI_getHandle()`, `SPP_HAL_SPI_deviceInit()`, `SPP_HAL_SPI_transmit()` |
-| `gpio.h` | `SPP_HAL_GPIO_configInterrupt()`, `SPP_HAL_GPIO_registerIsr()` and `SPP_GpioIsrCtx_t` |
-| `storage.h` | `SPP_HAL_STORAGE_mount()`, `SPP_HAL_STORAGE_unmount()` |
-| `time.h` | `SPP_HAL_TIME_getTimeMs()` — monotonic millisecond counter |
+| `spi.h` | `SPP_HAL_spiBusInit()`, `SPP_HAL_spiGetHandle()`, `SPP_HAL_spiDeviceInit()`, `SPP_HAL_spiTransmit()` |
+| `gpio.h` | `SPP_HAL_gpioConfigInterrupt()`, `SPP_HAL_gpioRegisterIsr()` and `SPP_GpioIsrCtx_t` |
+| `storage.h` | `SPP_HAL_storageMount()`, `SPP_HAL_storageUnmount()` |
+| `time.h` | `SPP_HAL_getTimeMs()` — monotonic millisecond counter |
 | `dispatch.c` | Routes every `SPP_HAL_*()` call through the port registered via `SPP_CORE_setHalPort()` |
 
 ---
@@ -68,7 +68,7 @@ Sensor services that use data-ready interrupts pass an `SPP_GpioIsrCtx_t` to `gp
 SPP_GpioIsrCtx_t isrCtx = {
     .p_flag = &myData.drdyFlag,  // volatile spp_bool_t
 };
-SPP_HAL_GPIO_registerIsr(INT_PIN, &isrCtx);
+SPP_HAL_gpioRegisterIsr(INT_PIN, &isrCtx);
 
 // In the superloop:
 if (myData.drdyFlag)
