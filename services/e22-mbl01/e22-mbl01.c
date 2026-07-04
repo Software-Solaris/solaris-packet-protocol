@@ -48,7 +48,7 @@ static SPP_SERVICE_ConsumerContract_t e22Contract = {
     .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,
     .suscribeToApid = 0U,
     .init = SPP_SERVICES_E22MBL01_init,
-    .deliverToMailbox = NULL,
+    .deliverToMailbox = SPP_SERVICES_E22MBL01_deliverToMailbox,
     .consumeData = SPP_SERVICES_E22MBL01_consumeData,
 };
 

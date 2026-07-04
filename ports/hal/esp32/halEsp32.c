@@ -17,6 +17,7 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "driver/sdspi_host.h"
+#include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -37,9 +38,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_ui
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx);
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void);
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block,
-                                                     spp_uint16_t count);
+// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageMount(void *p_cfg);
+// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageUnmount(void *p_cfg);
 
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
@@ -65,9 +65,10 @@ const static SPP_HALGpio_t s_esp32HalGpio = {
     .gpioRegisterIsr = SPP_PORTS_HAL_ESP32_gpioRegisterIsr,
 };
 
+// TODO: Change this when storage mount is working again
 const static SPP_HALStorage_t s_esp32HalStorage = {
-    .storageInit = SPP_PORTS_HAL_ESP32_storageInit,
-    .storageWrite = SPP_PORTS_HAL_ESP32_storageWrite,
+    .storageMount = NULL,
+    .storageUnmount = NULL,
 };
 
 const static SPP_HALTime_t s_esp32HalTime = {
@@ -110,9 +111,8 @@ static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
 static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
 
-static sdspi_dev_handle_t sdHandle;
-static sdmmc_card_t sdCard;
-static spp_bool_t s_storageInitialized = false;
+static sdmmc_card_t *s_p_sdCard = NULL;
+static spp_bool_t s_sdMounted = false;
 
 /* ----------------------------------------------------------------
  * SPI
@@ -133,8 +133,9 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
-    gpio_config(&misoCfg);
-    int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
+    // gpio_config(&misoCfg);
+    // int misoLevel = gpio_get_level((gpio_num_t)K_ESP32_PIN_MISO);
+    // ESP_LOGI(k_tag, "MISO GPIO%d pre-SPI level = %d", K_ESP32_PIN_MISO, misoLevel);
 
     spi_bus_config_t busCfg = {
         .miso_io_num = K_ESP32_PIN_MISO,
@@ -145,7 +146,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void)
         .max_transfer_sz = 0,
     };
 
-    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_CH_AUTO);
+    esp_err_t ret = spi_bus_initialize(K_ESP32_SPI_HOST, &busCfg, SPI_DMA_DISABLED);
     if (ret != ESP_OK)
     {
         ESP_LOGE(k_tag, "SPI bus init failed: %s", esp_err_to_name(ret));
@@ -189,8 +190,15 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     else if (s_spiDevCount == K_ESP32_SPI_IDX_BMP)
     {
         devCfg.clock_speed_hz = 500 * 1000;
-        devCfg.mode = 0;
+        devCfg.mode = 3;
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
+        devCfg.queue_size = 1;
+    }
+    else if (s_spiDevCount == K_ESP32_SPI_IDX_SDC)
+    {
+        devCfg.clock_speed_hz = 400 * 1000; /* 400 kHz — max allowed during SD init (spec §7.2.1) */
+        devCfg.mode = 0;                    /* SPI Mode 0: CPOL=0, CPHA=0 (spec §7) */
+        devCfg.spics_io_num = K_ESP32_PIN_CS_SDC;
         devCfg.queue_size = 1;
     }
     else
@@ -218,43 +226,18 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t 
     }
 
     spi_device_handle_t hDev = *(spi_device_handle_t *)p_handle;
-
     if (hDev == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    spp_uint8_t i = 0U;
+    spi_transaction_t trans = {0};
+    trans.length = 8U * (size_t)length;
+    trans.tx_buffer = p_data;
+    trans.rx_buffer = p_data;
 
-    while (i < length)
-    {
-        spi_transaction_t trans = {0};
-
-        if ((p_data[i] & 0x80U) != 0U)
-        {
-            trans.length = 8U * 3U;
-            trans.tx_buffer = &p_data[i];
-            trans.rx_buffer = &p_data[i];
-
-            i += 3U;
-        }
-        else
-        {
-            trans.length = 8U * 2U;
-            trans.tx_buffer = &p_data[i];
-
-            i += 2U;
-        }
-
-        esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
-
-        if (ret != ESP_OK)
-        {
-            return K_SPP_ERROR_ON_SPI_TRANSACTION;
-        }
-    }
-
-    return K_SPP_OK;
+    esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
+    return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR_ON_SPI_TRANSACTION;
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz)
@@ -333,87 +316,51 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
  * Storage
  * ---------------------------------------------------------------- */
 
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
-{
-    esp_err_t ret;
+// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageMount(void *p_cfg)
+// {
+//     if (s_sdMounted)
+//     {
+//         return K_SPP_OK;
+//     }
 
-    if (s_busInitialized == false)
-    {
-        return K_SPP_ERROR;
-    }
+//     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
 
-    sdspi_device_config_t sdCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
-    sdCfg.host_id = K_ESP32_SPI_HOST;
-    sdCfg.gpio_cs = K_ESP32_PIN_CS_SDC;
+//     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+//     sdspi_device_config_t slotCfg = SDSPI_DEVICE_CONFIG_DEFAULT();
+//     slotCfg.gpio_cs = (gpio_num_t)p_c->pinCs;
+//     slotCfg.host_id = (spi_host_device_t)p_c->spiHostId;
 
-    ret = sdspi_host_deinit();
-    if (ret != ESP_OK)
-    {
-        return K_SPP_ERROR;
-    }
+//     esp_vfs_fat_mount_config_t mountCfg = {
+//         .format_if_mount_failed = (bool)p_c->formatIfMountFailed,
+//         .max_files = (int)p_c->maxFiles,
+//         .allocation_unit_size = (size_t)p_c->allocationUnitSize,
+//     };
 
-    gpio_set_direction(K_ESP32_PIN_CS_BMP, GPIO_MODE_OUTPUT);
-    gpio_set_direction(K_ESP32_PIN_CS_ICM, GPIO_MODE_OUTPUT);
+//     esp_err_t ret = esp_vfs_fat_sdspi_mount(p_c->p_basePath, &host, &slotCfg, &mountCfg, &s_p_sdCard);
+//     if (ret != ESP_OK)
+//     {
+//         s_p_sdCard = NULL;
+//         ESP_LOGE(k_tag, "SD mount failed: %s", esp_err_to_name(ret));
+//         return K_SPP_ERROR;
+//     }
 
-    gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
-    gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
+//     s_sdMounted = true;
+//     return K_SPP_OK;
+// }
 
-    ret = sdspi_host_init();
+// static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageUnmount(void *p_cfg)
+// {
+//     if (!s_sdMounted)
+//     {
+//         return K_SPP_OK;
+//     }
 
-    if (ret != ESP_OK)
-    {
-        return K_SPP_ERROR;
-    }
-
-    ret = sdspi_host_init_device(&sdCfg, &sdHandle);
-    if (ret != ESP_OK)
-    {
-        (void)sdspi_host_deinit();
-        return K_SPP_ERROR;
-    }
-
-    sdmmc_host_t host = SDSPI_HOST_DEFAULT(); // revisar
-    host.slot = sdHandle;
-
-    ret = sdmmc_card_init(&host, &sdCard);
-    if (ret != ESP_OK)
-    {
-        ret = sdspi_host_remove_device(sdHandle);
-        ret = sdspi_host_deinit();
-        return K_SPP_ERROR;
-    }
-
-    s_storageInitialized = true;
-    return K_SPP_OK;
-}
-
-static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)
-{
-    esp_err_t ret;
-
-    if (s_storageInitialized == false || count == 0)
-    {
-        return K_SPP_ERROR;
-    }
-
-    if (p_buffer == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
-
-    if (sdCard.csd.capacity <= first_block || (sdCard.csd.capacity - first_block) < count)
-    {
-        return K_SPP_ERROR;
-    }
-
-    ret = sdmmc_write_sectors(&sdCard, p_buffer, first_block, count);
-    if (ret != ESP_OK)
-    {
-        return K_SPP_ERROR;
-    }
-
-    return K_SPP_OK;
-}
+//     const SPP_StorageInitCfg_t *p_c = (const SPP_StorageInitCfg_t *)p_cfg;
+//     esp_err_t ret = esp_vfs_fat_sdcard_unmount(p_c->p_basePath, s_p_sdCard);
+//     s_sdMounted = false;
+//     s_p_sdCard = NULL;
+//     return (ret == ESP_OK) ? K_SPP_OK : K_SPP_ERROR;
+// }
 
 /* ----------------------------------------------------------------
  * Time

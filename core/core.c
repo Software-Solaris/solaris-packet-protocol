@@ -13,6 +13,9 @@
 #include "spp/services/pubsub/pubsub.h"
 #include "spp/services/log/log.h"
 
+#include <stdio.h>
+
+
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */

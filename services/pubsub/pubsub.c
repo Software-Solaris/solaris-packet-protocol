@@ -176,33 +176,34 @@ void SPP_SERVICES_PUBSUB_signalProducerReady(void)
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
-    SPP_RetVal_t ret;
+    SPP_RetVal_t ret = K_SPP_OK;
 
     SPP_SERVICES_PUBSUB_sortConsumers();
 
-    /* First init: datalogger */
-    for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
-    {
-        ret = s_consumers[i].p_contract->init();
 
-        if (ret != K_SPP_OK)
+    if (s_registeredProducers > 0U)
+    {
+        //Call the init function for each of the producers registered
+        for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
         {
-            return ret;
+            ret = s_producers[i].p_contract->init();
         }
     }
-
-    for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
+    if (s_registeredConsumers > 0U)
     {
-        ret = s_producers[i].p_contract->init();
-
-        if (ret != K_SPP_OK)
+        //Call the init function for each of the consumers registered
+        for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
         {
-            return ret;
+            ret = s_consumers[i].p_contract->init();
         }
     }
-
-    return K_SPP_OK;
+    else
+    {
+        //No producers or consumers registered
+    }
+    return ret;
 }
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */

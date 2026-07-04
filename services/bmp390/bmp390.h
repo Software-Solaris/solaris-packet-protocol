@@ -44,8 +44,8 @@
 /* SPI */
 #define K_BMP390_SPI_READ    0x80U /**< SPI read flag: OR with register address. */
 #define K_BMP390_SPI_WRITE   0x00U /**< SPI write flag: OR with register address. */
-#define K_BMP390_PIN_NUM_CS  18U   /**< Chip-select GPIO pin (informational; set by HAL). */
-#define K_BMP390_SPI_BUS_IDX 0U    /**< SPI bus index (informational; set by HAL). */
+#define K_BMP390_PIN_NUM_CS  21U   /**< Chip-select GPIO pin (informational; set by HAL). */
+#define K_BMP390_SPI_BUS_IDX 1U    /**< SPI bus index (informational; set by HAL). */
 
 /* Identity and reset */
 #define K_BMP390_CHIP_ID_REG    0x00 /**< Chip ID register address. */
@@ -156,7 +156,7 @@ typedef struct
     spp_uint32_t intIntrType;     /**< Interrupt trigger type (1=rising). */
     spp_uint32_t intPull;         /**< Pull resistor: 0=none 1=up 2=down. */
     volatile spp_bool_t drdyFlag; /**< Interrupt flag.                 */
-    SPP_GpioIsrCtx_t isrCtx;      /**< ISR context (p_flag points at drdyFlag). */
+    SPP_GpioIsrCtx_t isrCtx;     /**< ISR context (p_flag points at drdyFlag). */
 } BMP390_GpioConfig_t;
 /**
  * @brief BMP390 sensor instance.
