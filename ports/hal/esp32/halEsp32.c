@@ -346,45 +346,46 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
     sdCfg.host_id = K_ESP32_SPI_HOST;
     sdCfg.gpio_cs = K_ESP32_PIN_CS_SDC;
 
-    ret = sdspi_host_deinit();
-    if (ret != ESP_OK)
-    {
-        return K_SPP_ERROR;
-    }
+    (void)sdspi_host_deinit();
 
     gpio_set_direction(K_ESP32_PIN_CS_BMP, GPIO_MODE_OUTPUT);
     gpio_set_direction(K_ESP32_PIN_CS_ICM, GPIO_MODE_OUTPUT);
-
     gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
     gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
 
-    ret = sdspi_host_init();
-
-    if (ret != ESP_OK)
+    for (int attempt = 0; attempt < 5; attempt++)
     {
-        return K_SPP_ERROR;
-    }
+        ret = sdspi_host_init();
+        if (ret != ESP_OK)
+        {
+            continue;
+        }
 
-    ret = sdspi_host_init_device(&sdCfg, &sdHandle);
-    if (ret != ESP_OK)
-    {
+        ret = sdspi_host_init_device(&sdCfg, &sdHandle);
+        if (ret != ESP_OK)
+        {
+            (void)sdspi_host_deinit();
+            continue;
+        }
+
+        sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+        host.slot = sdHandle;
+
+        vTaskDelay(pdMS_TO_TICKS(10));
+
+        ret = sdmmc_card_init(&host, &sdCard);
+        if (ret == ESP_OK)
+        {
+            s_storageInitialized = true;
+            return K_SPP_OK;
+        }
+
+        (void)sdspi_host_remove_device(sdHandle);
         (void)sdspi_host_deinit();
-        return K_SPP_ERROR;
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 
-    sdmmc_host_t host = SDSPI_HOST_DEFAULT(); // revisar
-    host.slot = sdHandle;
-
-    ret = sdmmc_card_init(&host, &sdCard);
-    if (ret != ESP_OK)
-    {
-        ret = sdspi_host_remove_device(sdHandle);
-        ret = sdspi_host_deinit();
-        return K_SPP_ERROR;
-    }
-
-    s_storageInitialized = true;
-    return K_SPP_OK;
+    return K_SPP_ERROR;
 }
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block, spp_uint16_t count)

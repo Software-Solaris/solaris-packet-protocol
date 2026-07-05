@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------- */
 #define K_SPP_SERVICES_PUBSUB_MAX_PRODUCERS    (5U)
 #define K_SPP_SERVICES_PUBSUB_MAX_CONSUMERS    (5U)
-#define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (8U) /**< Internal packet buffer depth. */
+#define K_SPP_SERVICES_PUBSUB_BUFFER_SIZE      (128U) /**< Internal packet buffer depth. */
 #define K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY (1U)
 
 #define K_SPP_SERVICES_PUBSUB_STEP             (1U) /**< Step to increment circular buffer index. */

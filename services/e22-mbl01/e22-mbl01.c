@@ -82,42 +82,27 @@ static SPP_RetVal_t SPP_SERVICES_E22MBL01_deliverToMailbox(const SPP_Packet_t pa
     if (s_mailboxCount < K_E22MBL01_MAILBOX_SIZE)
     {
         mailboxData[s_mailboxCount] = packet;
-        if (s_mailboxCount >= K_E22MBL01_MAILBOX_SIZE)
-        {
-            s_mailboxCount = 0;
-        }
-        else
-        {
-            s_mailboxCount++;
-        }
-        return K_SPP_OK;
+        s_mailboxCount++;
     }
     else
     {
-        return K_SPP_ERROR;
+        s_mailboxCount = 0;
+        mailboxData[s_mailboxCount] = packet;
+        s_mailboxCount++;
     }
+    return K_SPP_OK;
 }
 
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_consumeData(void *p_data)
 {
     (void)p_data;
-    char sensorsStr[256];
-    char strBMP390[64];
-    char strICM20948[128];
-
-    static spp_uint8_t counter = 0;
-
-    while (counter < 100)
-    {
-        counter++;
-        return K_SPP_OK;
-    }
-
-    counter = 0;
-
     for (spp_uint8_t index = 0; index < s_mailboxCount; index++)
     {
         SPP_Packet_t packet = mailboxData[index];
+        if (packet.primaryHeader.apid == 4U)
+        {
+            printf("Sending packet with apid 4\n");
+        }
 
         SPP_RetVal_t ret = SPP_HAL_UART_transmit(&packet, sizeof(packet));
         if (ret != K_SPP_OK)

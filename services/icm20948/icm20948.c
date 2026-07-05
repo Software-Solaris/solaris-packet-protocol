@@ -236,11 +236,10 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
     }
 
 
-    // Publish the packet 1 and packet2
-    (void)SPP_SERVICES_PUBSUB_publish(p_pkt1);
+    //Publish the packet 1 and packet 2
+    SPP_SERVICES_PUBSUB_publish(p_pkt1);
     (void)SPP_SERVICES_PUBSUB_publish(p_pkt2);
 
-    // (void)SPP_SERVICES_PUBSUB_publish(p_pkt);
     return K_SPP_OK;
 }
 
