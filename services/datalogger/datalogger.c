@@ -20,6 +20,7 @@ static SPP_Packet_t s_packetBuffer[K_DATALOGGER_BUFFER_SIZE];
 static spp_uint8_t s_packetIndex = 0;        /**< Index of the next packet to be written to the buffer. */
 static spp_uint32_t s_currentDataSector = 0; /**< Current sector of the data log. */
 static spp_uint16_t s_blocksWritten = 0;     /**< Number of blocks written to the current sector. */
+static SPP_RetVal_t s_initStatus = K_SPP_ERROR_NOT_INITIALIZED;
 
 
 /* ----------------------------------------------------------------
@@ -51,6 +52,11 @@ const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_DATALOGGER_getConsumerContrac
     return &g_dataloggerConsumerContract;
 }
 
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void)
+{
+    return s_initStatus;
+}
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */
@@ -66,10 +72,10 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
     s_blocksWritten = 1;
 
     /* Init SPI for SD card */
-    SPP_RetVal_t ret = SPP_HAL_STORAGE_init();
-    if (ret != K_SPP_OK)
+    s_initStatus = SPP_HAL_STORAGE_init();
+    if (s_initStatus != K_SPP_OK)
     {
-        return K_SPP_ERROR;
+        return s_initStatus;
     }
     return K_SPP_OK;
 }

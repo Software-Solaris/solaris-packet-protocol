@@ -28,5 +28,6 @@
  * ---------------------------------------------------------------- */
 
 const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_DATALOGGER_getConsumerContract(void);
+SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void);
 
 #endif /* SPP_DATALOGGER_H */
