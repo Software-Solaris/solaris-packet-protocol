@@ -155,12 +155,6 @@ FsmErrors_t *SPP_CORE_FSM_getErrorsBit(void)
 
 void FSM_init(void *p_halPorts)
 {
-    if (s_p_ports == NULL)
-    {
-        s_fsmErrors.fsmInitError = 1;
-        return false;
-    }
-
     s_p_ports = p_halPorts;
 }
 
