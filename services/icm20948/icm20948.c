@@ -19,6 +19,7 @@
 #include "spp/services/databank/databank.h"
 #include "spp/services/service.h"
 #include "spp/core/pubsub/pubsub.h"
+#include "spp/services/fsm/fsm.h"
 #ifdef SPP_DEBUG_PRINT
 #include <stdio.h>
 #endif
@@ -133,6 +134,11 @@ static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
  */
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
 {
+    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
+    if (p_fsmErrors == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
     s_icmData.spiDevIdx = K_ICM20948_SPI_HOST_USED;
     s_icmData.intPin = K_ICM20948_INT_PIN_NUM;
     s_icmData.intIntrType = K_ICM20948_INT_INTR_TYPE;
@@ -143,7 +149,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
     s_icmData.icmData.intIntrType = s_icmData.intIntrType;
     s_icmData.icmData.intPull = s_icmData.intPull;
 
-    SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
+    (void)SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
 
     s_icmData.p_spi = SPP_HAL_SPI_getHandle(s_icmData.spiDevIdx);
     (void)SPP_HAL_SPI_deviceInit(s_icmData.p_spi);
@@ -153,8 +159,10 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
     SPP_RetVal_t ret = SPP_SERVICES_ICM20948_configDmpInit(s_icmData.p_spi);
     if (ret != K_SPP_OK)
     {
+        p_fsmErrors->icmInitError = 1;
         SPP_LOGE(K_ICM20948_LOG_TAG, "configDmpInit failed ret=%d", (int)ret);
     }
+
     return ret;
 }
 

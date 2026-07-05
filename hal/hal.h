@@ -210,7 +210,7 @@ typedef struct
 /**
 * @brief This functions initializes the ports struct and initializes all the peripherals.
 */
-SPP_RetVal_t SPP_HAL_init(const SPP_HalPort_t *p_port);
+SPP_RetVal_t SPP_HAL_init(void *p_halPorts);
 
 /**
 * @brief This function is used to get the pointers to the functions that are used by the SPP library.

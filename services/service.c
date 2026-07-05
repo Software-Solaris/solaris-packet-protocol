@@ -5,5 +5,5 @@
 
 #include "spp/services/service.h"
 #include "spp/core/pubsub/pubsub.h"
-#include "spp/core/error.h"
+#include "spp/core/commonbit.h"
 #include "spp/services/log/log.h"

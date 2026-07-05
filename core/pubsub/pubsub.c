@@ -7,7 +7,7 @@
 #include "spp/services/databank/databank.h"
 #include "spp/util/macros.h"
 #include "spp/services/log/log.h"
-#include "spp/core/error.h"
+#include "spp/core/commonbit.h"
 #include "spp/services/kpid.h"
 
 
@@ -69,9 +69,9 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
     {
         s_producers[s_registeredProducers].p_contract = p_producerData;
 
-        s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 1));
+        s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 2));
         /*
-        * First bit reserved to logs
+        * First bit reserved to logs, second bit reserved for the FSM
         * with s_registeredProducers = 0 -> producer 0: 0000 0010
         * with s_registeredProducers = 1 -> producer 1: 0000 0100
         *
