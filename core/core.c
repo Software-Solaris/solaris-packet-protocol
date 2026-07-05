@@ -10,7 +10,7 @@
 #include "spp/core/packet.h"
 #include "spp/core/types.h"
 #include "spp/services/databank/databank.h"
-#include "spp/services/pubsub/pubsub.h"
+#include "spp/core/pubsub/pubsub.h"
 #include "spp/services/log/log.h"
 
 /* ----------------------------------------------------------------

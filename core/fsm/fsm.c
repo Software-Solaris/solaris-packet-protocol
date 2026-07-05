@@ -17,57 +17,56 @@
 
 static const FSM_Transition_t s_transitionTable[] = {
     {
-        .fromState    = FSM_STATE_INIT,
+        .fromState = FSM_STATE_INIT,
         .fromSubState = FSM_SUBSTATE_NONE,
-        .toState      = FSM_STATE_READY,
-        .toSubState   = FSM_SUBSTATE_NONE,
-        .event        = FSM_EVENT_NONE,
-        .guard        = NULL,
-        .action       = NULL,
+        .toState = FSM_STATE_READY,
+        .toSubState = FSM_SUBSTATE_NONE,
+        .event = FSM_EVENT_NONE,
+        .guard = NULL,
+        .action = NULL,
     },
     {
-        .fromState    = FSM_STATE_READY,
+        .fromState = FSM_STATE_READY,
         .fromSubState = FSM_SUBSTATE_NONE,
-        .toState      = FSM_STATE_FLIGHT,
-        .toSubState   = FSM_SUBSTATE_FLIGHT_ASCENDING,
-        .event        = FSM_EVENT_NONE,
-        .guard        = NULL,
-        .action       = NULL,
+        .toState = FSM_STATE_FLIGHT,
+        .toSubState = FSM_SUBSTATE_FLIGHT_ASCENDING,
+        .event = FSM_EVENT_NONE,
+        .guard = NULL,
+        .action = NULL,
     },
     {
-        .fromState    = FSM_STATE_FLIGHT,
+        .fromState = FSM_STATE_FLIGHT,
         .fromSubState = FSM_SUBSTATE_FLIGHT_ASCENDING,
-        .toState      = FSM_STATE_FLIGHT,
-        .toSubState   = FSM_SUBSTATE_FLIGHT_DESCENDING,
-        .event        = FSM_EVENT_NONE,
-        .guard        = NULL,
-        .action       = NULL,
+        .toState = FSM_STATE_FLIGHT,
+        .toSubState = FSM_SUBSTATE_FLIGHT_DESCENDING,
+        .event = FSM_EVENT_NONE,
+        .guard = NULL,
+        .action = NULL,
     },
     {
-        .fromState    = FSM_STATE_FLIGHT,
+        .fromState = FSM_STATE_FLIGHT,
         .fromSubState = FSM_SUBSTATE_FLIGHT_DESCENDING,
-        .toState      = FSM_STATE_FLIGHT,
-        .toSubState   = FSM_SUBSTATE_FLIGHT_PARACHUTE_DEPLOYED,
-        .event        = FSM_EVENT_NONE,
-        .guard        = NULL,
-        .action       = NULL,
+        .toState = FSM_STATE_FLIGHT,
+        .toSubState = FSM_SUBSTATE_FLIGHT_PARACHUTE_DEPLOYED,
+        .event = FSM_EVENT_NONE,
+        .guard = NULL,
+        .action = NULL,
     },
     {
-        .fromState    = FSM_STATE_FLIGHT,
+        .fromState = FSM_STATE_FLIGHT,
         .fromSubState = FSM_SUBSTATE_FLIGHT_PARACHUTE_DEPLOYED,
-        .toState      = FSM_STATE_LANDED,
-        .toSubState   = FSM_SUBSTATE_NONE,
-        .event        = FSM_EVENT_NONE,
-        .guard        = NULL,
-        .action       = NULL,
+        .toState = FSM_STATE_LANDED,
+        .toSubState = FSM_SUBSTATE_NONE,
+        .event = FSM_EVENT_NONE,
+        .guard = NULL,
+        .action = NULL,
     },
 };
 
-static FSM_Handle_t s_fsmHandle =
-{
-    .state        = FSM_STATE_INIT,
-    .subState     = FSM_SUBSTATE_NONE,
-    .prevState    = FSM_STATE_INIT,
+static FSM_Handle_t s_fsmHandle = {
+    .state = FSM_STATE_INIT,
+    .subState = FSM_SUBSTATE_NONE,
+    .prevState = FSM_STATE_INIT,
     .prevSubState = FSM_SUBSTATE_NONE,
 };
 
@@ -88,18 +87,43 @@ static SPP_SERVICE_ConsumerContract_t s_fsmConsumer = {
  * ---------------------------------------------------------------- */
 
 /* Guards */
-static spp_bool_t guard_healthcheckOk(void)      { return false; }
-static spp_bool_t guard_launchDetected(void)      { return false; }
-static spp_bool_t guard_apogeeDetected(void)      { return false; }
-static spp_bool_t guard_altitudeThreshold(void)   { return false; }
-static spp_bool_t guard_landingDetected(void)     { return false; }
+static spp_bool_t guard_healthcheckOk(void)
+{
+    return false;
+}
+static spp_bool_t guard_launchDetected(void)
+{
+    return false;
+}
+static spp_bool_t guard_apogeeDetected(void)
+{
+    return false;
+}
+static spp_bool_t guard_altitudeThreshold(void)
+{
+    return false;
+}
+static spp_bool_t guard_landingDetected(void)
+{
+    return false;
+}
 
 /* Actions */
-static void action_onEnterReady(void)             {}
-static void action_onEnterAscending(void)         {}
-static void action_onEnterDescending(void)        {}
-static void action_onDeployChute(void)            {}
-static void action_onEnterLanded(void)            {}
+static void action_onEnterReady(void)
+{
+}
+static void action_onEnterAscending(void)
+{
+}
+static void action_onEnterDescending(void)
+{
+}
+static void action_onDeployChute(void)
+{
+}
+static void action_onEnterLanded(void)
+{
+}
 
 
 /* ----------------------------------------------------------------
@@ -124,10 +148,10 @@ void FSM_tick(void)
             continue;
         }
 
-        s_fsmHandle.prevState    = s_fsmHandle.state;
+        s_fsmHandle.prevState = s_fsmHandle.state;
         s_fsmHandle.prevSubState = s_fsmHandle.subState;
-        s_fsmHandle.state        = p_t->toState;
-        s_fsmHandle.subState     = p_t->toSubState;
+        s_fsmHandle.state = p_t->toState;
+        s_fsmHandle.subState = p_t->toSubState;
 
         if (p_t->action != NULL)
         {

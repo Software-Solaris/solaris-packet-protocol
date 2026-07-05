@@ -3,7 +3,7 @@
  * @brief Priority-aware publish-subscribe packet router implementation.
  */
 
-#include "spp/services/pubsub/pubsub.h"
+#include "spp/core/pubsub/pubsub.h"
 #include "spp/services/databank/databank.h"
 #include "spp/util/macros.h"
 #include "spp/services/log/log.h"
