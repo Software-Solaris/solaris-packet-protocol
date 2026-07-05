@@ -176,29 +176,37 @@ void SPP_SERVICES_PUBSUB_signalProducerReady(void)
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
-    SPP_RetVal_t ret;
+    spp_uint8_t failedConsumers = 0U;
+    spp_uint8_t failedProducers = 0U;
 
     SPP_SERVICES_PUBSUB_sortConsumers();
 
-    /* First init: datalogger */
     for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
     {
-        ret = s_consumers[i].p_contract->init();
-
+        SPP_RetVal_t ret = s_consumers[i].p_contract->init();
         if (ret != K_SPP_OK)
         {
-            return ret;
+            failedConsumers++;
         }
     }
 
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        ret = s_producers[i].p_contract->init();
-
+        SPP_RetVal_t ret = s_producers[i].p_contract->init();
         if (ret != K_SPP_OK)
         {
-            return ret;
+            failedProducers++;
         }
+    }
+
+    if ((s_registeredConsumers > 0U) && (failedConsumers == s_registeredConsumers))
+    {
+        return K_SPP_ERROR;
+    }
+
+    if ((s_registeredProducers > 0U) && (failedProducers == s_registeredProducers))
+    {
+        return K_SPP_ERROR;
     }
 
     return K_SPP_OK;
