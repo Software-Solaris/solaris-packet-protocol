@@ -23,8 +23,9 @@ static const SPP_HalPort_t *s_p_halPort = {NULL}; /**< Pointer to the HAL ports 
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_init(const SPP_HalPort_t *p_port)
+SPP_RetVal_t SPP_HAL_init(void *p_halPorts)
 {
+    const SPP_HalPort_t *p_port = (SPP_HalPort_t *)p_halPorts;
     SPP_RetVal_t ret = K_SPP_ERROR;
     if (p_port == NULL)
     {

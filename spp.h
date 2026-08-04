@@ -30,7 +30,7 @@
 /* Services */
 #include "spp/services/service.h"
 #include "spp/services/databank/databank.h"
-#include "spp/services/pubsub/pubsub.h"
+#include "spp/core/pubsub/pubsub.h"
 #include "spp/services/log/log.h"
 
 /* Utilities */

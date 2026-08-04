@@ -5,7 +5,7 @@
 
 #include "spp/services/databank/databank.h"
 #include "spp/core/returnTypes.h"
-#include "spp/core/error.h"
+#include "spp/core/commonbit.h"
 #include "spp/core/packet.h"
 #include "spp/hal/time/time.h"
 #include "spp/util/crc.h"
@@ -34,7 +34,7 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_init(void)
 {
     if (s_initialized)
     {
-        SPP_ERR_RETURN(K_SPP_ERROR_ALREADY_INITIALIZED);
+        return K_SPP_ERROR_ALREADY_INITIALIZED;
     }
 
     memset(s_packets, 0, sizeof(s_packets));
@@ -65,13 +65,13 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_returnPacket(SPP_Packet_t *p_packet)
 {
     if (p_packet == NULL)
     {
-        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
+        return K_SPP_ERROR_NULL_POINTER;
     }
 
     /* Validate that the pointer belongs to the static pool. */
     if ((p_packet < &s_packets[0]) || (p_packet > &s_packets[K_SPP_DATABANK_SIZE - 1U]))
     {
-        SPP_ERR_RETURN(K_SPP_ERROR);
+        return K_SPP_ERROR;
     }
 
     /* Guard against double-return. */
@@ -79,13 +79,13 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_returnPacket(SPP_Packet_t *p_packet)
     {
         if (s_databank.p_freePackets[i] == p_packet)
         {
-            SPP_ERR_RETURN(K_SPP_ERROR_ALREADY_INITIALIZED); /* Already in free list. */
+            return K_SPP_ERROR_ALREADY_INITIALIZED; /* Already in free list. */
         }
     }
 
     if (s_databank.freeCount >= K_SPP_DATABANK_SIZE)
     {
-        SPP_ERR_RETURN(K_SPP_ERROR); /* Pool is already full — should not happen. */
+        return K_SPP_ERROR; /* Pool is already full — should not happen. */
     }
 
     s_databank.p_freePackets[s_databank.freeCount] = p_packet;
@@ -119,11 +119,11 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16
 {
     if ((p_packet == NULL) || (p_data == NULL))
     {
-        SPP_ERR_RETURN(K_SPP_ERROR_NULL_POINTER);
+        return K_SPP_ERROR_NULL_POINTER;
     }
     if (dataLen > K_SPP_PKT_PAYLOAD_MAX)
     {
-        SPP_ERR_RETURN(K_SPP_ERROR_INVALID_PARAMETER);
+        return K_SPP_ERROR_INVALID_PARAMETER;
     }
 
     /* Zero the whole struct so padding bytes are deterministic. */

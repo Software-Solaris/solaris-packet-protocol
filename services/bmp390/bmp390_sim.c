@@ -29,7 +29,7 @@
 
 #include "spp/services/databank/databank.h"
 #include "spp/services/log/log.h"
-#include "spp/services/pubsub/pubsub.h"
+#include "spp/core/pubsub/pubsub.h"
 #include "spp/core/packet.h"
 
 #include <math.h>

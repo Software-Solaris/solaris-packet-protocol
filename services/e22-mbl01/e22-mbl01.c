@@ -13,6 +13,7 @@
 #include "spp/core/packet.h"
 #include "spp/core/returnTypes.h"
 #include "spp/hal/uart/uart.h"
+#include "spp/services/fsm/fsm.h"
 
 /* -----------------------------------------
     DEFINES
@@ -66,11 +67,17 @@ SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_E22MBL01_getConsumerContract()
 static SPP_RetVal_t SPP_SERVICES_E22MBL01_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
+    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
+    if (p_fsmErrors == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
 
     const spp_uint8_t testData[3] = {0xFA, 0xBA, 0xDA};
     ret = SPP_HAL_UART_transmit((const void *)testData, sizeof(testData));
     if (ret != K_SPP_OK)
     {
+        p_fsmErrors->e22mbl01InitError = 1;
         return ret;
     }
 

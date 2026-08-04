@@ -5,7 +5,7 @@
  */
 
 #include <cgreen/cgreen.h>
-#include "spp/core/error.h"
+#include "spp/core/commonbit.h"
 #include "spp/core/returnTypes.h"
 
 #define FILE_EXAMPLE "Example.c"

@@ -10,8 +10,14 @@
 #include "spp/core/types.h"
 
 /* ----------------------------------------------------------------
- * TYPES
- * ---------------------------------------------------------------- */
+* DEFINES
+* ---------------------------------------------------------------- */
+#define K_FSM_TIMEOUT_MS 10000U // Only executed once, np with stops
+
+
+/* ----------------------------------------------------------------
+* STRUCTS
+* ---------------------------------------------------------------- */
 
 /**
  * @brief Top-level FSM states.
@@ -36,15 +42,6 @@ typedef enum
 } FSM_SubState_t;
 
 /**
- * @brief FSM events. FSM_EVENT_NONE means the transition is guard-driven only.
- *        Add new events here to support forced transitions in the future.
- */
-typedef enum
-{
-    FSM_EVENT_NONE = 0,
-} FSM_Event_t;
-
-/**
  * @brief A single row in the FSM transition table.
  */
 typedef struct
@@ -53,9 +50,9 @@ typedef struct
     FSM_SubState_t fromSubState;
     FSM_State_t toState;
     FSM_SubState_t toSubState;
-    FSM_Event_t event;
     spp_bool_t (*guard)(void);
     void (*action)(void);
+    void (*stateFunction)(void);
 } FSM_Transition_t;
 
 /**
@@ -70,10 +67,39 @@ typedef struct
 } FSM_Handle_t;
 
 
+typedef union
+{
+    spp_uint16_t errors;
+    struct
+    {
+        spp_uint16_t fsmInitError           : 1;
+        spp_uint16_t halInitError           : 1;
+        spp_uint16_t bmpPubsubError         : 1;
+        spp_uint16_t icmPubsubError         : 1;
+        spp_uint16_t datalogggerPubsubError : 1;
+        spp_uint16_t e22mbl01PubsubError    : 1;
+        spp_uint16_t bmpInitError           : 1;
+        spp_uint16_t icmInitError           : 1;
+        spp_uint16_t dataloggerInitError    : 1;
+        spp_uint16_t e22mbl01InitError      : 1;
+        spp_uint16_t reserved               : 6;
+    };
+} FsmErrors_t;
+
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
-
+/**
+* @brief    Get the pointer to the FSM errors bit.
+* @return   Pointer to the FSM errors bit.
+*/
+FsmErrors_t *SPP_CORE_FSM_getErrorsBit(void);
+/**
+* @brief    Initialize the FSM.
+* @param    p_halPorts  Pointer to the HAL ports.
+*/
+void FSM_init(void *p_halPorts);
 /**
  * @brief Evaluate the transition table and advance the FSM if a guard passes.
  *        Call this once per superloop tick.

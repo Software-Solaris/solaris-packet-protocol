@@ -3,11 +3,11 @@
  * @brief Priority-aware publish-subscribe packet router implementation.
  */
 
-#include "spp/services/pubsub/pubsub.h"
+#include "spp/core/pubsub/pubsub.h"
 #include "spp/services/databank/databank.h"
 #include "spp/util/macros.h"
 #include "spp/services/log/log.h"
-#include "spp/core/error.h"
+#include "spp/core/commonbit.h"
 #include "spp/services/kpid.h"
 
 
@@ -69,9 +69,9 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
     {
         s_producers[s_registeredProducers].p_contract = p_producerData;
 
-        s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 1));
+        s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 2));
         /*
-        * First bit reserved to logs
+        * First bit reserved to logs, second bit reserved for the FSM
         * with s_registeredProducers = 0 -> producer 0: 0000 0010
         * with s_registeredProducers = 1 -> producer 1: 0000 0100
         *
@@ -176,29 +176,37 @@ void SPP_SERVICES_PUBSUB_signalProducerReady(void)
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
-    SPP_RetVal_t ret;
+    spp_uint8_t failedConsumers = 0U;
+    spp_uint8_t failedProducers = 0U;
 
     SPP_SERVICES_PUBSUB_sortConsumers();
 
-    /* First init: datalogger */
     for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
     {
-        ret = s_consumers[i].p_contract->init();
-
+        SPP_RetVal_t ret = s_consumers[i].p_contract->init();
         if (ret != K_SPP_OK)
         {
-            return ret;
+            failedConsumers++;
         }
     }
 
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        ret = s_producers[i].p_contract->init();
-
+        SPP_RetVal_t ret = s_producers[i].p_contract->init();
         if (ret != K_SPP_OK)
         {
-            return ret;
+            failedProducers++;
         }
+    }
+
+    if ((s_registeredConsumers > 0U) && (failedConsumers == s_registeredConsumers))
+    {
+        return K_SPP_ERROR;
+    }
+
+    if ((s_registeredProducers > 0U) && (failedProducers == s_registeredProducers))
+    {
+        return K_SPP_ERROR;
     }
 
     return K_SPP_OK;
