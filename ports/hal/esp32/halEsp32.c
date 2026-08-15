@@ -46,6 +46,7 @@ static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uint32_t len);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartRead(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes);
 
 
 /* ----------------------------------------------------------------
@@ -75,8 +76,11 @@ const static SPP_HALTime_t s_esp32HalTime = {
     .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
 
-const static SPP_HALUart_t s_esp32HalUart = {.uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
-                                             .uartTransmit = SPP_PORTS_HAL_ESP32_uartTransmit};
+const static SPP_HALUart_t s_esp32HalUart = {
+    .uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
+    .uartTransmit = SPP_PORTS_HAL_ESP32_uartTransmit,
+    .uartRead = SPP_PORTS_HAL_ESP32_uartRead,
+};
 
 
 static const SPP_HalPort_t s_esp32HalPorts = {
