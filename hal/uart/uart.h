@@ -24,3 +24,10 @@ SPP_RetVal_t SPP_HAL_UART_portInit(void);
   * @return K_SPP_OK on success.
   */
 SPP_RetVal_t SPP_HAL_UART_transmit(const void *p_data, spp_uint16_t len);
+
+/**
+  * @brief Perform UART read.
+  * 
+  * @return K_SPP_OK on success.
+  */
+SPP_RetVal_t SPP_HAL_ESP32_uartRead(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes);
