@@ -21,6 +21,14 @@
 #define K_M10M_SERVICE_PAYLOAD_LEN (12U)
 #define K_M10M_LOG_TAG             "MAX-M10M-20B"
 
+/* UBX MESSAGES */
+// Structure: Header | Class | ID | Length | (Payload) | Cheksum
+// Header 0xb5 0x62
+
+static const spp_uint8_t K_M10M_CTRL_RST_CMD[] = {0xb5, 0x62, 0x06, 0x04, 0x04, 0x00,
+                                                  0x00, 0x00, 0x01, 0x00, 0x0F, 0x66};
+static const spp_uint8_t K_M10M_ID_OUT[] = {0xb5, 0x62, 0x27, 0x03, 0x00, 0x00, 0x2A, 0xA5};
+
 /* ----------------------------------------------------------------
 *  PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */

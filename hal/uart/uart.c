@@ -73,16 +73,16 @@ SPP_RetVal_t SPP_HAL_UART_transmit(const void *p_data, spp_uint16_t len)
 #endif
 }
 
-SPP_RetVal_t SPP_HAL_ESP32_uartRead(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes)
+SPP_RetVal_t SPP_HAL_UART_read(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes)
 {
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
 
-    if (p_port == NULL || p_data == NULL)
+    if (p_port == NULL || p_data == NULL || p_readBytes == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
 
-    if (p_port->uart.uartTransmit == NULL)
+    if (p_port->uart.uartRead == NULL)
     {
         return K_SPP_ERROR;
     }

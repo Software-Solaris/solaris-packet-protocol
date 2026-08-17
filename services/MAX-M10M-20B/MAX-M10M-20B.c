@@ -27,10 +27,12 @@ static SPP_RetVal_t SPP_SERVICES_M10M_acquireData(SPP_Kpid_t kpid);
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
-static const SPP_SERVICE_ProducerContract_t g_m10mProducerContract = {.p_nameProducer = "bmp390",
+static const SPP_SERVICE_ProducerContract_t g_m10mProducerContract = {.p_nameProducer = "GNSS (UBLOX MAX-M10M-20B)",
                                                                       .tiemoutMs = K_M10M_TIMEOUT_MS,
                                                                       .init = SPP_SERVICES_M10M_init,
                                                                       .acquireData = SPP_SERVICES_M10M_acquireData};
+static spp_uint8_t s_M10M_id[18] = {};
+static spp_uint32_t s_readBytes = 0;
 
 /* ----------------------------------------------------------------
 * PUBLIC FUNCTIONS
@@ -39,3 +41,31 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_M10M_getProducerContract(void
 {
     return &g_m10mProducerContract;
 }
+
+/* ----------------------------------------------------------------
+* STATIC FUNCTIONS
+* ---------------------------------------------------------------- */
+static SPP_RetVal_t SPP_SERVICES_M10M_init(void)
+{
+    SPP_RetVal_t ret = SPP_HAL_UART_transmit(K_M10M_CTRL_RST_CMD, sizeof(K_M10M_CTRL_RST_CMD));
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    SPP_HAL_TIME_delayMs(200);
+
+    ret = SPP_HAL_UART_transmit(K_M10M_ID_OUT, sizeof(K_M10M_ID_OUT));
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    ret = SPP_HAL_UART_read(s_M10M_id, 10, &s_readBytes);
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    return K_SPP_OK;
+};
