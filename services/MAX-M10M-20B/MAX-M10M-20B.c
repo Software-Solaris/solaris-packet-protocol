@@ -32,6 +32,7 @@ static const SPP_SERVICE_ProducerContract_t g_m10mProducerContract = {.p_namePro
                                                                       .init = SPP_SERVICES_M10M_init,
                                                                       .acquireData = SPP_SERVICES_M10M_acquireData};
 static spp_uint8_t s_M10M_id[18] = {};
+static spp_uint8_t s_M10M_dynModel[18] = {};
 static spp_uint32_t s_readBytes = 0;
 
 /* ----------------------------------------------------------------
@@ -61,11 +62,28 @@ static SPP_RetVal_t SPP_SERVICES_M10M_init(void)
         return K_SPP_ERROR;
     }
 
-    ret = SPP_HAL_UART_read(s_M10M_id, 10, &s_readBytes);
+    ret = SPP_HAL_UART_read(s_M10M_id, sizeof(s_M10M_id), &s_readBytes);
     if (ret != K_SPP_OK)
     {
         return K_SPP_ERROR;
     }
 
+    ret = SPP_HAL_UART_transmit(K_M10M_AIR4_DYNMODEL_SET, sizeof(K_M10M_AIR4_DYNMODEL_SET));
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    ret = SPP_HAL_UART_transmit(K_M10M_AIR4_DYNMODEL_GET, sizeof(K_M10M_AIR4_DYNMODEL_GET));
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    ret = SPP_HAL_UART_read(s_M10M_dynModel, sizeof(s_M10M_dynModel), &s_readBytes);
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
+    }
     return K_SPP_OK;
 };
