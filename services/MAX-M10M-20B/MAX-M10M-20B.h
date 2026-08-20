@@ -66,6 +66,22 @@ static const spp_uint8_t K_M10M_AIR4_DYNMODEL_GET[] = {
     0x21, 0x00, 0x11, 0x20, // CFG-NAVSPG-DYNMODEL
     0xEB, 0x57              // Checksum
 };
+
+static const spp_uint8_t K_M10M_DYNMODEL_ACK_OUT[] = {
+    0xB5, 0x62, // Sync
+    0x05, 0x01, // UBX-ACK-ACK
+    0x02, 0x00, // Length
+    0x06, 0x8A, // clsID, msdID <-> UBX-CFG-VALSET
+    0x98, 0xC1  // Checksum
+};
+
+static const spp_uint8_t K_M10M_DYNMODEL_NAK_OUT[] = {
+    0xB5, 0x62, // Sync
+    0x05, 0x00, // UBX-ACK-NAK
+    0x02, 0x00, // Length
+    0x06, 0x8A, // clsID, msdID <-> UBX-CFG-VALSET
+    0x97, 0xBC  // Checksum
+};
 /* ----------------------------------------------------------------
 *  PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
