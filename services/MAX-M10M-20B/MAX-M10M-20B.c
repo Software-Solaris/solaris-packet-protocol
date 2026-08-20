@@ -13,6 +13,8 @@
 #include "spp/core/pubsub/pubsub.h"
 #include "spp/services/fsm/fsm.h"
 
+#include <string.h>
+
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
