@@ -78,11 +78,13 @@ typedef union
         spp_uint16_t icmPubsubError         : 1;
         spp_uint16_t datalogggerPubsubError : 1;
         spp_uint16_t e22mbl01PubsubError    : 1;
+        spp_uint16_t m10mPubsubError        : 1;
         spp_uint16_t bmpInitError           : 1;
         spp_uint16_t icmInitError           : 1;
         spp_uint16_t dataloggerInitError    : 1;
         spp_uint16_t e22mbl01InitError      : 1;
-        spp_uint16_t reserved               : 6;
+        spp_uint16_t m10mInitError          : 1;
+        spp_uint16_t reserved               : 4;
     };
 } FsmErrors_t;
 

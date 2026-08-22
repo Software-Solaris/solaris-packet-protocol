@@ -13,6 +13,7 @@
 #include "spp/services/icm20948/icm20948.h"
 #include "spp/services/datalogger/datalogger.h"
 #include "spp/services/e22-mbl01/e22-mbl01.h"
+#include "spp/services/maxm10m20b/maxm10m20b.h"
 #include "spp/core/returnTypes.h"
 #include "spp/services/kpid.h"
 #include "spp/core/pubsub/pubsub.h"
@@ -212,6 +213,7 @@ static spp_bool_t SPP_CORE_FSM_registerConsumerProducer(void)
 {
     SPP_Kpid_t bmp390Kpid = {0};
     SPP_Kpid_t icm20948Kpid = {0};
+    SPP_Kpid_t m10mKpid = {0};
 
     SPP_Kpid_t sdSubscription = {0};
     SPP_Kpid_t e22mbl01Subscription = {0};
@@ -240,7 +242,18 @@ static spp_bool_t SPP_CORE_FSM_registerConsumerProducer(void)
         s_fsmErrors.icmPubsubError = 1;
     }
 
-    sdSubscription.value = bmp390Kpid.value | icm20948Kpid.value;
+    const SPP_SERVICE_ProducerContract_t *p_m10mProducerContract = SPP_SERVICES_M10M_getProducerContract();
+    if (p_m10mProducerContract == NULL)
+    {
+        s_fsmErrors.m10mPubsubError = 1;
+    }
+    ret = SPP_SERVICES_PUBSUB_registerProducer(p_m10mProducerContract, &m10mKpid);
+    if (ret != K_SPP_OK)
+    {
+        s_fsmErrors.m10mPubsubError = 1;
+    }
+
+    sdSubscription.value = bmp390Kpid.value | icm20948Kpid.value | m10mKpid.value;
 
     const SPP_SERVICE_ConsumerContract_t *p_sdConsumerContract = SPP_SERVICES_DATALOGGER_getConsumerContract();
     ret = SPP_SERVICES_PUBSUB_registerConsumer(p_sdConsumerContract, sdSubscription);
@@ -257,12 +270,14 @@ static spp_bool_t SPP_CORE_FSM_registerConsumerProducer(void)
         s_fsmErrors.e22mbl01PubsubError = 1;
     }
 
-    spp_bool_t producersFailed = (s_fsmErrors.bmpPubsubError && s_fsmErrors.icmPubsubError);
+    spp_bool_t producersFailed =
+        (s_fsmErrors.bmpPubsubError && s_fsmErrors.icmPubsubError && s_fsmErrors.m10mPubsubError);
     spp_bool_t consumersFailed = (s_fsmErrors.datalogggerPubsubError && s_fsmErrors.e22mbl01PubsubError);
 
     if (producersFailed || consumersFailed)
     {
         return false;
     }
+
     return true;
 }
