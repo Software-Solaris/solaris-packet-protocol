@@ -3,41 +3,21 @@
  * @brief sx1262 module telemetry + SPP service implementation.
  */
 
+#include "spp/services/sx1262/sx1262.h"
+
 #include <stdio.h>
 #include <string.h>
 #include "spp/services/sx1262/sx1262.h"
-#include "spp/core/types.h"
 #include "spp/core/packet.h"
-#include "spp/core/returnTypes.h"
 #include "spp/hal/spi.h"
 #include "spp/hal/gpio/gpio.h"
 #include "spp/hal/time/time.h"
 
 
 /* -----------------------------------------
-    DEFINES
---------------------------------------------*/
-
-#define SX1262_OPCODE_SET_STANDBY               0x80
-#define SX1262_OPCODE_SET_TX                    0x83
-#define SX1262_OPCODE_SET_PACKET_TYPE           0x8A
-#define SX1262_OPCODE_SET_RF_FRECUENCY          0x86
-#define SX1262_OPCODE_SET_PA_CONFIG             0x95
-#define SX1262_OPCODE_SET_TX_PARAMS             0x8E
-#define SX1262_OPCODE_SET_BUFFER_BASE_ADDRESS   0x8F
-#define SX1262_OPCODE_WRITE_BUFFER              0x0E
-#define SX1262_OPCODE_SET_MODULATION_PARAMS     0x8B
-#define SX1262_OPCODE_SET_PACKET_PARAMS         0x8C
-#define SX1262_OPCODE_SET_DIO_IRQ_PARAMS        0x08
-#define SX1262_OPCODE_CLEAR_IRQ_STATUS          0x02
-
-#define SX1262_BUSY_PIN 4 // hay que ver en que PIN estara el BUSY del SX1262
-#define SX126X_DIO1_PIN 5 // hay que ver en que PIN estara el DIO1
-
-/* -----------------------------------------
     VARIABLES
 --------------------------------------------*/
-static SPP_Packet_t mailboxData[K_E22MBL01_MAILBOX_SIZE] = {0};
+static SPP_Packet_t mailboxData[K_SX1262_MAILBOX_SIZE] = {0};
 
 static spp_uint8_t mailboxHead = 0;
 static spp_uint8_t mailboxTail = 0;
@@ -45,12 +25,11 @@ static spp_uint8_t mailboxCount = 0;
 
 static spp_uint32_t s_frame_number = 1;
 
-static SPP_SERVICE_ConsumerContract_t e22Contract = {
+static SPP_SERVICE_ConsumerContract_t sx1262Contract = {
     .consumerID = K_SX1262_SERVICE_APID,
     .priority = 1,
     .p_nameConsumer = "sx1262",
     .tiemoutMs = K_SX1262_TASK_TIMEOUT_MS,
-    .suscribeToApid = K_BMP390_SERVICE_APID | K_ICM20948_SERVICE_APID,
     .init = SPP_SERVICES_SX1262_init,
     .deliverToMailbox = SPP_SERVICES_SX1262_deliverToMailbox,
     .consumeData = SPP_SERVICES_SX1262_consumeData,
@@ -128,7 +107,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data){
 }
 
 static SPP_SERVICE_ConsumerContract_t SPP_SERVICES_SX1262_getConsumerContract(){
-    return &e22Contract;
+    return &sx1262Contract;
 }
 
 SPP_RetVal_t SX1262_Transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
@@ -146,6 +125,9 @@ SPP_RetVal_t SX1262_Transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t le
     if (ret != K_SPP_OK) return ret;
 
     ret = SX1262_SetPaConfig(p_handle);
+    if (ret != K_SPP_OK) return ret;
+
+    ret = SX1262_CalibrateImage(p_handle);
     if (ret != K_SPP_OK) return ret;
 
     ret = SX1262_SetTxParams(p_handle);
@@ -295,6 +277,20 @@ SPP_RetVal_t SX1262_SetPaConfig(void *p_handle)
     if (ret != K_SPP_OK)
         return ret;
     return SPP_HAL_SPI_transmit(p_handle, buffer, 5);
+}
+
+SPP_RetVal_t SX1262_CalibrateImage(void *p_handle)
+{
+    spp_uint8_t buffer[3];
+    buffer[0] = SX1262_OPCODE_CALIBRATE_IMAGE;
+    buffer[1] = 0xD7; // Calibracion para 868 MHz
+    buffer[2] = 0xDB;
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+        return ret;
+
+    return SPP_HAL_SPI_transmit(p_handle, buffer, 3);
 }
 
 SPP_RetVal_t SX1262_SetTxParams(void *p_handle)
