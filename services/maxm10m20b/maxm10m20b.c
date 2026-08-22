@@ -3,7 +3,7 @@
  * @brief Ublox GNSS (MAX-M10M-20B) driver + SPP service implementation.
  */
 
-#include "spp/services/MAX-M10M-20B/MAX-M10M-20B.h"
+#include "spp/services/maxm10m20b/maxm10m20b.h"
 
 #include "spp/hal/uart/uart.h"
 #include "spp/hal/time/time.h"
