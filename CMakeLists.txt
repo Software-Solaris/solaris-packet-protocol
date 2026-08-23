@@ -27,7 +27,7 @@ option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
 # ----------------------------------------------------------------
 set(SPP_CORE_SOURCES
     core/core.c
-    core/error.c
+    core/commonbit.c
     hal/hal.c
     hal/spi/spi.c
     hal/gpio/gpio.c
@@ -35,7 +35,7 @@ set(SPP_CORE_SOURCES
     hal/time/time.c
     services/service.c
     services/databank/databank.c
-    services/pubsub/pubsub.c
+    core/pubsub/pubsub.c
     services/log/log.c
     util/crc.c
     hal/uart/uart.c
@@ -137,7 +137,5 @@ if(SPP_BUILD_TESTS)
         add_test(NAME ${name} COMMAND ${CGREEN_RUNNER} $<TARGET_FILE:${name}>)
     endfunction()
 
-    spp_add_test_module(spp_test_core tests/core/test_core_boot.c tests/mocks.c)
-    spp_add_test_module(spp_test_core_api tests/core/test_core.c tests/mocks.c)
-    spp_add_test_module(spp_test_core_error tests/core/test_core_error.c tests/mocks.c)
+    spp_add_test_module(spp_test_sx1262 tests/services/test_sx1262.c tests/mocks.c)
 endif()
