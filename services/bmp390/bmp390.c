@@ -27,15 +27,13 @@
  * CONSTANTS
  * ---------------------------------------------------------------- */
 #define K_BMP390_TASK_TIMEOUT_MS 5000U
-#define K_BMP390_SERVICE_APID    (0x0004U)
-#define K_BMP390_LOG_TAG         "BMP390"
-
+#define K_BMP390_TAG             "BMP390"
 
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
-static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid);
+static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
@@ -63,9 +61,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.p_nameProducer = "bmp390",
                                                                         .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
                                                                         .init = SPP_SERVICES_BMP390_init,
-                                                                        .acquireData = SPP_BMP390_acquireData};
+                                                                        .acquireData = SPP_SERVICES_BMP390_acquireData};
 static BMP390_t s_bmpData;
-static const char *const k_tag = "BMP390";
 static const char *const k_svcTag = "BMP_SVC";
 static float s_pd1, s_pd2, s_pd3, s_pd4;
 static float s_po1, s_po2;
@@ -151,7 +148,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
  *
  * @param  p_data  Pointer to the BMP390_t sensor instance.
  */
-static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
+static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
 {
     BMP390_t *p_bmpData = &s_bmpData;
     float altitude = 0.0f;
@@ -181,7 +178,7 @@ static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
     }
 
 #ifdef SPP_DEBUG_PRINT
-    SPP_LOGI(K_BMP390_LOG_TAG, "[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+    SPP_LOGI(K_BMP390_TAG, "[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
 #endif
 
 
@@ -256,11 +253,11 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler)
         return ret;
     }
 
-    SPP_LOGI(k_tag, "ID: 0x%02X", buf[8]);
+    SPP_LOGI(K_BMP390_TAG, "ID: 0x%02X", buf[8]);
 
     if (buf[8] != 0x60U)
     {
-        SPP_LOGE(k_tag, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);
+        SPP_LOGE(K_BMP390_TAG, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);
         return K_SPP_ERROR;
     }
 
