@@ -132,7 +132,7 @@ static void action_emitTelemetry(void)
     }
 
     // Call the consumers (to force the telemetry to be sent)
-    (void)SPP_SERVICES_PUBSUB_callConsumers();
+    //(void)SPP_SERVICES_PUBSUB_callConsumers();
 
     return;
 }
@@ -142,7 +142,7 @@ static void action_emitTelemetry(void)
 static void statefunction_pubSubLoop(void)
 {
     (void)SPP_SERVICES_PUBSUB_callProducers();
-    (void)SPP_SERVICES_PUBSUB_callConsumers();
+    //(void)SPP_SERVICES_PUBSUB_callConsumers();
 }
 
 
@@ -231,50 +231,50 @@ static spp_bool_t SPP_CORE_FSM_registerConsumerProducer(void)
         s_fsmErrors.bmpPubsubError = 1;
     }
 
-    const SPP_SERVICE_ProducerContract_t *p_icmProducerContract = SPP_SERVICES_ICM20948_getProducerContract();
-    if (p_icmProducerContract == NULL)
-    {
-        s_fsmErrors.icmPubsubError = 1;
-    }
-    ret = SPP_SERVICES_PUBSUB_registerProducer(p_icmProducerContract, &icm20948Kpid);
-    if (ret != K_SPP_OK)
-    {
-        s_fsmErrors.icmPubsubError = 1;
-    }
+    // const SPP_SERVICE_ProducerContract_t *p_icmProducerContract = SPP_SERVICES_ICM20948_getProducerContract();
+    // if (p_icmProducerContract == NULL)
+    // {
+    //     s_fsmErrors.icmPubsubError = 1;
+    // }
+    // ret = SPP_SERVICES_PUBSUB_registerProducer(p_icmProducerContract, &icm20948Kpid);
+    // if (ret != K_SPP_OK)
+    // {
+    //     s_fsmErrors.icmPubsubError = 1;
+    // }
 
-    const SPP_SERVICE_ProducerContract_t *p_m10mProducerContract = SPP_SERVICES_M10M_getProducerContract();
-    if (p_m10mProducerContract == NULL)
-    {
-        s_fsmErrors.m10mPubsubError = 1;
-    }
-    ret = SPP_SERVICES_PUBSUB_registerProducer(p_m10mProducerContract, &m10mKpid);
-    if (ret != K_SPP_OK)
-    {
-        s_fsmErrors.m10mPubsubError = 1;
-    }
+    // const SPP_SERVICE_ProducerContract_t *p_m10mProducerContract = SPP_SERVICES_M10M_getProducerContract();
+    // if (p_m10mProducerContract == NULL)
+    // {
+    //     s_fsmErrors.m10mPubsubError = 1;
+    // }
+    // ret = SPP_SERVICES_PUBSUB_registerProducer(p_m10mProducerContract, &m10mKpid);
+    // if (ret != K_SPP_OK)
+    // {
+    //     s_fsmErrors.m10mPubsubError = 1;
+    // }
 
-    sdSubscription.value = bmp390Kpid.value | icm20948Kpid.value | m10mKpid.value;
+    // sdSubscription.value = bmp390Kpid.value | icm20948Kpid.value | m10mKpid.value;
 
-    const SPP_SERVICE_ConsumerContract_t *p_sdConsumerContract = SPP_SERVICES_DATALOGGER_getConsumerContract();
-    ret = SPP_SERVICES_PUBSUB_registerConsumer(p_sdConsumerContract, sdSubscription);
-    if (ret != K_SPP_OK)
-    {
-        s_fsmErrors.datalogggerPubsubError = 1;
-    }
+    // const SPP_SERVICE_ConsumerContract_t *p_sdConsumerContract = SPP_SERVICES_DATALOGGER_getConsumerContract();
+    // ret = SPP_SERVICES_PUBSUB_registerConsumer(p_sdConsumerContract, sdSubscription);
+    // if (ret != K_SPP_OK)
+    // {
+    //     s_fsmErrors.datalogggerPubsubError = 1;
+    // }
 
-    e22mbl01Subscription.value = bmp390Kpid.value | icm20948Kpid.value | K_SPP_KPID_FSM;
-    const SPP_SERVICE_ConsumerContract_t *p_e22mbl01ConsumerContract = SPP_SERVICES_E22MBL01_getConsumerContract();
-    ret = SPP_SERVICES_PUBSUB_registerConsumer(p_e22mbl01ConsumerContract, e22mbl01Subscription);
-    if (ret != K_SPP_OK)
-    {
-        s_fsmErrors.e22mbl01PubsubError = 1;
-    }
+    // e22mbl01Subscription.value = bmp390Kpid.value | icm20948Kpid.value | K_SPP_KPID_FSM;
+    // const SPP_SERVICE_ConsumerContract_t *p_e22mbl01ConsumerContract = SPP_SERVICES_E22MBL01_getConsumerContract();
+    // ret = SPP_SERVICES_PUBSUB_registerConsumer(p_e22mbl01ConsumerContract, e22mbl01Subscription);
+    // if (ret != K_SPP_OK)
+    // {
+    //     s_fsmErrors.e22mbl01PubsubError = 1;
+    // }
 
-    spp_bool_t producersFailed =
-        (s_fsmErrors.bmpPubsubError && s_fsmErrors.icmPubsubError && s_fsmErrors.m10mPubsubError);
-    spp_bool_t consumersFailed = (s_fsmErrors.datalogggerPubsubError && s_fsmErrors.e22mbl01PubsubError);
+    // spp_bool_t producersFailed =
+    //     (s_fsmErrors.bmpPubsubError && s_fsmErrors.icmPubsubError && s_fsmErrors.m10mPubsubError);
+    // spp_bool_t consumersFailed = (s_fsmErrors.datalogggerPubsubError && s_fsmErrors.e22mbl01PubsubError);
 
-    if (producersFailed || consumersFailed)
+    if (s_fsmErrors.bmpPubsubError)
     {
         return false;
     }
