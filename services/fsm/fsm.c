@@ -142,7 +142,7 @@ static void action_emitTelemetry(void)
 static void statefunction_pubSubLoop(void)
 {
     (void)SPP_SERVICES_PUBSUB_callProducers();
-    //(void)SPP_SERVICES_PUBSUB_callConsumers();
+    (void)SPP_SERVICES_PUBSUB_callConsumers();
 }
 
 

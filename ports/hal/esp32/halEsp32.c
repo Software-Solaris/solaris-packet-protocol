@@ -30,6 +30,7 @@
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void);
 static void *SPP_PORTS_HAL_ESP32_spiGetHandle(spp_uint8_t deviceIdx);
+
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
@@ -42,6 +43,7 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
                                                      spp_uint16_t count);
 
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
+static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeUs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void);
@@ -73,6 +75,7 @@ const static SPP_HALStorage_t s_esp32HalStorage = {
 
 const static SPP_HALTime_t s_esp32HalTime = {
     .getTimeMs = SPP_PORTS_HAL_ESP32_getTimeMs,
+    .getTimeUs = SPP_PORTS_HAL_ESP32_getTimeUs,
     .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
 
@@ -427,6 +430,11 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void)
 {
     return (spp_uint32_t)(esp_timer_get_time() / 1000LL);
+}
+
+static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeUs(void)
+{
+    return (spp_uint32_t)(esp_timer_get_time());
 }
 
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)

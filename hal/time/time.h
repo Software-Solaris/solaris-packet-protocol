@@ -23,6 +23,13 @@
 spp_uint32_t SPP_HAL_TIME_getTimeMs(void);
 
 /**
+ * @brief Return the current hardware time in microseconds.
+ *
+ * @return Elapsed time in ms (monotonically non-decreasing).
+ */
+spp_uint32_t SPP_HAL_TIME_getTimeUs(void);
+
+/**
  * @brief Block for the requested number of milliseconds.
  *
  * @param[in] ms  Number of milliseconds to delay.

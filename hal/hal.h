@@ -188,6 +188,15 @@ typedef struct
     spp_uint32_t (*getTimeMs)(void);
 
     /**
+     * @brief Return the current hardware time in microseconds.
+     *
+     * Used to timestamp packets.  Must be monotonically non-decreasing.
+     *
+     * @return Elapsed time in us.
+     */
+    spp_uint32_t (*getTimeUs)(void);
+
+    /**
      * @brief Block for the requested number of milliseconds.
      *
      * Used during sensor initialisation sequences that require a fixed delay.
