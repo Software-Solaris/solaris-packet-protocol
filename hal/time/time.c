@@ -31,7 +31,7 @@ spp_uint32_t SPP_HAL_TIME_getTimeUs(void)
     {
         return 0U;
     }
-    return p_port->time.getTimeMs();
+    return p_port->time.getTimeUs();
 }
 
 void SPP_HAL_TIME_delayMs(spp_uint32_t ms)
