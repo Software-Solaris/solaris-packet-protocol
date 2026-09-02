@@ -8,29 +8,12 @@
  * INCLUDES
  * ---------------------------------------------------------------- */
 #include "spp/services/fsm/fsm.h"
-#include "spp/services/service.h"
-#include "spp/services/bmp390/bmp390.h"
-#include "spp/services/icm20948/icm20948.h"
-#include "spp/services/datalogger/datalogger.h"
-#include "spp/services/e22-mbl01/e22-mbl01.h"
-#include "spp/services/maxm10m20b/maxm10m20b.h"
-#include "spp/core/returnTypes.h"
-#include "spp/services/kpid.h"
-#include "spp/core/pubsub/pubsub.h"
-#include "spp/core/core.h"
-#include "spp/core/commonbit.h"
-#include "spp/services/databank/databank.h"
-#include "spp/services/kpid.h"
-#include "spp/hal/hal.h"
-
 
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
 
-FsmErrors_t s_fsmErrors = {0};
-
-static void *s_p_ports;
+static spp_uint16_t s_fsmErrors = {0};
 
 static const FSM_Transition_t *p_s_transitionTable = NULL;
 
@@ -47,14 +30,14 @@ static spp_uint8_t s_tableSize = 0;
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
-FsmErrors_t *SPP_CORE_FSM_getErrorsBit(void)
+spp_uint16_t *SPP_CORE_FSM_getErrorsBit(void)
 {
     return &s_fsmErrors;
 }
 
-SPP_RetVal_t FSM_init(void *p_halPorts, const FSM_Transition_t *p_transitionTable, const spp_uint8_t tableSize)
+SPP_RetVal_t FSM_init(const FSM_Transition_t *p_transitionTable, const spp_uint8_t tableSize)
 {
-    if ((p_transitionTable == NULL) || (p_halPorts == NULL))
+    if (p_transitionTable == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
@@ -68,7 +51,6 @@ SPP_RetVal_t FSM_init(void *p_halPorts, const FSM_Transition_t *p_transitionTabl
     // Assign the table parameters to the static variables
     p_s_transitionTable = p_transitionTable;
     s_tableSize = tableSize;
-    s_p_ports = p_halPorts;
 
     return K_SPP_OK;
 }
