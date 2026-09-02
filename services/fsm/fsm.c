@@ -41,6 +41,8 @@ static FSM_Handle_t s_fsmHandle = {
     .prevSubState = FSM_SUBSTATE_NONE,
 };
 
+static spp_uint8_t s_tableSize = 0;
+
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -56,29 +58,24 @@ SPP_RetVal_t FSM_init(void *p_halPorts, const FSM_Transition_t *p_transitionTabl
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
-    else
+
+    // Check the size of the table
+    if (tableSize > K_FSM_MAX_TABLE_SIZE || tableSize == 0)
     {
-        // Asign the HAL to the pointer
-        s_p_ports = p_halPorts;
-        // Check the size of the table
-        if (tableSize > K_FSM_MAX_TABLE_SIZE)
-        {
-            return K_SPP_ERROR_INVALID_PARAMETER;
-        }
-        else
-        {
-            // Assign the table pointer to the static variable
-            p_s_transitionTable = p_transitionTable;
-        }
+        return K_SPP_ERROR_INVALID_PARAMETER;
     }
+
+    // Assign the table parameters to the static variables
+    p_s_transitionTable = p_transitionTable;
+    s_tableSize = tableSize;
+    s_p_ports = p_halPorts;
+
+    return K_SPP_OK;
 }
 
 void FSM_tick(void)
 {
-    // TODO: review if this is correct
-    const spp_uint8_t tableSize = sizeof(p_s_transitionTable) / sizeof(p_s_transitionTable[0]);
-
-    for (spp_uint8_t i = 0; i < tableSize; i++)
+    for (spp_uint8_t i = 0; i < s_tableSize; i++)
     {
         // TODO: review if this is correct
         const FSM_Transition_t *p_t = &p_s_transitionTable[i];
