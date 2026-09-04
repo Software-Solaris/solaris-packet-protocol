@@ -216,6 +216,45 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 
     return K_SPP_OK;
 }
+
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getProducerInitResult(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                       SPP_RetVal_t *p_initResult)
+{
+    if (p_producerData == NULL || p_initResult == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    for (spp_uint8_t i = 0; i < s_registeredProducers; i++)
+    {
+        if (p_producerData == s_producers[i].p_contract)
+        {
+            *p_initResult = s_producers[i].initResult;
+            return K_SPP_OK;
+        }
+    }
+    return K_SPP_ERROR;
+}
+
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getConsumerInitResult(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                       SPP_RetVal_t *p_initResult)
+{
+    if (p_consumerData == NULL || p_initResult == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    for (spp_uint8_t i = 0; i < s_registeredConsumers; i++)
+    {
+        if (p_consumerData == s_consumers[i].p_contract)
+        {
+            *p_initResult = s_consumers[i].initResult;
+            return K_SPP_OK;
+        }
+    }
+    return K_SPP_ERROR;
+}
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */
