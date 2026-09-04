@@ -178,4 +178,10 @@ typedef struct
 * ---------------------------------------------------------------- */
 const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(void);
 
+/* Performance Test*/
+spp_uint16_t SPP_SERVICES_BMP390_getPerformanceSampleCount(void);
+
+SPP_RetVal_t SPP_SERVICES_BMP390_getPerformanceSample(spp_uint16_t index, spp_uint32_t *p_bmpUs,
+                                                      spp_uint32_t *p_tempSpiUs, spp_uint32_t *p_pressSpiUs);
+
 #endif /* SPP_BMP390_H */
