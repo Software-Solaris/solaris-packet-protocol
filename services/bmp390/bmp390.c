@@ -89,12 +89,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
-    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
-    if (p_fsmErrors == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
-
     s_bmpData.gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
     s_bmpData.gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
     s_bmpData.gpioConfig.intPull = K_BMP390_INT_PULL;
@@ -128,11 +122,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
         {
             ret = K_SPP_ERROR;
         }
-    }
-
-    if (ret != K_SPP_OK)
-    {
-        p_fsmErrors->bmpInitError = 1;
     }
 
     return ret;
