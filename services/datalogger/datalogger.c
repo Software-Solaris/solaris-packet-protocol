@@ -35,7 +35,6 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_consumeData(void *p_data);
  * VARIABLES
  * ---------------------------------------------------------------- */
 static const SPP_SERVICE_ConsumerContract_t g_dataloggerConsumerContract = {
-    .consumerID = K_DATALOGGER_CONSUMER_ID,
     .priority = K_DATALOGGER_CONSUMER_PRIO,
     .p_nameConsumer = "datalogger",
     .tiemoutMs = K_DATALOGGER_TIMEOUT_MS,

@@ -21,7 +21,6 @@
 
 #define K_E22MBL01_TASK_TIMEOUT_MS 5000U
 #define K_E22MBL01_MAILBOX_SIZE    128U
-#define K_E22MBL01_SERVICE_APID    (0x0004U)
 
 /* -----------------------------------------
     VARIABLES
@@ -43,7 +42,6 @@ static void SPP_SERVICES_E22MBL01_icmPacket_to_text(SPP_Packet_t *p_pkt, char *d
 
 
 static SPP_SERVICE_ConsumerContract_t e22Contract = {
-    .consumerID = K_E22MBL01_SERVICE_APID,
     .priority = 1,
     .p_nameConsumer = "e22-mbl01",
     .tiemoutMs = K_E22MBL01_TASK_TIMEOUT_MS,

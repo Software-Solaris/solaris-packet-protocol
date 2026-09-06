@@ -27,15 +27,13 @@
  * CONSTANTS
  * ---------------------------------------------------------------- */
 #define K_BMP390_TASK_TIMEOUT_MS 5000U
-#define K_BMP390_SERVICE_APID    (0x0004U)
-#define K_BMP390_LOG_TAG         "BMP390"
-
+#define K_BMP390_TAG             "BMP390"
 
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS DECLARATIONS
  * ---------------------------------------------------------------- */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void);
-static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid);
+static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid);
 static SPP_RetVal_t SPP_SERVICES_BMP390_softReset(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_enableSpiMode(void *p_spiHandler);
 static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler);
@@ -57,15 +55,27 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, float *a
                                                     float *temperature_c);
 static SPP_RetVal_t SPP_SERVICES_BMP390_intEnableDrdy(void *p_spiHandler);
 
+/* Performance testing*/
+#define K_BMP390_PERFORMANCE_SAMPLES (10000U)
+
+// static spp_uint32_t s_bmpPerformance[K_BMP390_PERFORMANCE_SAMPLES] = {0U};
+// static spp_uint32_t s_tempSpiPerformance[K_BMP390_PERFORMANCE_SAMPLES] = {0U};
+// static spp_uint32_t s_pressSpiPerformance[K_BMP390_PERFORMANCE_SAMPLES] = {0U};
+
+// static spp_uint32_t s_lastTempSpi = 0U;
+// static spp_uint32_t s_lastPressSpi = 0U;
+
+// static spp_uint16_t s_performanceSamples = 0U;
+// static spp_bool_t s_performanceWarmupDone = false;
+
 /* ----------------------------------------------------------------
 * VARIABLES
 * ---------------------------------------------------------------- */
 static const SPP_SERVICE_ProducerContract_t g_bmp390ProducerContract = {.p_nameProducer = "bmp390",
                                                                         .tiemoutMs = K_BMP390_TASK_TIMEOUT_MS,
                                                                         .init = SPP_SERVICES_BMP390_init,
-                                                                        .acquireData = SPP_BMP390_acquireData};
+                                                                        .acquireData = SPP_SERVICES_BMP390_acquireData};
 static BMP390_t s_bmpData;
-static const char *const k_tag = "BMP390";
 static const char *const k_svcTag = "BMP_SVC";
 static float s_pd1, s_pd2, s_pd3, s_pd4;
 static float s_po1, s_po2;
@@ -78,6 +88,27 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(vo
 {
     return &g_bmp390ProducerContract;
 }
+/* Performance Test */
+// spp_uint16_t SPP_SERVICES_BMP390_getPerformanceSampleCount(void)
+// {
+//     return s_performanceSamples;
+// }
+
+
+// SPP_RetVal_t SPP_SERVICES_BMP390_getPerformanceSample(spp_uint16_t i, spp_uint32_t *p_bmp, spp_uint32_t *p_tempSpi,
+//                                                       spp_uint32_t *p_pressSpi)
+// {
+//     if ((i >= s_performanceSamples) || (p_bmp == NULL) || (p_tempSpi == NULL) || (p_pressSpi == NULL))
+//     {
+//         return K_SPP_ERROR;
+//     }
+
+//     *p_bmp = s_bmpPerformance[i];
+//     *p_tempSpi = s_tempSpiPerformance[i];
+//     *p_pressSpi = s_pressSpiPerformance[i];
+
+//     return K_SPP_OK;
+// }
 
 /* ----------------------------------------------------------------
 * STATIC FUNCTIONS
@@ -91,12 +122,6 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(vo
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
-
-    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
-    if (p_fsmErrors == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
 
     s_bmpData.gpioConfig.intPin = K_BMP390_INT_PIN_NUM;
     s_bmpData.gpioConfig.intIntrType = K_BMP390_INT_INTR_TYPE;
@@ -133,11 +158,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
         }
     }
 
-    if (ret != K_SPP_OK)
-    {
-        p_fsmErrors->bmpInitError = 1;
-    }
-
     return ret;
 }
 
@@ -151,7 +171,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
  *
  * @param  p_data  Pointer to the BMP390_t sensor instance.
  */
-static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
+static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
 {
     BMP390_t *p_bmpData = &s_bmpData;
     float altitude = 0.0f;
@@ -171,8 +191,13 @@ static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
         return K_SPP_ERROR;
     }
 
+    // spp_uint32_t t0 = SPP_HAL_TIME_getTimeUs();
+
     SPP_RetVal_t ret =
         SPP_SERVICES_BMP390_getAltitude(p_bmpData->spiConfig.p_spiHandler, &altitude, &pressure, &temperature);
+
+    // spp_uint32_t t1 = SPP_HAL_TIME_getTimeUs();
+
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
@@ -180,8 +205,21 @@ static SPP_RetVal_t SPP_BMP390_acquireData(SPP_Kpid_t kpid)
         return ret;
     }
 
+    // if (s_performanceWarmupDone == false)
+    // {
+    //     s_performanceWarmupDone = true;
+    // }
+    // else if (s_performanceSamples < K_BMP390_PERFORMANCE_SAMPLES)
+    // {
+    //     s_bmpPerformance[s_performanceSamples] = t1 - t0;
+    //     s_tempSpiPerformance[s_performanceSamples] = s_lastTempSpi;
+    //     s_pressSpiPerformance[s_performanceSamples] = s_lastPressSpi;
+
+    //     s_performanceSamples++;
+    // }
+
 #ifdef SPP_DEBUG_PRINT
-    SPP_LOGI(K_BMP390_LOG_TAG, "[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
+    SPP_LOGI(K_BMP390_TAG, "[BMP] alt=%.1fm P=%.1fhPa T=%.2fC\n", altitude, pressure / 100.0f, temperature);
 #endif
 
 
@@ -256,11 +294,11 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler)
         return ret;
     }
 
-    SPP_LOGI(k_tag, "ID: 0x%02X", buf[8]);
+    SPP_LOGI(K_BMP390_TAG, "ID: 0x%02X", buf[8]);
 
     if (buf[8] != 0x60U)
     {
-        SPP_LOGE(k_tag, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);
+        SPP_LOGE(K_BMP390_TAG, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);
         return K_SPP_ERROR;
     }
 
@@ -394,7 +432,12 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_readRawTemp(void *p_spiHandler, uint32_t
         (spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_TEMP_RAW_REG + 1)), K_BMP390_SPI_WRITE, K_BMP390_SPI_WRITE,
         (spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_TEMP_RAW_REG + 2)), K_BMP390_SPI_WRITE, K_BMP390_SPI_WRITE};
 
+    // spp_uint32_t t0 = SPP_HAL_TIME_getTimeUs();
     SPP_RetVal_t ret = SPP_HAL_SPI_transmit(p_spiHandler, buf, sizeof(buf));
+    // spp_uint32_t t1 = SPP_HAL_TIME_getTimeUs();
+
+    // s_lastTempSpi = t1 - t0;
+
     if (ret != K_SPP_OK)
     {
         return ret;
@@ -578,7 +621,12 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_readRawPress(void *p_spiHandler, spp_uin
         (spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_PRESS_RAW_REG + 1)), K_BMP390_SPI_WRITE, K_BMP390_SPI_WRITE,
         (spp_uint8_t)(K_BMP390_SPI_READ | (K_BMP390_PRESS_RAW_REG + 2)), K_BMP390_SPI_WRITE, K_BMP390_SPI_WRITE};
 
+    // spp_uint32_t t0 = SPP_HAL_TIME_getTimeUs();
     SPP_RetVal_t ret = SPP_HAL_SPI_transmit(p_spiHandler, buf, sizeof(buf));
+    // spp_uint32_t t1 = SPP_HAL_TIME_getTimeUs();
+
+    // s_lastPressSpi = t1 - t0;
+
     if (ret != K_SPP_OK)
     {
         return ret;

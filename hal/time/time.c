@@ -24,6 +24,16 @@ spp_uint32_t SPP_HAL_TIME_getTimeMs(void)
     return p_port->time.getTimeMs();
 }
 
+spp_uint32_t SPP_HAL_TIME_getTimeUs(void)
+{
+    const SPP_HalPort_t *p_port = SPP_HAL_getPort();
+    if ((p_port == NULL) || (p_port->time.getTimeUs == NULL))
+    {
+        return 0U;
+    }
+    return p_port->time.getTimeUs();
+}
+
 void SPP_HAL_TIME_delayMs(spp_uint32_t ms)
 {
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
