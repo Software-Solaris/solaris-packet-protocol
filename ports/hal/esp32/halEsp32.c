@@ -30,6 +30,7 @@
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiBusInit(void);
 static void *SPP_PORTS_HAL_ESP32_spiGetHandle(spp_uint8_t deviceIdx);
+
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
@@ -42,10 +43,12 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_u
                                                      spp_uint16_t count);
 
 static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void);
+static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeUs(void);
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartPortInit(void);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uint32_t len);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartRead(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes);
 
 
 /* ----------------------------------------------------------------
@@ -72,11 +75,15 @@ const static SPP_HALStorage_t s_esp32HalStorage = {
 
 const static SPP_HALTime_t s_esp32HalTime = {
     .getTimeMs = SPP_PORTS_HAL_ESP32_getTimeMs,
+    .getTimeUs = SPP_PORTS_HAL_ESP32_getTimeUs,
     .delayMs = SPP_PORTS_HAL_ESP32_delayMs,
 };
 
-const static SPP_HALUart_t s_esp32HalUart = {.uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
-                                             .uartTransmit = SPP_PORTS_HAL_ESP32_uartTransmit};
+const static SPP_HALUart_t s_esp32HalUart = {
+    .uartPortInit = SPP_PORTS_HAL_ESP32_uartPortInit,
+    .uartTransmit = SPP_PORTS_HAL_ESP32_uartTransmit,
+    .uartRead = SPP_PORTS_HAL_ESP32_uartRead,
+};
 
 
 static const SPP_HalPort_t s_esp32HalPorts = {
@@ -425,6 +432,11 @@ static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeMs(void)
     return (spp_uint32_t)(esp_timer_get_time() / 1000LL);
 }
 
+static spp_uint32_t SPP_PORTS_HAL_ESP32_getTimeUs(void)
+{
+    return (spp_uint32_t)(esp_timer_get_time());
+}
+
 static void SPP_PORTS_HAL_ESP32_delayMs(spp_uint32_t ms)
 {
     spp_uint32_t start = SPP_PORTS_HAL_ESP32_getTimeMs();
@@ -498,5 +510,32 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartTransmit(const void *p_data, spp_uin
         return K_SPP_ERROR;
     }
 
+    return K_SPP_OK;
+}
+
+/**
+ * @brief Reads data from the ESP32 UART.
+ *
+ * @param[out] p_data      Pointer to the buffer where received data will be stored.
+ * @param[in]  len         Number of bytes to read.
+ * @param[out] p_readBytes Pointer to the variable where the number of bytes read will be stored.
+ */
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_uartRead(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes)
+{
+    if ((p_data == NULL) || (len == 0U))
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    spp_uint8_t *p_dataToRead = (spp_uint8_t *)p_data;
+
+    const int read = uart_read_bytes(K_ESP32_UART_PORT_ID, p_dataToRead, (size_t)len, K_ESP32_UART_MAX_DELAY);
+
+    if (read < 0)
+    {
+        return K_SPP_ERROR;
+    }
+
+    *p_readBytes = (spp_uint32_t)read;
     return K_SPP_OK;
 }

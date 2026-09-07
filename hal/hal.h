@@ -104,6 +104,16 @@ typedef struct
      */
     SPP_RetVal_t (*uartTransmit)(const void *p_data, spp_uint32_t len);
 
+    /**
+     * @brief Reads data from the ESP32 UART.
+     *
+     * @param[out] p_data      Pointer to the buffer where received data will be stored.
+     * @param[in]  len         Number of bytes to read.
+     * @param[out] p_readBytes Pointer to the variable where the number of bytes read will be stored.
+     */
+
+    SPP_RetVal_t (*uartRead)(void *p_data, spp_uint32_t len, spp_uint32_t *p_readBytes);
+
 } SPP_HALUart_t;
 
 /**
@@ -176,6 +186,15 @@ typedef struct
      * @return Elapsed time in ms.
      */
     spp_uint32_t (*getTimeMs)(void);
+
+    /**
+     * @brief Return the current hardware time in microseconds.
+     *
+     * Used to timestamp packets.  Must be monotonically non-decreasing.
+     *
+     * @return Elapsed time in us.
+     */
+    spp_uint32_t (*getTimeUs)(void);
 
     /**
      * @brief Block for the requested number of milliseconds.

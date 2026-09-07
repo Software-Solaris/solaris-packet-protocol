@@ -41,7 +41,6 @@ typedef struct
 */
 typedef struct
 {
-    spp_uint8_t consumerID;
     spp_int8_t priority;         /**< Priority of the consumer */
     const char *p_nameConsumer;  /**< Human-readable module name (for logging). */
     spp_uint16_t tiemoutMs;      /**< Timeout for the consumer to receive a packet */

@@ -14,7 +14,6 @@
  * DEFINES
  * ---------------------------------------------------------------- */
 
-#define K_DATALOGGER_CONSUMER_ID   (0x01U)
 #define K_DATALOGGER_CONSUMER_PRIO (0)
 #define K_DATALOGGER_TIMEOUT_MS    (1000U)
 #define K_DATALOGGER_SPI_DEV_IDX   (2U)

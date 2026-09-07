@@ -12,7 +12,8 @@
 /* ----------------------------------------------------------------
 * DEFINES
 * ---------------------------------------------------------------- */
-#define K_FSM_TIMEOUT_MS 10000U // Only executed once, np with stops
+#define K_FSM_TIMEOUT_MS     10000U // Only executed once, np with stops
+#define K_FSM_MAX_TABLE_SIZE 10U    /*<Only allow 10 rows on the FSM table */
 
 
 /* ----------------------------------------------------------------
@@ -66,27 +67,6 @@ typedef struct
     FSM_SubState_t prevSubState;
 } FSM_Handle_t;
 
-
-typedef union
-{
-    spp_uint16_t errors;
-    struct
-    {
-        spp_uint16_t fsmInitError           : 1;
-        spp_uint16_t halInitError           : 1;
-        spp_uint16_t bmpPubsubError         : 1;
-        spp_uint16_t icmPubsubError         : 1;
-        spp_uint16_t datalogggerPubsubError : 1;
-        spp_uint16_t e22mbl01PubsubError    : 1;
-        spp_uint16_t bmpInitError           : 1;
-        spp_uint16_t icmInitError           : 1;
-        spp_uint16_t dataloggerInitError    : 1;
-        spp_uint16_t e22mbl01InitError      : 1;
-        spp_uint16_t reserved               : 6;
-    };
-} FsmErrors_t;
-
-
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
@@ -94,12 +74,14 @@ typedef union
 * @brief    Get the pointer to the FSM errors bit.
 * @return   Pointer to the FSM errors bit.
 */
-FsmErrors_t *SPP_CORE_FSM_getErrorsBit(void);
+spp_uint16_t *SPP_CORE_FSM_getErrorsBit(void);
 /**
 * @brief    Initialize the FSM.
 * @param    p_halPorts  Pointer to the HAL ports.
+* @param    p_transitiontable Pointer to the FSM table for operation.
+* @param    tableSize Size of the table.
 */
-void FSM_init(void *p_halPorts);
+SPP_RetVal_t FSM_init(const FSM_Transition_t *p_transitionTable, const spp_uint8_t tableSize);
 /**
  * @brief Evaluate the transition table and advance the FSM if a guard passes.
  *        Call this once per superloop tick.

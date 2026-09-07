@@ -21,6 +21,7 @@ typedef struct
 {
     const SPP_SERVICE_ProducerContract_t *p_contract;
     SPP_Kpid_t kpid;
+    SPP_RetVal_t initResult;
 
 } SPP_SERVICES_PUBSUB_Producer_t;
 
@@ -28,6 +29,7 @@ typedef struct
 {
     const SPP_SERVICE_ConsumerContract_t *p_contract;
     SPP_Kpid_t subcription;
+    SPP_RetVal_t initResult;
 
 } SPP_SERVICES_PUBSUB_Consumer_t;
 
@@ -67,13 +69,15 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
     }
     else
     {
+        s_producers[s_registeredProducers].initResult = K_SPP_ERROR_NOT_INITIALIZED;
+
         s_producers[s_registeredProducers].p_contract = p_producerData;
 
         s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 2));
         /*
         * First bit reserved to logs, second bit reserved for the FSM
-        * with s_registeredProducers = 0 -> producer 0: 0000 0010
-        * with s_registeredProducers = 1 -> producer 1: 0000 0100
+        * with s_registeredProducers = 0 -> producer 0: 0000 0100
+        * with s_registeredProducers = 1 -> producer 1: 0000 1000
         *
         * Then u can do an OR:
         * producer[X].kpid.value | producer[Y].kpid.value
@@ -101,6 +105,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerCont
     }
     else
     {
+        s_consumers[s_registeredConsumers].initResult = K_SPP_ERROR_NOT_INITIALIZED;
         s_consumers[s_registeredConsumers].p_contract = p_consumerData;
         s_consumers[s_registeredConsumers].subcription = subscription;
 
@@ -183,8 +188,8 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 
     for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
     {
-        SPP_RetVal_t ret = s_consumers[i].p_contract->init();
-        if (ret != K_SPP_OK)
+        s_consumers[i].initResult = s_consumers[i].p_contract->init();
+        if (s_consumers[i].initResult != K_SPP_OK)
         {
             failedConsumers++;
         }
@@ -192,8 +197,8 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
-        SPP_RetVal_t ret = s_producers[i].p_contract->init();
-        if (ret != K_SPP_OK)
+        s_producers[i].initResult = s_producers[i].p_contract->init();
+        if (s_producers[i].initResult != K_SPP_OK)
         {
             failedProducers++;
         }
@@ -211,6 +216,45 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 
     return K_SPP_OK;
 }
+
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getProducerInitResult(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                       SPP_RetVal_t *p_initResult)
+{
+    if (p_producerData == NULL || p_initResult == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    for (spp_uint8_t i = 0; i < s_registeredProducers; i++)
+    {
+        if (p_producerData == s_producers[i].p_contract)
+        {
+            *p_initResult = s_producers[i].initResult;
+            return K_SPP_OK;
+        }
+    }
+    return K_SPP_ERROR;
+}
+
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getConsumerInitResult(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                       SPP_RetVal_t *p_initResult)
+{
+    if (p_consumerData == NULL || p_initResult == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    for (spp_uint8_t i = 0; i < s_registeredConsumers; i++)
+    {
+        if (p_consumerData == s_consumers[i].p_contract)
+        {
+            *p_initResult = s_consumers[i].initResult;
+            return K_SPP_OK;
+        }
+    }
+    return K_SPP_ERROR;
+}
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */

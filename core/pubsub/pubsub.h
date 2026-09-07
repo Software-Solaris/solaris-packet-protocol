@@ -75,4 +75,9 @@ spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
  */
 void SPP_SERVICES_PUBSUB_signalProducerReady(void);
 
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getProducerInitResult(const SPP_SERVICE_ProducerContract_t *p_producerData,
+                                                       SPP_RetVal_t *p_initResult);
+
+SPP_RetVal_t SPP_SERVICES_PUBSUB_getConsumerInitResult(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
+                                                       SPP_RetVal_t *p_initResult);
 #endif /* SPP_PUBSUB_H */
