@@ -125,8 +125,13 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void){
     if (ret != K_SPP_OK) return ret;
 
     // Modulation and Lora packet parameters
-    // SF7, BW 125kHz, CR 4/5, LDRO OFF
-    ret = SX1262_SetModulationParams(p_spi, 0x07, 0x04, 0x01, 0x00);
+    const spp_uint8_t lora_mod_params[4] = {
+        0x07, // Spreading Factor = 7
+        0x04, // BW = 125 kHz
+        0x01, // Code Rate = 4/5
+        0x00  // LDRO OFF
+    };
+    ret = SX1262_SetModulationParams(p_spi, lora_mod_params[0], lora_mod_params[1], lora_mod_params[2], lora_mod_params[3]);
     if (ret != K_SPP_OK) return ret;
 
     // Sync Word Configuration to Private Network (0x1424)
@@ -157,7 +162,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data){
         SPP_Packet_t packet = mailboxData[mailboxHead];
 
         spp_uint8_t payloadLength = sizeof(SPP_Packet_t);
-        SPP_RetVal_t txStatus = SX1262_Transmit(s_sx1262Ctx.p_spi, (spp_uint8_t*)&packet, payloadLength);
+        SPP_RetVal_t txStatus = SX1262_Transmit(s_sx1262Ctx.p_spi, (spp_uint8_t*)&packet, K_SPP_TOTAL_PACKET_SIZE);
 
         if (txStatus == K_SPP_OK) {
             s_sx1262Ctx.frame_number++;
@@ -464,15 +469,13 @@ static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, s
     AUXILIAR FUNCTION (Wait the chip to finish any operation that is running)
 --------------------------------------------*/
 static SPP_RetVal_t SX1262_WaitBusy(void)
-{
-    const spp_uint32_t TIMEOUT_MAX_MS = 1000; // in miliseconds
-    
+{   
     spp_uint32_t startTime = SPP_HAL_TIME_getTimeMs();
 
     while (SPP_HAL_GPIO_read(SX1262_BUSY_PIN) == 1) // this function in the HAL does not exist, it should be created!!
     {
         // Check if the maximum time of waiting was reached
-        if ((SPP_HAL_TIME_getTimeMs() - startTime) >= TIMEOUT_MAX_MS)
+        if ((SPP_HAL_TIME_getTimeMs() - startTime) >= SX1262_MAX_BUSY_TIMEOUT_MS)
         {
             return K_SPP_ERROR;
         }
