@@ -1,13 +1,15 @@
-#ifndef SPP_SX1262_H
-#define SPP_SX1262_H
+#ifndef SPP_SERVICES_SX1262_H
+#define SPP_SERVICES_SX1262_H
 
-#include "spp/core/types.h"
 #include "spp/core/returnTypes.h"
-
+#include "spp/core/packet.h"
+#include "spp/services/service.h"
 
 /* -----------------------------------------
     DEFINES
 --------------------------------------------*/
+#define K_SX1262_MAILBOX_SIZE       100U
+#define K_SX1262_TASK_TIMEOUT_MS    1000U
 
 #define SX1262_OPCODE_SET_STANDBY               0x80
 #define SX1262_OPCODE_SET_TX                    0x83
@@ -22,12 +24,36 @@
 #define SX1262_OPCODE_SET_DIO_IRQ_PARAMS        0x08
 #define SX1262_OPCODE_CLEAR_IRQ_STATUS          0x02
 #define SX1262_OPCODE_CALIBRATE_IMAGE           0x98
+#define SX1262_OPCODE_WRITE_REGISTER            0x0D
+#define K_SX1262_TOTAL_PACKET_SIZE                 64U
+#define K_SX1262_MAX_PACKETS_TO_TRANSMIT           50U
+#define SX1262_MAX_BUSY_TIMEOUT_MS              1000U
+#define SX1262_MAX_DONE_TIMEOUT_MS              2000U
 
-#define SX1262_BUSY_PIN 4 // hay que ver en que PIN estara el BUSY del SX1262
-#define SX126X_DIO1_PIN 5 // hay que ver en que PIN estara el DIO1
+#define SX1262_BUSY_PIN   5
+#define SX1262_DIO1_PIN   6
+#define SX126X_NRESET_PIN 7
+#define K_SX1262_SPI      2U
+
+typedef enum {
+    SX1262_TX_STATE_IDLE,
+    SX1262_TX_STATE_WRITE_BUFFER,
+    SX1262_TX_STATE_SET_PARAMS,
+    SX1262_TX_STATE_SET_TX,
+    SX1262_TX_STATE_WAIT_TX_DONE
+} SX1262_TxState_t;
+
+typedef struct {
+    void *p_spi;
+    spp_uint32_t frame_number;
+    SX1262_TxState_t tx_state;
+    spp_uint32_t timer_ms;
+} SX1262_Ctx_t;
+
+/* -----------------------------------------
+    PUBLIC DECLARATIONS
+--------------------------------------------*/
+const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(void);
 
 
-
-
-
-#endif /* SPP_SX1262_H */
+#endif /* SPP_SERVICES_SX1262_H */

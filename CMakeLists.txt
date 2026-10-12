@@ -15,11 +15,12 @@ option(SPP_PORT        "Port to use: posix | freertos | baremetal"     "posix")
 option(SPP_ENCRYPTION  "Compile AES-128-GCM encryption module"         OFF)
 
 # ----------------------------------------------------------------
-# Services — opt-in (all ON by default)
+# Services
 # ----------------------------------------------------------------
 option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
 option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
 option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
+option(SPP_SERVICE_SX1262     "Compile SX1262 (telemetry) service"      ON)
 
 # ----------------------------------------------------------------
 # Core SPP library (platform-agnostic)
@@ -49,6 +50,9 @@ if(SPP_SERVICE_ICM20948)
 endif()
 if(SPP_SERVICE_DATALOGGER)
     list(APPEND SPP_CORE_SOURCES services/datalogger/datalogger.c)
+endif()
+if(SPP_SERVICE_SX1262)
+    list(APPEND SPP_CORE_SOURCES services/sx1262/sx1262.c)
 endif()
 
 if(SPP_ENCRYPTION)

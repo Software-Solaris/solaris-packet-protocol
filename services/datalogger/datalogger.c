@@ -38,7 +38,6 @@ static const SPP_SERVICE_ConsumerContract_t g_dataloggerConsumerContract = {
     .priority = K_DATALOGGER_CONSUMER_PRIO,
     .p_nameConsumer = "datalogger",
     .tiemoutMs = K_DATALOGGER_TIMEOUT_MS,
-    .suscribeToApid = 0U,
     .init = SPP_SERVICES_DATALOGGER_init,
     .deliverToMailbox = SPP_SERVICES_DATALOGGER_deliverToMailbox,
     .consumeData = SPP_SERVICES_DATALOGGER_consumeData,
