@@ -58,6 +58,7 @@ static void         SX1262_InitInterrupts(void);
 static SPP_RetVal_t SX1262_WriteBuffer(void*, spp_uint8_t*, spp_uint8_t);
 static SPP_RetVal_t SX1262_SetTx(void*, spp_uint32_t);
 static SPP_RetVal_t SX1262_WriteRegister(void*, spp_uint16_t, spp_uint8_t*, spp_uint8_t);
+static SPP_RetVal_t SX1262_Timeout_Sequence(void);
 
 static SPP_SERVICE_ConsumerContract_t sx1262Contract = {
     .priority = 3U,
@@ -158,6 +159,8 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
 
 static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 {
+    (void)p_data;
+
     if (s_sx1262Ctx.p_spi == NULL) return K_SPP_ERROR;
 
     spp_uint8_t busy_status = SPP_HAL_GPIO_read(SX1262_BUSY_PIN);
@@ -167,10 +170,10 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
     {
         case SX1262_TX_STATE_IDLE:
             if (mailboxCount > 0) {
-                if (mailboxCount > K_SPP_MAX_PACKETS_TO_TRANSMIT) {
-                    spp_uint8_t remainder = mailboxCount - K_SPP_MAX_PACKETS_TO_TRANSMIT;
+                if (mailboxCount > K_SX1262_MAX_PACKETS_TO_TRANSMIT) {
+                    spp_uint8_t remainder = mailboxCount - K_SX1262_MAX_PACKETS_TO_TRANSMIT;
                     mailboxHead = (spp_uint8_t)((mailboxHead + remainder) % K_SX1262_MAILBOX_SIZE);
-                    mailboxCount = K_SPP_MAX_PACKETS_TO_TRANSMIT;
+                    mailboxCount = K_SX1262_MAX_PACKETS_TO_TRANSMIT;
                 }
                 s_sx1262Ctx.timer_ms = current_time;
                 s_sx1262Ctx.tx_state = SX1262_TX_STATE_WRITE_BUFFER;
@@ -179,30 +182,30 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 
         case SX1262_TX_STATE_WRITE_BUFFER:
             if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) goto timeout_error;
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
             
-            SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t*)&mailboxData[mailboxHead], K_SPP_TOTAL_PACKET_SIZE);
+            SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t*)&mailboxData[mailboxHead], K_SX1262_TOTAL_PACKET_SIZE);
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_PARAMS;
             break;
 
         case SX1262_TX_STATE_SET_PARAMS:
             if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) goto timeout_error;
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
 
             // Preamble = 8 symbols, Variable packet, packet length, CRC ON
-            SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008, K_SPP_TOTAL_PACKET_SIZE);
+            SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008, K_SX1262_TOTAL_PACKET_SIZE);
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_TX;
             break;
 
         case SX1262_TX_STATE_SET_TX:
             if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) goto timeout_error;
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
 
@@ -214,7 +217,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 
         case SX1262_TX_STATE_WAIT_TX_DONE:
             if (g_txDoneFlag == false) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS) goto timeout_error;
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS) return SX1262_Timeout_Sequence();
                 return K_SPP_OK; // Waiting for DIO1 interruption
             }
 
@@ -231,15 +234,6 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
     }
 
     return K_SPP_OK;
-
-timeout_error:
-    // When an error happens --> reset of the transmision buffer
-    s_sx1262Ctx.tx_state = SX1262_TX_STATE_IDLE;
-    mailboxHead =  0;
-    mailboxTail =  0;
-    mailboxCount = 0;
-    g_txDoneFlag = false;
-    return K_SPP_ERROR;
 }
 
 
@@ -497,4 +491,19 @@ static SPP_RetVal_t SX1262_WaitBusy(void)
     }
 
     return K_SPP_OK;
+}
+
+
+/* -----------------------------------------
+    AUXILIAR FUNCTION (Execute a reset sequence when an error happens in TX)
+--------------------------------------------*/
+static SPP_RetVal_t SX1262_Timeout_Sequence(void)
+{
+    // When an error happens --> reset of the transmision buffer
+    s_sx1262Ctx.tx_state = SX1262_TX_STATE_IDLE;
+    mailboxHead =  0;
+    mailboxTail =  0;
+    mailboxCount = 0;
+    g_txDoneFlag = false;
+    return K_SPP_ERROR;
 }
