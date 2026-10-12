@@ -26,12 +26,29 @@
 #define SX1262_OPCODE_CALIBRATE_IMAGE           0x98
 #define SX1262_OPCODE_WRITE_REGISTER            0x0D
 #define K_SPP_TOTAL_PACKET_SIZE                 64U
+#define K_SPP_MAX_PACKETS_TO_TRANSMIT           50U
 #define SX1262_MAX_BUSY_TIMEOUT_MS              1000U
+#define SX1262_MAX_DONE_TIMEOUT_MS              2000U
 
-#define SX1262_BUSY_PIN   4 // SEARCH THE CORRECT PIN WHERE BUSY WILL BE CONNECTED IS NEEDED!!!!!
-#define SX1262_DIO1_PIN   5 // SEARCH THE CORRECT PIN WHERE DIO1 WILL BE CONNECTED IS NEEDED!!!!!
-#define SX126X_NRESET_PIN 6 // SEARCH THE CORRECT PIN WHERE NRESET WILL BE CONNECTED IS NEEDED!!!!!
+#define SX1262_BUSY_PIN   5
+#define SX1262_DIO1_PIN   6
+#define SX126X_NRESET_PIN 7
 #define K_SX1262_SPI      2U
+
+typedef enum {
+    SX1262_TX_STATE_IDLE,
+    SX1262_TX_STATE_WRITE_BUFFER,
+    SX1262_TX_STATE_SET_PARAMS,
+    SX1262_TX_STATE_SET_TX,
+    SX1262_TX_STATE_WAIT_TX_DONE
+} SX1262_TxState_t;
+
+typedef struct {
+    void *p_spi;
+    spp_uint32_t frame_number;
+    SX1262_TxState_t tx_state;
+    spp_uint32_t timer_ms;
+} SX1262_Ctx_t;
 
 /* -----------------------------------------
     PUBLIC DECLARATIONS
