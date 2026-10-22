@@ -16,8 +16,7 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
-SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                          spp_uint32_t pull)
+SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
     const SPP_HalPort_t *p_port = SPP_HAL_getPort();
@@ -51,6 +50,26 @@ SPP_RetVal_t SPP_HAL_GPIO_registerIsr(spp_uint32_t pin, void *p_isrCtx)
         {
             ret = K_SPP_ERROR;
         }
+    }
+
+    return ret;
+}
+
+spp_uint16_t SPP_HAL_GPIO_read(spp_uint32_t pin)
+{
+    const SPP_HalPort_t *p_port = SPP_HAL_getPort();
+
+    return p_port->gpio.gpioRead(pin);
+}
+
+SPP_RetVal_t SPP_HAL_GPIO_write(spp_uint32_t pin, spp_uint8_t level)
+{
+    const SPP_HalPort_t *p_port = SPP_HAL_getPort();
+
+    SPP_RetVal_t ret = p_port->gpio.gpioWrite(pin, level);
+    if (ret != K_SPP_OK)
+    {
+        return K_SPP_ERROR;
     }
 
     return ret;

@@ -37,6 +37,8 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_ui
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx);
+static spp_uint16_t SPP_PORTS_HAL_ESP32_gpioRead(spp_uint32_t pin);
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioWrite(spp_uint32_t pin, spp_uint8_t level);
 
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void);
 static SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageWrite(const void *p_buffer, spp_uint32_t first_block,
@@ -66,6 +68,8 @@ const static SPP_HALSpi_t s_esp32HalSpi = {
 const static SPP_HALGpio_t s_esp32HalGpio = {
     .gpioConfigInterrupt = SPP_PORTS_HAL_ESP32_gpioConfigInterrupt,
     .gpioRegisterIsr = SPP_PORTS_HAL_ESP32_gpioRegisterIsr,
+    .gpioRead = SPP_PORTS_HAL_ESP32_gpioRead,
+    .gpioWrite = SPP_PORTS_HAL_ESP32_gpioWrite,
 };
 
 const static SPP_HALStorage_t s_esp32HalStorage = {
@@ -333,6 +337,30 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *
         s_serviceInstalled = true;
     }
     gpio_isr_handler_add((gpio_num_t)pin, SPP_PORTS_HAL_ESP32_gpioIsr, p_isrCtx);
+    return K_SPP_OK;
+}
+
+static spp_uint16_t SPP_PORTS_HAL_ESP32_gpioRead(spp_uint32_t pin)
+{
+    spp_uint16_t level = (spp_uint16_t)gpio_get_level((gpio_num_t)pin);
+
+    return level;
+}
+
+static SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioWrite(spp_uint32_t pin, spp_uint8_t level)
+{
+    esp_err_t ret = gpio_set_direction((gpio_num_t)pin, GPIO_MODE_OUTPUT);
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
+    ret = gpio_set_level((gpio_num_t)pin, level);
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
     return K_SPP_OK;
 }
 

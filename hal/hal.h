@@ -141,6 +141,11 @@ typedef struct
      * @return K_SPP_OK on success.
      */
     SPP_RetVal_t (*gpioRegisterIsr)(spp_uint32_t pin, void *p_isrCtx);
+
+    spp_uint16_t (*gpioRead)(spp_uint32_t pin);
+
+    SPP_RetVal_t (*gpioWrite)(spp_uint32_t pin, spp_uint8_t level);
+
 } SPP_HALGpio_t;
 
 
