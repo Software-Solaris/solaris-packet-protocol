@@ -41,8 +41,7 @@ typedef struct
  *
  * @return K_SPP_OK on success.
  */
-SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrType,
-                                          spp_uint32_t pull);
+SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull);
 
 /**
  * @brief Register an ISR handler for a GPIO pin.
@@ -56,5 +55,9 @@ SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrTyp
  * @return K_SPP_OK on success.
  */
 SPP_RetVal_t SPP_HAL_GPIO_registerIsr(spp_uint32_t pin, void *p_isrCtx);
+
+spp_uint16_t SPP_HAL_GPIO_read(spp_uint32_t pin);
+
+SPP_RetVal_t SPP_HAL_GPIO_write(spp_uint32_t pin, spp_uint8_t level);
 
 #endif /* SPP_HAL_GPIO_H */
