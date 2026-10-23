@@ -65,11 +65,6 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void)
  */
 static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
 {
-    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
-    if (p_fsmErrors == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
     /* Init the variables */
     s_currentDataSector = K_DATALOGGER_FIRST_SECTOR;
     s_packetIndex = 0;
@@ -79,7 +74,6 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
     s_initStatus = SPP_HAL_STORAGE_init();
     if (s_initStatus != K_SPP_OK)
     {
-        p_fsmErrors->dataloggerInitError = 1;
         return s_initStatus;
     }
     return K_SPP_OK;
