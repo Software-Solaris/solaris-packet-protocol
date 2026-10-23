@@ -201,20 +201,12 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
         return K_SPP_ERROR;
     }
 
-    SPP_Packet_t *p_pkt2 = SPP_SERVICES_DATABANK_getPacket();
-    if (p_pkt2 == NULL)
-    {
-#ifdef SPP_DEBUG_PRINT
-        SPP_LOGI(K_ICM20948_LOG_TAG, "No free packet");
-#endif
-        return K_SPP_ERROR;
-    }
+    float payload1[12] = {
+        p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az,       p_ctx->lastData.gx,
+        p_ctx->lastData.gy, p_ctx->lastData.gz, p_ctx->lastData.qw,       p_ctx->lastData.qx,
+        p_ctx->lastData.qy, p_ctx->lastData.qz, p_ctx->lastData.accuracy,
+    };
 
-    float payload1[12] = {p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az, p_ctx->lastData.gx,
-                          p_ctx->lastData.gy, p_ctx->lastData.gz, p_ctx->lastData.mx, p_ctx->lastData.my,
-                          p_ctx->lastData.mz, p_ctx->lastData.qw, p_ctx->lastData.qx, p_ctx->lastData.qy};
-
-    float payload2[4U] = {p_ctx->lastData.qz, p_ctx->lastData.accuracy};
 #ifdef SPP_DEBUG_PRINT
     SPP_LOGI(K_ICM20948_LOG_TAG,
              "[ICM] A:[%.2f %.2f %.2f]g G:[%.1f %.1f %.1f]dps M:[%.1f %.1f "
@@ -234,19 +226,8 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
         return ret;
     }
 
-    SPP_RetVal_t ret2 =
-        SPP_SERVICES_DATABANK_packetData(p_pkt2, kpid.value, p_ctx->seq++, payload2, (spp_uint16_t)sizeof(payload2));
-    if (ret2 != K_SPP_OK)
-    {
-        SPP_LOGE(K_ICM20948_LOG_TAG, "packetData failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_pkt2);
-        return ret;
-    }
-
-
     //Publish the packet 1 and packet 2
     SPP_SERVICES_PUBSUB_publish(p_pkt1);
-    (void)SPP_SERVICES_PUBSUB_publish(p_pkt2);
 
     return K_SPP_OK;
 }
