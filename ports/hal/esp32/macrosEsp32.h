@@ -1,9 +1,6 @@
 /**
  * @file macrosEsp32.h
  * @brief ESP32 hardware pin definitions and SPI constants.
- *
- * Naming conventions used in this file:
- * - Constants/macros: K_ESP32_*
  */
 
 #ifndef SPP_MACROS_ESP32_H
