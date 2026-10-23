@@ -204,6 +204,13 @@ static SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
         devCfg.queue_size = 1;
     }
+    else if (s_spiDevCount == K_ESP32_SPI_IDX_SX1262)
+    {
+        devCfg.clock_speed_hz = 1 * 1000 * 1000; // Max: 16MHz
+        devCfg.mode = 0;
+        devCfg.spics_io_num = K_ESP32_PIN_CS_SX1262;
+        devCfg.queue_size = 1;
+    }
     else
     {
         ESP_LOGE(k_tag, "Unexpected device index %u", s_spiDevCount);
