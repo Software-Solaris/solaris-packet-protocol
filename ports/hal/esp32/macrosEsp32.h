@@ -40,6 +40,9 @@
 /** @brief SD card chip-select GPIO. */
 #define K_ESP32_PIN_CS_SDC (9)
 
+/** @brief SX1262 chip-select GPIO. */
+#define K_ESP32_PIN_CS_SX1262 (8)
+
 /* ----------------------------------------------------------------
  * Device table constants
  * ---------------------------------------------------------------- */
@@ -57,8 +60,8 @@
 /** @brief SPI device index for the ICM20948. */
 #define K_ESP32_SPI_IDX_ICM (1U)
 
-/** @brief SPI device index for the SD card. */
-#define K_ESP32_SPI_IDX_SDC (2U)
+/** @brief SPI device index for the sx1262. */
+#define K_ESP32_SPI_IDX_SX1262 (2U)
 
 /* ----------------------------------------------------------------
  * UART port assignments
