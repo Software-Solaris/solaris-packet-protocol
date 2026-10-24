@@ -20,7 +20,8 @@
 static SPP_Packet_t s_packetBuffer[K_DATALOGGER_BUFFER_SIZE];
 static spp_uint8_t s_packetIndex = 0;        /**< Index of the next packet to be written to the buffer. */
 static spp_uint32_t s_currentDataSector = 0; /**< Current sector of the data log. */
-static spp_uint16_t s_blocksWritten = 0;     /**< Number of blocks written to the current sector. */
+static spp_uint16_t s_blocksWritten =
+    K_DATALOGGER_BUFFER_SIZE / K_DATALOGGER_SECTOR_SIZE; /**< Number of blocks written to the current sector. */
 static SPP_RetVal_t s_initStatus = K_SPP_ERROR_NOT_INITIALIZED;
 
 
@@ -65,21 +66,14 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void)
  */
 static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
 {
-    FsmErrors_t *p_fsmErrors = SPP_CORE_FSM_getErrorsBit();
-    if (p_fsmErrors == NULL)
-    {
-        return K_SPP_ERROR_NULL_POINTER;
-    }
     /* Init the variables */
     s_currentDataSector = K_DATALOGGER_FIRST_SECTOR;
     s_packetIndex = 0;
-    s_blocksWritten = 1;
 
     /* Init SPI for SD card */
     s_initStatus = SPP_HAL_STORAGE_init();
     if (s_initStatus != K_SPP_OK)
     {
-        p_fsmErrors->dataloggerInitError = 1;
         return s_initStatus;
     }
     return K_SPP_OK;
@@ -110,8 +104,7 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_consumeData(void *p_data)
         SPP_RetVal_t ret = SPP_HAL_STORAGE_write(s_packetBuffer, s_currentDataSector, s_blocksWritten);
         if (ret == K_SPP_OK)
         {
-            s_currentDataSector++;
-            s_blocksWritten++;
+            s_currentDataSector += s_blocksWritten;
             s_packetIndex = 0;
         }
     }

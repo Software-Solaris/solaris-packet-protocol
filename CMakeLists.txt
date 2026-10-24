@@ -20,6 +20,7 @@ option(SPP_ENCRYPTION  "Compile AES-128-GCM encryption module"         OFF)
 option(SPP_SERVICE_BMP390     "Compile BMP390 pressure sensor service"  OFF)
 option(SPP_SERVICE_ICM20948   "Compile ICM20948 IMU service"            OFF)
 option(SPP_SERVICE_DATALOGGER "Compile datalogger (SD card) service"    OFF)
+option(SPP_SERVICE_UART       "Compile UART telemetry consumer service" ON)
 option(SPP_SERVICE_SX1262     "Compile SX1262 (telemetry) service"      ON)
 
 # ----------------------------------------------------------------
@@ -50,6 +51,9 @@ if(SPP_SERVICE_ICM20948)
 endif()
 if(SPP_SERVICE_DATALOGGER)
     list(APPEND SPP_CORE_SOURCES services/datalogger/datalogger.c)
+endif()
+if(SPP_SERVICE_UART)
+    list(APPEND SPP_CORE_SOURCES services/uart/uart.c)
 endif()
 if(SPP_SERVICE_SX1262)
     list(APPEND SPP_CORE_SOURCES services/sx1262/sx1262.c)
@@ -93,6 +97,11 @@ if(SPP_PORT STREQUAL "posix")
 elseif(SPP_PORT STREQUAL "freertos")
     set(SPP_PORT_SOURCES
         ports/hal/esp32/halEsp32.c
+        ports/hal/esp32/spi/spiPort.c
+        ports/hal/esp32/gpio/gpioPort.c
+        ports/hal/esp32/storage/storagePort.c
+        ports/hal/esp32/time/timePort.c
+        ports/hal/esp32/uart/uartPort.c
     )
     add_library(spp_port STATIC ${SPP_PORT_SOURCES})
     target_include_directories(spp_port PUBLIC

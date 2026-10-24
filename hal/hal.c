@@ -1,7 +1,7 @@
 /**
  * @file hal.c
  * @brief HAL port. All the necessary functions needed to setup the HAL ports and
- *        to get the pointers to the functions that are used by the SPP library.    
+ *        to get the pointers to the functions that are used by the SPP library.
  */
 
 

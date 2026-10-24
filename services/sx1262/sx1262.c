@@ -32,32 +32,32 @@ static spp_uint8_t mailboxCount = 0;
 
 
 volatile spp_bool_t g_txDoneFlag = false; // volatile to avoid optimizations
-SPP_GpioIsrCtx_t g_dio1Ctx = { .p_flag = &g_txDoneFlag };
+SPP_GpioIsrCtx_t g_dio1Ctx = {.p_flag = &g_txDoneFlag};
 
 
 /* -----------------------------------------
     STATIC DECLARATIONS
 --------------------------------------------*/
 static SPP_RetVal_t SPP_SERVICES_SX1262_init(void);
-static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void*);
+static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *);
 static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t);
 
 static SPP_RetVal_t SX1262_WaitBusy(void);
-static SPP_RetVal_t SX1262_SetStandby(void*);
-static SPP_RetVal_t SX1262_SetPacketType(void*);
-static SPP_RetVal_t SX1262_SetRfFrequency(void*);
-static SPP_RetVal_t SX1262_SetPaConfig(void*);
-static SPP_RetVal_t SX1262_CalibrateImage(void*);
-static SPP_RetVal_t SX1262_SetTxParams(void*);
-static SPP_RetVal_t SX1262_SetBufferBaseAddress(void*);
-static SPP_RetVal_t SX1262_SetModulationParams(void*, spp_uint8_t, spp_uint8_t, spp_uint8_t, spp_uint8_t);
-static SPP_RetVal_t SX1262_SetPacketParams(void*, spp_uint16_t, spp_uint8_t);
-static SPP_RetVal_t SX1262_SetDioIrqParams(void*, spp_uint16_t, spp_uint16_t, spp_uint16_t, spp_uint16_t);
-static SPP_RetVal_t SX1262_ClearIrqStatus(void*, spp_uint16_t);
-static void         SX1262_InitInterrupts(void);
-static SPP_RetVal_t SX1262_WriteBuffer(void*, spp_uint8_t*, spp_uint8_t);
-static SPP_RetVal_t SX1262_SetTx(void*, spp_uint32_t);
-static SPP_RetVal_t SX1262_WriteRegister(void*, spp_uint16_t, spp_uint8_t*, spp_uint8_t);
+static SPP_RetVal_t SX1262_SetStandby(void *);
+static SPP_RetVal_t SX1262_SetPacketType(void *);
+static SPP_RetVal_t SX1262_SetRfFrequency(void *);
+static SPP_RetVal_t SX1262_SetPaConfig(void *);
+static SPP_RetVal_t SX1262_CalibrateImage(void *);
+static SPP_RetVal_t SX1262_SetTxParams(void *);
+static SPP_RetVal_t SX1262_SetBufferBaseAddress(void *);
+static SPP_RetVal_t SX1262_SetModulationParams(void *, spp_uint8_t, spp_uint8_t, spp_uint8_t, spp_uint8_t);
+static SPP_RetVal_t SX1262_SetPacketParams(void *, spp_uint16_t, spp_uint8_t);
+static SPP_RetVal_t SX1262_SetDioIrqParams(void *, spp_uint16_t, spp_uint16_t, spp_uint16_t, spp_uint16_t);
+static SPP_RetVal_t SX1262_ClearIrqStatus(void *, spp_uint16_t);
+static void SX1262_InitInterrupts(void);
+static SPP_RetVal_t SX1262_WriteBuffer(void *, spp_uint8_t *, spp_uint8_t);
+static SPP_RetVal_t SX1262_SetTx(void *, spp_uint32_t);
+static SPP_RetVal_t SX1262_WriteRegister(void *, spp_uint16_t, spp_uint8_t *, spp_uint8_t);
 static SPP_RetVal_t SX1262_Timeout_Sequence(void);
 
 static SPP_SERVICE_ConsumerContract_t sx1262Contract = {
@@ -72,7 +72,8 @@ static SPP_SERVICE_ConsumerContract_t sx1262Contract = {
 /* -----------------------------------------
     PUBLIC FUNCTIONS
 --------------------------------------------*/
-const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(void) {
+const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(void)
+{
     return &sx1262Contract;
 }
 
@@ -80,9 +81,11 @@ const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(vo
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
 --------------------------------------------*/
-static SPP_RetVal_t SPP_SERVICES_SX1262_init(void){
-    s_sx1262Ctx.p_spi = SPP_HAL_SPI_getHandle(K_SX1262_SPI); 
-    if (s_sx1262Ctx.p_spi == NULL) return K_SPP_ERROR;
+static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
+{
+    s_sx1262Ctx.p_spi = SPP_HAL_SPI_getHandle(K_SX1262_SPI);
+    if (s_sx1262Ctx.p_spi == NULL)
+        return K_SPP_ERROR;
 
     (void)SPP_HAL_SPI_deviceInit(s_sx1262Ctx.p_spi);
 
@@ -100,25 +103,32 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void){
 
     // Sequence of basic and radio configuration
     ret = SX1262_SetStandby(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_SetPacketType(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_SetRfFrequency(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_SetPaConfig(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_CalibrateImage(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_SetTxParams(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     ret = SX1262_SetBufferBaseAddress(p_spi);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     // Modulation and Lora packet parameters
     const spp_uint8_t lora_mod_params[4] = {
@@ -127,29 +137,34 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void){
         0x01, // Code Rate = 4/5
         0x00  // LDRO OFF
     };
-    ret = SX1262_SetModulationParams(p_spi, lora_mod_params[0], lora_mod_params[1], lora_mod_params[2], lora_mod_params[3]);
-    if (ret != K_SPP_OK) return ret;
+    ret = SX1262_SetModulationParams(p_spi, lora_mod_params[0], lora_mod_params[1], lora_mod_params[2],
+                                     lora_mod_params[3]);
+    if (ret != K_SPP_OK)
+        return ret;
 
     // Sync Word Configuration to Private Network (0x1424)
     spp_uint8_t syncWord[2] = {0x14, 0x24};
     ret = SX1262_WriteRegister(p_spi, 0x0740, syncWord, 2);
-    if (ret != K_SPP_OK) return ret;
+    if (ret != K_SPP_OK)
+        return ret;
 
     // Interrupt configuration in DIO1 (TxDone + Timeout)
     ret = SX1262_SetDioIrqParams(p_spi, 0x0201, 0x0201, 0x0000, 0x0000);
-    
+
     return ret;
 }
 
-static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt){
-        
+static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
+{
     mailboxData[mailboxTail] = pqt;
     mailboxTail = (spp_uint8_t)((mailboxTail + 1U) % K_SX1262_MAILBOX_SIZE);
 
-    if (mailboxCount < K_SX1262_MAILBOX_SIZE) {
+    if (mailboxCount < K_SX1262_MAILBOX_SIZE)
+    {
         mailboxCount++; // we use mailboxCount to know how many packets we have to send later
     }
-    else {
+    else
+    {
         mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_SX1262_MAILBOX_SIZE);
     }
 
@@ -161,7 +176,8 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 {
     (void)p_data;
 
-    if (s_sx1262Ctx.p_spi == NULL) return K_SPP_ERROR;
+    if (s_sx1262Ctx.p_spi == NULL)
+        return K_SPP_ERROR;
 
     spp_uint8_t busy_status = SPP_HAL_GPIO_read(SX1262_BUSY_PIN);
     spp_uint32_t current_time = SPP_HAL_TIME_getTimeMs();
@@ -169,8 +185,10 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
     switch (s_sx1262Ctx.tx_state)
     {
         case SX1262_TX_STATE_IDLE:
-            if (mailboxCount > 0) {
-                if (mailboxCount > K_SX1262_MAX_PACKETS_TO_TRANSMIT) {
+            if (mailboxCount > 0)
+            {
+                if (mailboxCount > K_SX1262_MAX_PACKETS_TO_TRANSMIT)
+                {
                     spp_uint8_t remainder = mailboxCount - K_SX1262_MAX_PACKETS_TO_TRANSMIT;
                     mailboxHead = (spp_uint8_t)((mailboxHead + remainder) % K_SX1262_MAILBOX_SIZE);
                     mailboxCount = K_SX1262_MAX_PACKETS_TO_TRANSMIT;
@@ -181,19 +199,23 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             break;
 
         case SX1262_TX_STATE_WRITE_BUFFER:
-            if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
+            if (busy_status == 1)
+            {
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                    return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
-            
-            SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t*)&mailboxData[mailboxHead], K_SX1262_TOTAL_PACKET_SIZE);
+
+            SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t *)&mailboxData[mailboxHead], K_SX1262_TOTAL_PACKET_SIZE);
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_PARAMS;
             break;
 
         case SX1262_TX_STATE_SET_PARAMS:
-            if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
+            if (busy_status == 1)
+            {
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                    return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
 
@@ -204,8 +226,10 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             break;
 
         case SX1262_TX_STATE_SET_TX:
-            if (busy_status == 1) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS) return SX1262_Timeout_Sequence();
+            if (busy_status == 1)
+            {
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                    return SX1262_Timeout_Sequence();
                 return K_SPP_OK;
             }
 
@@ -216,8 +240,10 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             break;
 
         case SX1262_TX_STATE_WAIT_TX_DONE:
-            if (g_txDoneFlag == false) {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS) return SX1262_Timeout_Sequence();
+            if (g_txDoneFlag == false)
+            {
+                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS)
+                    return SX1262_Timeout_Sequence();
                 return K_SPP_OK; // Waiting for DIO1 interruption
             }
 
@@ -227,7 +253,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 
             s_sx1262Ctx.frame_number++;
             mailboxHead = (mailboxHead + 1U) % K_SX1262_MAILBOX_SIZE;
-            mailboxCount--;      
+            mailboxCount--;
 
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_IDLE;
             break;
@@ -244,7 +270,7 @@ static SPP_RetVal_t SX1262_SetStandby(void *p_handle)
 {
     spp_uint8_t buffer[2];
     buffer[0] = SX1262_OPCODE_SET_STANDBY; // Opcode SetStandby
-    buffer[1] = 0x00; // STDBY_RC (without TXCO)
+    buffer[1] = 0x00;                      // STDBY_RC (without TXCO)
 
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
@@ -360,7 +386,7 @@ static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_
     /* The maximum length of the buffer is 255 bytes
     Adding 1 byte of Opcode and 1 byte of Offset, the array maximum length is 257 bytes */
     spp_uint8_t buffer[257];
-    
+
     buffer[0] = SX1262_OPCODE_WRITE_BUFFER;
     buffer[1] = 0x00; // the address where we start to write
 
@@ -368,7 +394,7 @@ static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_
     {
         buffer[2 + i] = p_data[i];
     }
-    
+
     // The total length of the SPI transaction is the length + 2 bytes of header
     return SPP_HAL_SPI_transmit(p_handle, buffer, length + 2);
 }
@@ -376,7 +402,8 @@ static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_
 /* -----------------------------------------
     LoRa Parameters
 --------------------------------------------*/
-static SPP_RetVal_t SX1262_SetModulationParams(void *p_handle, spp_uint8_t sf, spp_uint8_t bw, spp_uint8_t cr, spp_uint8_t ldro)
+static SPP_RetVal_t SX1262_SetModulationParams(void *p_handle, spp_uint8_t sf, spp_uint8_t bw, spp_uint8_t cr,
+                                               spp_uint8_t ldro)
 {
     spp_uint8_t buffer[5];
     buffer[0] = SX1262_OPCODE_SET_MODULATION_PARAMS;
@@ -395,14 +422,14 @@ static SPP_RetVal_t SX1262_SetPacketParams(void *p_handle, spp_uint16_t preamble
 {
     // The command requires 9 bytes of parameters according the general structure (10 bytes total) (for LoRa only the 6 firsts are used)
     spp_uint8_t buffer[10] = {0};
-    
+
     buffer[0] = SX1262_OPCODE_SET_PACKET_PARAMS;
-    buffer[1] = (spp_uint8_t)(preambleLength >> 8); // MSB
+    buffer[1] = (spp_uint8_t)(preambleLength >> 8);   // MSB
     buffer[2] = (spp_uint8_t)(preambleLength & 0xFF); // LSB
-    buffer[3] = 0x00; // Variable packet length (explicit header)
-    buffer[4] = payloadLength; // Exact length of the packet in bytes
-    buffer[5] = 0x01; // CRC ON
-    buffer[6] = 0x00; // Standard IQ
+    buffer[3] = 0x00;                                 // Variable packet length (explicit header)
+    buffer[4] = payloadLength;                        // Exact length of the packet in bytes
+    buffer[5] = 0x01;                                 // CRC ON
+    buffer[6] = 0x00;                                 // Standard IQ
 
     return SPP_HAL_SPI_transmit(p_handle, buffer, 10);
 }
@@ -410,7 +437,8 @@ static SPP_RetVal_t SX1262_SetPacketParams(void *p_handle, spp_uint16_t preamble
 /* -----------------------------------------
     Interruption Management
 --------------------------------------------*/
-static SPP_RetVal_t SX1262_SetDioIrqParams(void *p_handle, spp_uint16_t irqMask, spp_uint16_t dio1Mask, spp_uint16_t dio2Mask, spp_uint16_t dio3Mask)
+static SPP_RetVal_t SX1262_SetDioIrqParams(void *p_handle, spp_uint16_t irqMask, spp_uint16_t dio1Mask,
+                                           spp_uint16_t dio2Mask, spp_uint16_t dio3Mask)
 {
     spp_uint8_t buffer[9];
     buffer[0] = SX1262_OPCODE_SET_DIO_IRQ_PARAMS;
@@ -446,8 +474,8 @@ static SPP_RetVal_t SX1262_ClearIrqStatus(void *p_handle, spp_uint16_t clearMask
 static void SX1262_InitInterrupts(void)
 {
     // This instruction configures the pin as an input with interruption by rising edge
-    SPP_HAL_GPIO_configInterrupt(SX1262_DIO1_PIN, 1, 0); 
-    
+    SPP_HAL_GPIO_configInterrupt(SX1262_DIO1_PIN, 1, 0);
+
     // This instruction registers the context to the ISR can modify g_txDoneFlag
     SPP_HAL_GPIO_registerIsr(SX1262_DIO1_PIN, &g_dio1Ctx);
 }
@@ -457,11 +485,11 @@ static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, s
 {
     // Maximum length: opcode + address + data
     spp_uint8_t buffer[16];
-    
-    buffer[0] = 0x0D; // Opcode WriteRegister
+
+    buffer[0] = 0x0D;                          // Opcode WriteRegister
     buffer[1] = (spp_uint8_t)(address >> 8);   // MSB
     buffer[2] = (spp_uint8_t)(address & 0xFF); // LSB
-    
+
     for (spp_uint8_t i = 0; i < length; i++)
     {
         buffer[3 + i] = p_data[i];
@@ -478,7 +506,7 @@ static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, s
     AUXILIAR FUNCTION (Wait the chip to finish any operation that is running)
 --------------------------------------------*/
 static SPP_RetVal_t SX1262_WaitBusy(void)
-{   
+{
     spp_uint32_t startTime = SPP_HAL_TIME_getTimeMs();
 
     while (SPP_HAL_GPIO_read(SX1262_BUSY_PIN) == 1) // this function in the HAL does not exist, it should be created!!
@@ -501,8 +529,8 @@ static SPP_RetVal_t SX1262_Timeout_Sequence(void)
 {
     // When an error happens --> reset of the transmision buffer
     s_sx1262Ctx.tx_state = SX1262_TX_STATE_IDLE;
-    mailboxHead =  0;
-    mailboxTail =  0;
+    mailboxHead = 0;
+    mailboxTail = 0;
     mailboxCount = 0;
     g_txDoneFlag = false;
     return K_SPP_ERROR;
