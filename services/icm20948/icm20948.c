@@ -195,7 +195,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
         return K_SPP_ERROR;
     }
 
-    float payload1[12] = {
+    float payload1[11] = {
         p_ctx->lastData.ax, p_ctx->lastData.ay, p_ctx->lastData.az,       p_ctx->lastData.gx,
         p_ctx->lastData.gy, p_ctx->lastData.gz, p_ctx->lastData.qw,       p_ctx->lastData.qx,
         p_ctx->lastData.qy, p_ctx->lastData.qz, p_ctx->lastData.accuracy,

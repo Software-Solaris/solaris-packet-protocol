@@ -16,6 +16,8 @@
 #include "spp/core/pubsub/pubsub.h"
 #include "spp/services/fsm/fsm.h"
 
+#include <stdio.h>
+
 #include <string.h>
 #include <math.h>
 #ifdef SPP_DEBUG_PRINT
@@ -80,6 +82,13 @@ static const char *const k_svcTag = "BMP_SVC";
 static float s_pd1, s_pd2, s_pd3, s_pd4;
 static float s_po1, s_po2;
 static float s_compPress;
+
+/* Calibration */
+#define K_BMP390_CALIBRATION_SAMPLES 100U
+spp_bool_t s_isCalibrated = false;
+spp_float32_t s_altitudeSum = 0;
+spp_float32_t s_altitudeOffset = 0;
+spp_uint16_t s_calibrationSamples = 0;
 
 /* ----------------------------------------------------------------
 * PUBLIC FUNCTIONS
@@ -182,14 +191,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
     {
         return K_SPP_OK;
     }
-    p_bmpData->gpioConfig.drdyFlag = false;
 
-    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
-    if (p_packet == NULL)
-    {
-        SPP_LOGW(k_svcTag, "No free packet");
-        return K_SPP_ERROR;
-    }
+    p_bmpData->gpioConfig.drdyFlag = false;
 
     // spp_uint32_t t0 = SPP_HAL_TIME_getTimeUs();
 
@@ -201,10 +204,38 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
         return ret;
     }
 
+    if (s_isCalibrated == false)
+    {
+        s_altitudeSum += altitude;
+        s_calibrationSamples++;
+
+        printf("CAL [%u/%u] altitude=%.2f m\n", s_calibrationSamples, K_BMP390_CALIBRATION_SAMPLES, altitude);
+
+        if (s_calibrationSamples >= K_BMP390_CALIBRATION_SAMPLES)
+        {
+            s_altitudeOffset = s_altitudeSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
+
+            s_isCalibrated = true;
+
+            printf("CAL DONE offset=%.2f m\n", s_altitudeOffset);
+        }
+
+        return K_SPP_OK; // Do not packet calibration samples
+    }
+
+    altitude -= s_altitudeOffset;
+
+    printf("ALT relative=%.2f m\n", altitude);
+
+    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
+    if (p_packet == NULL)
+    {
+        SPP_LOGW(k_svcTag, "No free packet");
+        return K_SPP_ERROR;
+    }
     // if (s_performanceWarmupDone == false)
     // {
     //     s_performanceWarmupDone = true;
