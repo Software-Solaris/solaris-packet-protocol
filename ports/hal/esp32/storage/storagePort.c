@@ -47,8 +47,10 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_storageInit(void)
 
     gpio_set_direction(K_ESP32_PIN_CS_BMP, GPIO_MODE_OUTPUT);
     gpio_set_direction(K_ESP32_PIN_CS_ICM, GPIO_MODE_OUTPUT);
+    gpio_set_direction(K_ESP32_PIN_CS_SX1262, GPIO_MODE_OUTPUT);
     gpio_set_level(K_ESP32_PIN_CS_BMP, 1);
     gpio_set_level(K_ESP32_PIN_CS_ICM, 1);
+    gpio_set_level(K_ESP32_PIN_CS_SX1262, 1);
 
     for (int attempt = 0; attempt < 5; attempt++)
     {

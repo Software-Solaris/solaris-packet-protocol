@@ -83,6 +83,8 @@ const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(vo
 --------------------------------------------*/
 static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
 {
+    SPP_RetVal_t ret = K_SPP_OK;
+
     s_sx1262Ctx.p_spi = SPP_HAL_SPI_getHandle(K_SX1262_SPI);
     if (s_sx1262Ctx.p_spi == NULL)
         return K_SPP_ERROR;
@@ -91,10 +93,16 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
 
     void *p_spi = s_sx1262Ctx.p_spi;
 
+    ret = SPP_HAL_GPIO_configInterrupt(SX1262_BUSY_PIN, 0, 0); // Gitanada pa poñer o BUSY como input
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
     // Hardware Reset
-    SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 0); // this function in the HAL does not exist, it should be created!!
+    SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 0);
     SPP_HAL_TIME_delayMs(1);
-    SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 1); // this function in the HAL does not exist, it should be created!!
+    SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 1);
     SPP_HAL_TIME_delayMs(5);
 
 

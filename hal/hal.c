@@ -34,11 +34,11 @@ SPP_RetVal_t SPP_HAL_init(void *p_halPorts)
     s_p_halPort = p_port;
 
     /* Init the UART port */
-    ret = SPP_HAL_UART_portInit();
-    if (ret != K_SPP_OK)
-    {
-        return K_SPP_ERROR;
-    }
+    // ret = SPP_HAL_UART_portInit();
+    // if (ret != K_SPP_OK)
+    // {
+    //     return K_SPP_ERROR;
+    // }
 
     /* Init the SPI bus */
     ret = SPP_HAL_SPI_busInit();
