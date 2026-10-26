@@ -18,6 +18,7 @@ void *SPP_PORTS_HAL_ESP32_spiGetHandle(spp_uint8_t deviceIdx);
 SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle);
 SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
+SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmitRaw(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
 /**
  * @brief  Check whether the SPI bus has been initialised.

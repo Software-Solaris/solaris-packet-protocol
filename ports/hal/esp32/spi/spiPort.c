@@ -215,3 +215,32 @@ spp_bool_t SPP_PORTS_HAL_ESP32_spiIsBusInitialized(void)
 {
     return s_busInitialized;
 }
+
+SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiTransmitRaw(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
+{
+    if ((p_handle == NULL) || (p_data == NULL) || (length == 0U))
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    spi_device_handle_t hDev = *(spi_device_handle_t *)p_handle;
+
+    if (hDev == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    spi_transaction_t trans = {0};
+
+    trans.length = 8U * length;
+    trans.tx_buffer = p_data;
+    trans.rx_buffer = p_data;
+
+    esp_err_t ret = spi_device_polling_transmit(hDev, &trans);
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR_ON_SPI_TRANSACTION;
+    }
+
+    return K_SPP_OK;
+}

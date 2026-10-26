@@ -107,4 +107,7 @@ SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8
  */
 SPP_RetVal_t SPP_HAL_SPI_deviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
 
+/* Read funtion for sx1262 fix */
+SPP_RetVal_t SPP_HAL_SPI_transmitRaw(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
+
 #endif /* SPP_HAL_SPI_H */

@@ -283,7 +283,7 @@ static SPP_RetVal_t SX1262_SetStandby(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 2);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 2);
 }
 
 static SPP_RetVal_t SX1262_SetTx(void *p_handle, spp_uint32_t timeout)
@@ -296,7 +296,7 @@ static SPP_RetVal_t SX1262_SetTx(void *p_handle, spp_uint32_t timeout)
     buffer[2] = (spp_uint8_t)((timeout >> 8) & 0xFF);
     buffer[3] = (spp_uint8_t)(timeout & 0xFF);
 
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 4);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 4);
 }
 
 
@@ -313,7 +313,7 @@ static SPP_RetVal_t SX1262_SetPacketType(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 2);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 2);
 }
 
 static SPP_RetVal_t SX1262_SetRfFrequency(void *p_handle)
@@ -328,7 +328,7 @@ static SPP_RetVal_t SX1262_SetRfFrequency(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 5);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 5);
 }
 
 static SPP_RetVal_t SX1262_SetPaConfig(void *p_handle)
@@ -343,7 +343,7 @@ static SPP_RetVal_t SX1262_SetPaConfig(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 5);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 5);
 }
 
 static SPP_RetVal_t SX1262_CalibrateImage(void *p_handle)
@@ -357,7 +357,7 @@ static SPP_RetVal_t SX1262_CalibrateImage(void *p_handle)
     if (ret != K_SPP_OK)
         return ret;
 
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 3);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
 static SPP_RetVal_t SX1262_SetTxParams(void *p_handle)
@@ -370,7 +370,7 @@ static SPP_RetVal_t SX1262_SetTxParams(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 3);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
 /* -----------------------------------------
@@ -386,7 +386,7 @@ static SPP_RetVal_t SX1262_SetBufferBaseAddress(void *p_handle)
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 3);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
 static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
@@ -404,7 +404,7 @@ static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_
     }
 
     // The total length of the SPI transaction is the length + 2 bytes of header
-    return SPP_HAL_SPI_transmit(p_handle, buffer, length + 2);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, length + 2);
 }
 
 /* -----------------------------------------
@@ -423,13 +423,13 @@ static SPP_RetVal_t SX1262_SetModulationParams(void *p_handle, spp_uint8_t sf, s
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 5);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 5);
 }
 
 static SPP_RetVal_t SX1262_SetPacketParams(void *p_handle, spp_uint16_t preambleLength, spp_uint8_t payloadLength)
 {
     // The command requires 9 bytes of parameters according the general structure (10 bytes total) (for LoRa only the 6 firsts are used)
-    spp_uint8_t buffer[10] = {0};
+    spp_uint8_t buffer[7] = {0};
 
     buffer[0] = SX1262_OPCODE_SET_PACKET_PARAMS;
     buffer[1] = (spp_uint8_t)(preambleLength >> 8);   // MSB
@@ -439,7 +439,7 @@ static SPP_RetVal_t SX1262_SetPacketParams(void *p_handle, spp_uint16_t preamble
     buffer[5] = 0x01;                                 // CRC ON
     buffer[6] = 0x00;                                 // Standard IQ
 
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 10);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
 }
 
 /* -----------------------------------------
@@ -462,7 +462,7 @@ static SPP_RetVal_t SX1262_SetDioIrqParams(void *p_handle, spp_uint16_t irqMask,
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
         return ret;
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 9);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 9);
 }
 
 static SPP_RetVal_t SX1262_ClearIrqStatus(void *p_handle, spp_uint16_t clearMask)
@@ -476,7 +476,7 @@ static SPP_RetVal_t SX1262_ClearIrqStatus(void *p_handle, spp_uint16_t clearMask
     if (ret != K_SPP_OK)
         return ret;
 
-    return SPP_HAL_SPI_transmit(p_handle, buffer, 3);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
 static void SX1262_InitInterrupts(void)
@@ -507,7 +507,7 @@ static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, s
     if (ret != K_SPP_OK)
         return ret;
 
-    return SPP_HAL_SPI_transmit(p_handle, buffer, length + 3);
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, length + 3);
 }
 
 /* -----------------------------------------

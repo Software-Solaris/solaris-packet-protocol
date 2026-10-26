@@ -28,6 +28,7 @@ static const SPP_HALSpi_t s_esp32HalSpi = {
     .spiDeviceInit = SPP_PORTS_HAL_ESP32_spiDeviceInit,
     .spiTransmit = SPP_PORTS_HAL_ESP32_spiTransmit,
     .spiDeviceSetSpeed = SPP_PORTS_HAL_ESP32_spiDeviceSetSpeed,
+    .spiTransmitRaw = SPP_PORTS_HAL_ESP32_spiTransmitRaw,
 };
 
 static const SPP_HALGpio_t s_esp32HalGpio = {
