@@ -21,7 +21,6 @@
 static const char *const k_tag = "SPP_HAL";
 
 static spi_device_handle_t s_spiHandles[K_ESP32_MAX_SPI_DEVICES];
-static spp_uint8_t s_spiDevCount = 0U;
 static spp_bool_t s_busInitialized = false;
 
 /* ----------------------------------------------------------------
@@ -81,7 +80,19 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     {
         return K_SPP_ERROR_NULL_POINTER;
     }
-    if (s_spiDevCount >= K_ESP32_MAX_SPI_DEVICES)
+
+    spp_uint8_t deviceIdx = K_ESP32_MAX_SPI_DEVICES;
+
+    for (spp_uint8_t i = 0; i < K_ESP32_MAX_SPI_DEVICES; i++)
+    {
+        if (p_handle == &s_spiHandles[i])
+        {
+            deviceIdx = i;
+            break;
+        }
+    }
+
+    if (deviceIdx >= K_ESP32_MAX_SPI_DEVICES)
     {
         return K_SPP_ERROR;
     }
@@ -89,21 +100,21 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     spi_device_handle_t *p_h = (spi_device_handle_t *)p_handle;
     spi_device_interface_config_t devCfg = {0};
 
-    if (s_spiDevCount == K_ESP32_SPI_IDX_ICM)
+    if (deviceIdx == K_ESP32_SPI_IDX_ICM)
     {
         devCfg.clock_speed_hz = 1 * 1000 * 1000;
         devCfg.mode = 0;
         devCfg.spics_io_num = K_ESP32_PIN_CS_ICM;
         devCfg.queue_size = 1;
     }
-    else if (s_spiDevCount == K_ESP32_SPI_IDX_BMP)
+    else if (deviceIdx == K_ESP32_SPI_IDX_BMP)
     {
         devCfg.clock_speed_hz = 500 * 1000;
         devCfg.mode = 0;
         devCfg.spics_io_num = K_ESP32_PIN_CS_BMP;
         devCfg.queue_size = 1;
     }
-    else if (s_spiDevCount == K_ESP32_SPI_IDX_SX1262)
+    else if (deviceIdx == K_ESP32_SPI_IDX_SX1262)
     {
         devCfg.clock_speed_hz = 1 * 1000 * 1000; // Max: 16MHz
         devCfg.mode = 0;
@@ -112,7 +123,7 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
     }
     else
     {
-        ESP_LOGE(k_tag, "Unexpected device index %u", s_spiDevCount);
+        ESP_LOGE(k_tag, "Unexpected device index %u", deviceIdx);
         return K_SPP_ERROR;
     }
 
@@ -123,7 +134,6 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
         return K_SPP_ERROR;
     }
 
-    s_spiDevCount++;
     return K_SPP_OK;
 }
 
