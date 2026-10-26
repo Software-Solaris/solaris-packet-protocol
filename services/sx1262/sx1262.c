@@ -106,7 +106,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     SPP_HAL_TIME_delayMs(5);
 
 
-    SPP_RetVal_t ret = K_SPP_OK;
+    ret = K_SPP_OK;
     SX1262_InitInterrupts();
 
     // Sequence of basic and radio configuration
