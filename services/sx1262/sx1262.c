@@ -5,8 +5,6 @@
 
 #include "spp/services/sx1262/sx1262.h"
 
-#include <stdio.h>
-#include <string.h>
 #include "spp/hal/spi/spi.h"
 #include "spp/hal/gpio/gpio.h"
 #include "spp/hal/time/time.h"
@@ -35,9 +33,6 @@ static spp_uint8_t mailboxCount = 0;
 
 volatile spp_bool_t g_txDoneFlag = false; // volatile to avoid optimizations
 SPP_GpioIsrCtx_t g_dio1Ctx = {.p_flag = &g_txDoneFlag};
-
-static const spp_uint8_t K_SX1262_TEST_PACKET[K_SX1262_TOTAL_PACKET_SIZE] = {'S', 'O', 'L', 'A', 'R', 'I',
-                                                                             'S', '_', 'T', 'E', 'S', 'T'};
 
 /* -----------------------------------------
     STATIC DECLARATIONS
@@ -96,8 +91,6 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
-    printf("SX1262 INIT start\n");
-
     s_sx1262Ctx.p_spi = SPP_HAL_SPI_getHandle(K_SX1262_SPI);
     if (s_sx1262Ctx.p_spi == NULL)
     {
@@ -118,7 +111,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     ret = SPP_HAL_GPIO_configInterrupt(SX1262_BUSY_PIN, 0, 0); // Gitanada pa poñer o BUSY como input
     if (ret != K_SPP_OK)
     {
-        printf("SX1262 INIT FAIL: DIO1 interrupt ret=%d\n", (int)ret);
+        printf("SX1262 INIT FAIL: BUSY pin ret=%d\n", (int)ret);
         return ret;
     }
 
@@ -127,8 +120,6 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     SPP_HAL_TIME_delayMs(1);
     SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 1);
     SPP_HAL_TIME_delayMs(5);
-
-    printf("SX1262 BUSY after reset=%u\n", SPP_HAL_GPIO_read(SX1262_BUSY_PIN));
 
     ret = SX1262_InitInterrupts();
     if (ret != K_SPP_OK)
@@ -225,10 +216,9 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
         return ret;
     }
 
-    printf("SX1262 DEVICE ERRORS=0x%04X\n", deviceErrors);
-
     if (deviceErrors != 0U)
     {
+        printf("SX1262 INIT FAIL: device errors=0x%04X\n", deviceErrors);
         return K_SPP_ERROR;
     }
 
@@ -245,7 +235,6 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
     if (mailboxCount < K_SX1262_MAILBOX_SIZE)
     {
         mailboxCount++; // we use mailboxCount to know how many packets we have to send later
-        printf("SX1262 MAILBOX RX | count=%u\n", (unsigned)mailboxCount);
     }
     else
     {
@@ -299,16 +288,14 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
                 return K_SPP_OK;
             }
 
-            ret =
-                SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t *)K_SX1262_TEST_PACKET, K_SX1262_TOTAL_PACKET_SIZE);
+            ret = SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t *)&mailboxData[mailboxHead],
+                                     K_SPP_TOTAL_PACKET_SIZE);
 
             if (ret != K_SPP_OK)
             {
                 printf("SX1262 TX FAIL: WriteBuffer ret=%d\n", (int)ret);
                 return ret;
             }
-
-            printf("SX1262 TEST PACKET WRITTEN\n");
 
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_PARAMS;
@@ -326,7 +313,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             }
 
             // Preamble = 8 symbols, variable packet length, CRC ON
-            ret = SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008U, K_SX1262_TOTAL_PACKET_SIZE);
+            ret = SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008U, K_SPP_TOTAL_PACKET_SIZE);
 
             if (ret != K_SPP_OK)
             {
@@ -359,25 +346,22 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
                 return ret;
             }
 
-            printf("SX1262 TX START\n");
-
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_WAIT_TX_DONE;
             break;
 
         case SX1262_TX_STATE_WAIT_TX_DONE:
-            if (g_txDoneFlag == false)
-            {
-                if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS)
-                {
-                    printf("SX1262 TX FAIL: no DIO1\n");
-                    return SX1262_Timeout_Sequence();
-                }
 
-                return K_SPP_OK;
+            if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS)
+            {
+                printf("SX1262 TX FAIL: completion timeout\n");
+                return SX1262_Timeout_Sequence();
             }
 
-            g_txDoneFlag = false;
+            if (g_txDoneFlag == false)
+            {
+                return K_SPP_OK;
+            }
 
             spp_uint16_t irqStatus = 0U;
 
@@ -387,10 +371,8 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             {
                 printf("SX1262 TX FAIL: GetIrqStatus ret=%d\n", (int)ret);
 
-                return SX1262_Timeout_Sequence();
+                return K_SPP_OK;
             }
-
-            printf("SX1262 IRQ=0x%04X\n", irqStatus);
 
             if ((irqStatus & SX1262_IRQ_TIMEOUT) != 0U)
             {
@@ -404,9 +386,15 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
                 return SX1262_Timeout_Sequence();
             }
 
-            printf("SX1262 TX DONE\n");
+            ret = SX1262_ClearIrqStatus(s_sx1262Ctx.p_spi, (SX1262_IRQ_TX_DONE | SX1262_IRQ_TIMEOUT));
 
-            (void)SX1262_ClearIrqStatus(s_sx1262Ctx.p_spi, (SX1262_IRQ_TX_DONE | SX1262_IRQ_TIMEOUT));
+            if (ret != K_SPP_OK)
+            {
+                printf("SX1262 TX FAIL: ClearIrqStatus ret=%d\n", (int)ret);
+                return K_SPP_OK;
+            }
+
+            g_txDoneFlag = false;
 
             s_sx1262Ctx.frame_number++;
 
@@ -539,8 +527,6 @@ static SPP_RetVal_t SX1262_GetDeviceErrors(void *p_handle, spp_uint16_t *p_error
     {
         return ret;
     }
-
-    printf("SX1262 DEVERR RAW = %02X %02X %02X %02X\n", buffer[0], buffer[1], buffer[2], buffer[3]);
 
     *p_errors = ((spp_uint16_t)buffer[2] << 8) | (spp_uint16_t)buffer[3];
 
@@ -802,7 +788,7 @@ static SPP_RetVal_t SX1262_WaitBusy(void)
 {
     spp_uint32_t startTime = SPP_HAL_TIME_getTimeMs();
 
-    while (SPP_HAL_GPIO_read(SX1262_BUSY_PIN) == 1) // this function in the HAL does not exist, it should be created!!
+    while (SPP_HAL_GPIO_read(SX1262_BUSY_PIN) == 1)
     {
         // Check if the maximum time of waiting was reached
         if ((SPP_HAL_TIME_getTimeMs() - startTime) >= SX1262_MAX_BUSY_TIMEOUT_MS)

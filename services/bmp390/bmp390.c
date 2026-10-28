@@ -212,7 +212,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
         s_altitudeSum += altitude;
         s_calibrationSamples++;
 
-        printf("CAL [%u/%u] altitude=%.2f m\n", s_calibrationSamples, K_BMP390_CALIBRATION_SAMPLES, altitude);
+        //printf("CAL [%u/%u] altitude=%.2f m\n", s_calibrationSamples, K_BMP390_CALIBRATION_SAMPLES, altitude);
 
         if (s_calibrationSamples >= K_BMP390_CALIBRATION_SAMPLES)
         {
@@ -228,7 +228,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
 
     altitude -= s_altitudeOffset;
 
-    printf("ALT relative=%.2f m\n", altitude);
+    //printf("ALT relative=%.2f m\n", altitude);
 
     SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
     if (p_packet == NULL)
