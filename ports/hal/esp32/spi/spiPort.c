@@ -15,6 +15,8 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 
+#include <stdio.h>
+
 /* ----------------------------------------------------------------
  * VARIABLES
  * ---------------------------------------------------------------- */
@@ -126,6 +128,8 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_spiDeviceInit(void *p_handle)
         ESP_LOGE(k_tag, "Unexpected device index %u", deviceIdx);
         return K_SPP_ERROR;
     }
+
+    printf("SPI DEV INIT | idx=%u CS=%d\n", (unsigned)deviceIdx, devCfg.spics_io_num);
 
     esp_err_t ret = spi_bus_add_device(K_ESP32_SPI_HOST, &devCfg, p_h);
     if (ret != ESP_OK)

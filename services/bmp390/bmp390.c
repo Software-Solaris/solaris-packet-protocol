@@ -327,6 +327,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler)
 
     SPP_LOGI(K_BMP390_TAG, "ID: 0x%02X", buf[8]);
 
+    printf("BMP390 ID=0x%02X\n", buf[8]);
     if (buf[8] != 0x60U)
     {
         SPP_LOGE(K_BMP390_TAG, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);

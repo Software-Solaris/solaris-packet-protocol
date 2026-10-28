@@ -24,7 +24,7 @@
 #include <stdio.h>
 #endif
 
-
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -655,6 +655,9 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data)
     {
         return ret;
     }
+
+    printf("ICM20948 WHO_AM_I=0x%02X\n", whoAmIValue);
+
 #ifdef SPP_DEBUG_PRINT
     SPP_LOGI(K_ICM20948_LOG_TAG, "WHO_AM_I = 0x%02X (expect 0xEA)", whoAmIValue);
 #endif

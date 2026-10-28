@@ -29,6 +29,8 @@ static void IRAM_ATTR SPP_PORTS_HAL_ESP32_gpioIsr(void *p_arg)
 
 SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint32_t intrType, spp_uint32_t pull)
 {
+    SPP_RetVal_t ret = K_SPP_ERROR;
+
     gpio_config_t ioCfg = {
         .pin_bit_mask = (1ULL << pin),
         .mode = GPIO_MODE_INPUT,
@@ -46,7 +48,13 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint3
         ioCfg.pull_down_en = GPIO_PULLDOWN_ENABLE;
     }
 
-    gpio_config(&ioCfg);
+    ret = gpio_config(&ioCfg);
+
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
     return K_SPP_OK;
 }
 

@@ -12,6 +12,8 @@
 #include "spp/hal/time/time.h"
 #include "spp/services/kpid.h"
 
+#include <stdio.h>
+
 /* -----------------------------------------
     STRUCTS
 --------------------------------------------*/
@@ -34,6 +36,8 @@ static spp_uint8_t mailboxCount = 0;
 volatile spp_bool_t g_txDoneFlag = false; // volatile to avoid optimizations
 SPP_GpioIsrCtx_t g_dio1Ctx = {.p_flag = &g_txDoneFlag};
 
+static const spp_uint8_t K_SX1262_TEST_PACKET[K_SX1262_TOTAL_PACKET_SIZE] = {'S', 'O', 'L', 'A', 'R', 'I',
+                                                                             'S', '_', 'T', 'E', 'S', 'T'};
 
 /* -----------------------------------------
     STATIC DECLARATIONS
@@ -54,11 +58,18 @@ static SPP_RetVal_t SX1262_SetModulationParams(void *, spp_uint8_t, spp_uint8_t,
 static SPP_RetVal_t SX1262_SetPacketParams(void *, spp_uint16_t, spp_uint8_t);
 static SPP_RetVal_t SX1262_SetDioIrqParams(void *, spp_uint16_t, spp_uint16_t, spp_uint16_t, spp_uint16_t);
 static SPP_RetVal_t SX1262_ClearIrqStatus(void *, spp_uint16_t);
-static void SX1262_InitInterrupts(void);
+static SPP_RetVal_t SX1262_InitInterrupts(void);
 static SPP_RetVal_t SX1262_WriteBuffer(void *, spp_uint8_t *, spp_uint8_t);
 static SPP_RetVal_t SX1262_SetTx(void *, spp_uint32_t);
 static SPP_RetVal_t SX1262_WriteRegister(void *, spp_uint16_t, spp_uint8_t *, spp_uint8_t);
 static SPP_RetVal_t SX1262_Timeout_Sequence(void);
+
+static SPP_RetVal_t SX1262_GetIrqStatus(void *, spp_uint16_t *);
+static SPP_RetVal_t SX1262_SetRegulatorMode(void *);
+static SPP_RetVal_t SX1262_SetDio3AsTcxoCtrl(void *);
+static SPP_RetVal_t SX1262_Calibrate(void *);
+static SPP_RetVal_t SX1262_ClearDeviceErrors(void *);
+static SPP_RetVal_t SX1262_GetDeviceErrors(void *, spp_uint16_t *);
 
 static SPP_SERVICE_ConsumerContract_t sx1262Contract = {
     .priority = 3U,
@@ -85,17 +96,29 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
 
+    printf("SX1262 INIT start\n");
+
     s_sx1262Ctx.p_spi = SPP_HAL_SPI_getHandle(K_SX1262_SPI);
     if (s_sx1262Ctx.p_spi == NULL)
+    {
+        printf("SX1262 INIT FAIL: getHandle\n");
         return K_SPP_ERROR;
+    }
 
-    (void)SPP_HAL_SPI_deviceInit(s_sx1262Ctx.p_spi);
+    ret = SPP_HAL_SPI_deviceInit(s_sx1262Ctx.p_spi);
+
+    if (ret != K_SPP_OK)
+    {
+        printf("SX1262 INIT FAIL: deviceInit ret=%d\n", (int)ret);
+        return ret;
+    }
 
     void *p_spi = s_sx1262Ctx.p_spi;
 
     ret = SPP_HAL_GPIO_configInterrupt(SX1262_BUSY_PIN, 0, 0); // Gitanada pa poñer o BUSY como input
     if (ret != K_SPP_OK)
     {
+        printf("SX1262 INIT FAIL: DIO1 interrupt ret=%d\n", (int)ret);
         return ret;
     }
 
@@ -105,14 +128,43 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     SPP_HAL_GPIO_write(SX126X_NRESET_PIN, 1);
     SPP_HAL_TIME_delayMs(5);
 
+    printf("SX1262 BUSY after reset=%u\n", SPP_HAL_GPIO_read(SX1262_BUSY_PIN));
 
-    ret = K_SPP_OK;
-    SX1262_InitInterrupts();
+    ret = SX1262_InitInterrupts();
+    if (ret != K_SPP_OK)
+    {
+        printf("SX1262 INIT FAIL: DIO1 init ret=%d\n", (int)ret);
+        return ret;
+    }
 
     // Sequence of basic and radio configuration
     ret = SX1262_SetStandby(p_spi);
     if (ret != K_SPP_OK)
         return ret;
+
+    ret = SX1262_SetRegulatorMode(p_spi);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    ret = SX1262_SetDio3AsTcxoCtrl(p_spi);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    ret = SX1262_ClearDeviceErrors(p_spi);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    ret = SX1262_Calibrate(p_spi);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
 
     ret = SX1262_SetPacketType(p_spi);
     if (ret != K_SPP_OK)
@@ -143,7 +195,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
         0x07, // Spreading Factor = 7
         0x04, // BW = 125 kHz
         0x01, // Code Rate = 4/5
-        0x00  // LDRO OFF
+        0x01  // LDRO ON (same as devkit)
     };
     ret = SX1262_SetModulationParams(p_spi, lora_mod_params[0], lora_mod_params[1], lora_mod_params[2],
                                      lora_mod_params[3]);
@@ -159,6 +211,29 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     // Interrupt configuration in DIO1 (TxDone + Timeout)
     ret = SX1262_SetDioIrqParams(p_spi, 0x0201, 0x0201, 0x0000, 0x0000);
 
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    spp_uint16_t deviceErrors = 0U;
+
+    ret = SX1262_GetDeviceErrors(p_spi, &deviceErrors);
+    if (ret != K_SPP_OK)
+    {
+        printf("SX1262 INIT FAIL: GetDeviceErrors ret=%d\n", (int)ret);
+        return ret;
+    }
+
+    printf("SX1262 DEVICE ERRORS=0x%04X\n", deviceErrors);
+
+    if (deviceErrors != 0U)
+    {
+        return K_SPP_ERROR;
+    }
+
+    printf("SX1262 INIT OK\n");
+
     return ret;
 }
 
@@ -170,6 +245,7 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
     if (mailboxCount < K_SX1262_MAILBOX_SIZE)
     {
         mailboxCount++; // we use mailboxCount to know how many packets we have to send later
+        printf("SX1262 MAILBOX RX | count=%u\n", (unsigned)mailboxCount);
     }
     else
     {
@@ -185,64 +261,106 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
     (void)p_data;
 
     if (s_sx1262Ctx.p_spi == NULL)
+    {
         return K_SPP_ERROR;
+    }
 
     spp_uint8_t busy_status = SPP_HAL_GPIO_read(SX1262_BUSY_PIN);
     spp_uint32_t current_time = SPP_HAL_TIME_getTimeMs();
+    SPP_RetVal_t ret = K_SPP_OK;
 
     switch (s_sx1262Ctx.tx_state)
     {
         case SX1262_TX_STATE_IDLE:
-            if (mailboxCount > 0)
+            if (mailboxCount > 0U)
             {
                 if (mailboxCount > K_SX1262_MAX_PACKETS_TO_TRANSMIT)
                 {
                     spp_uint8_t remainder = mailboxCount - K_SX1262_MAX_PACKETS_TO_TRANSMIT;
+
                     mailboxHead = (spp_uint8_t)((mailboxHead + remainder) % K_SX1262_MAILBOX_SIZE);
+
                     mailboxCount = K_SX1262_MAX_PACKETS_TO_TRANSMIT;
                 }
+
                 s_sx1262Ctx.timer_ms = current_time;
                 s_sx1262Ctx.tx_state = SX1262_TX_STATE_WRITE_BUFFER;
             }
             break;
 
         case SX1262_TX_STATE_WRITE_BUFFER:
-            if (busy_status == 1)
+            if (busy_status == 1U)
             {
                 if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                {
                     return SX1262_Timeout_Sequence();
+                }
+
                 return K_SPP_OK;
             }
 
-            SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t *)&mailboxData[mailboxHead], K_SX1262_TOTAL_PACKET_SIZE);
+            ret =
+                SX1262_WriteBuffer(s_sx1262Ctx.p_spi, (spp_uint8_t *)K_SX1262_TEST_PACKET, K_SX1262_TOTAL_PACKET_SIZE);
+
+            if (ret != K_SPP_OK)
+            {
+                printf("SX1262 TX FAIL: WriteBuffer ret=%d\n", (int)ret);
+                return ret;
+            }
+
+            printf("SX1262 TEST PACKET WRITTEN\n");
+
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_PARAMS;
             break;
 
         case SX1262_TX_STATE_SET_PARAMS:
-            if (busy_status == 1)
+            if (busy_status == 1U)
             {
                 if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                {
                     return SX1262_Timeout_Sequence();
+                }
+
                 return K_SPP_OK;
             }
 
-            // Preamble = 8 symbols, Variable packet, packet length, CRC ON
-            SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008, K_SX1262_TOTAL_PACKET_SIZE);
+            // Preamble = 8 symbols, variable packet length, CRC ON
+            ret = SX1262_SetPacketParams(s_sx1262Ctx.p_spi, 0x0008U, K_SX1262_TOTAL_PACKET_SIZE);
+
+            if (ret != K_SPP_OK)
+            {
+                printf("SX1262 TX FAIL: SetPacketParams ret=%d\n", (int)ret);
+                return ret;
+            }
+
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_SET_TX;
             break;
 
         case SX1262_TX_STATE_SET_TX:
-            if (busy_status == 1)
+            if (busy_status == 1U)
             {
                 if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_BUSY_TIMEOUT_MS)
+                {
                     return SX1262_Timeout_Sequence();
+                }
+
                 return K_SPP_OK;
             }
 
             g_txDoneFlag = false;
-            SX1262_SetTx(s_sx1262Ctx.p_spi, 0x00FA00); // Signal transmission (SetTx with 1 sec timeout: 0x00FA00)
+
+            ret = SX1262_SetTx(s_sx1262Ctx.p_spi, 0x00FA00U);
+
+            if (ret != K_SPP_OK)
+            {
+                printf("SX1262 TX FAIL: SetTx ret=%d\n", (int)ret);
+                return ret;
+            }
+
+            printf("SX1262 TX START\n");
+
             s_sx1262Ctx.timer_ms = current_time;
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_WAIT_TX_DONE;
             break;
@@ -251,20 +369,56 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
             if (g_txDoneFlag == false)
             {
                 if ((current_time - s_sx1262Ctx.timer_ms) >= SX1262_MAX_DONE_TIMEOUT_MS)
+                {
+                    printf("SX1262 TX FAIL: no DIO1\n");
                     return SX1262_Timeout_Sequence();
-                return K_SPP_OK; // Waiting for DIO1 interruption
+                }
+
+                return K_SPP_OK;
             }
 
-            // Transmision succeed
             g_txDoneFlag = false;
-            SX1262_ClearIrqStatus(s_sx1262Ctx.p_spi, 0x0201);
+
+            spp_uint16_t irqStatus = 0U;
+
+            ret = SX1262_GetIrqStatus(s_sx1262Ctx.p_spi, &irqStatus);
+
+            if (ret != K_SPP_OK)
+            {
+                printf("SX1262 TX FAIL: GetIrqStatus ret=%d\n", (int)ret);
+
+                return SX1262_Timeout_Sequence();
+            }
+
+            printf("SX1262 IRQ=0x%04X\n", irqStatus);
+
+            if ((irqStatus & SX1262_IRQ_TIMEOUT) != 0U)
+            {
+                printf("SX1262 TX FAIL: radio timeout\n");
+                return SX1262_Timeout_Sequence();
+            }
+
+            if ((irqStatus & SX1262_IRQ_TX_DONE) == 0U)
+            {
+                printf("SX1262 TX FAIL: unexpected IRQ\n");
+                return SX1262_Timeout_Sequence();
+            }
+
+            printf("SX1262 TX DONE\n");
+
+            (void)SX1262_ClearIrqStatus(s_sx1262Ctx.p_spi, (SX1262_IRQ_TX_DONE | SX1262_IRQ_TIMEOUT));
 
             s_sx1262Ctx.frame_number++;
-            mailboxHead = (mailboxHead + 1U) % K_SX1262_MAILBOX_SIZE;
+
+            mailboxHead = (spp_uint8_t)((mailboxHead + 1U) % K_SX1262_MAILBOX_SIZE);
+
             mailboxCount--;
 
             s_sx1262Ctx.tx_state = SX1262_TX_STATE_IDLE;
             break;
+
+        default:
+            return K_SPP_ERROR;
     }
 
     return K_SPP_OK;
@@ -286,6 +440,72 @@ static SPP_RetVal_t SX1262_SetStandby(void *p_handle)
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 2);
 }
 
+static SPP_RetVal_t SX1262_SetRegulatorMode(void *p_handle)
+{
+    spp_uint8_t buffer[2];
+
+    buffer[0] = SX1262_OPCODE_SET_REGULATOR_MODE;
+    buffer[1] = SX1262_REGULATOR_DC_DC;
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+}
+
+static SPP_RetVal_t SX1262_SetDio3AsTcxoCtrl(void *p_handle)
+{
+    spp_uint32_t delay = SX1262_TCXO_STARTUP_DELAY;
+
+    spp_uint8_t buffer[5];
+
+    buffer[0] = SX1262_OPCODE_SET_DIO3_AS_TCXO_CTRL;
+    buffer[1] = SX1262_TCXO_VOLTAGE_1V7;
+    buffer[2] = (spp_uint8_t)((delay >> 16) & 0xFFU);
+    buffer[3] = (spp_uint8_t)((delay >> 8) & 0xFFU);
+    buffer[4] = (spp_uint8_t)(delay & 0xFFU);
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+}
+
+static SPP_RetVal_t SX1262_ClearDeviceErrors(void *p_handle)
+{
+    spp_uint8_t buffer[3] = {SX1262_OPCODE_CLEAR_DEVICE_ERRORS, 0x00U, 0x00U};
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+}
+
+static SPP_RetVal_t SX1262_Calibrate(void *p_handle)
+{
+    spp_uint8_t buffer[2];
+
+    buffer[0] = SX1262_OPCODE_CALIBRATE;
+    buffer[1] = SX1262_CALIBRATE_ALL;
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    return SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+}
+
 static SPP_RetVal_t SX1262_SetTx(void *p_handle, spp_uint32_t timeout)
 {
     // SetTx requires 1 byte of Opcode and 3 bytes of parameters
@@ -299,6 +519,33 @@ static SPP_RetVal_t SX1262_SetTx(void *p_handle, spp_uint32_t timeout)
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 4);
 }
 
+static SPP_RetVal_t SX1262_GetDeviceErrors(void *p_handle, spp_uint16_t *p_errors)
+{
+    if (p_errors == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    spp_uint8_t buffer[4] = {SX1262_OPCODE_GET_DEVICE_ERRORS, 0x00U, 0x00U, 0x00U};
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    ret = SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    printf("SX1262 DEVERR RAW = %02X %02X %02X %02X\n", buffer[0], buffer[1], buffer[2], buffer[3]);
+
+    *p_errors = ((spp_uint16_t)buffer[2] << 8) | (spp_uint16_t)buffer[3];
+
+    return K_SPP_OK;
+}
 
 /* -----------------------------------------
     BASIC PARAMETERS
@@ -479,13 +726,51 @@ static SPP_RetVal_t SX1262_ClearIrqStatus(void *p_handle, spp_uint16_t clearMask
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
-static void SX1262_InitInterrupts(void)
+static SPP_RetVal_t SX1262_GetIrqStatus(void *p_handle, spp_uint16_t *p_irqStatus)
 {
+    if (p_irqStatus == NULL)
+    {
+        return K_SPP_ERROR_NULL_POINTER;
+    }
+
+    spp_uint8_t buffer[4] = {SX1262_OPCODE_GET_IRQ_STATUS, 0x00, 0x00, 0x00};
+
+    SPP_RetVal_t ret = SX1262_WaitBusy();
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    ret = SPP_HAL_SPI_transmitRaw(p_handle, buffer, sizeof(buffer));
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    *p_irqStatus = ((spp_uint16_t)buffer[2] << 8) | (spp_uint16_t)buffer[3];
+
+    return K_SPP_OK;
+}
+
+static SPP_RetVal_t SX1262_InitInterrupts(void)
+{
+    SPP_RetVal_t ret = K_SPP_ERROR;
+
     // This instruction configures the pin as an input with interruption by rising edge
-    SPP_HAL_GPIO_configInterrupt(SX1262_DIO1_PIN, 1, 0);
+    ret = SPP_HAL_GPIO_configInterrupt(SX1262_DIO1_PIN, 1, 0);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
 
     // This instruction registers the context to the ISR can modify g_txDoneFlag
-    SPP_HAL_GPIO_registerIsr(SX1262_DIO1_PIN, &g_dio1Ctx);
+    ret = SPP_HAL_GPIO_registerIsr(SX1262_DIO1_PIN, &g_dio1Ctx);
+    if (ret != K_SPP_OK)
+    {
+        return ret;
+    }
+
+    return K_SPP_OK;
 }
 
 
