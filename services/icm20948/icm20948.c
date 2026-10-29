@@ -74,7 +74,7 @@ static SPP_RetVal_t ICM20948_dmpWriteOutputConfig(void *p_data, spp_uint16_t out
 static SPP_RetVal_t SPP_SERVICES_ICM20948_loadDmp(void *p_data);
 static SPP_RetVal_t SPP_SERVICES_ICM20948_configDmpInit(void *p_data);
 static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx);
-static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm);
+static SPP_RetVal_t SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm);
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void);
 static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid);
 
@@ -120,12 +120,18 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_ICM20948_getProducerContract(
  * @brief  Initialises the ICM20948 interrupt context and registers the GPIO ISR.
  * @param  p_icm  Pointer to the ICM20948 interrupt context to initialise.
  */
-static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
+static SPP_RetVal_t SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
 {
     p_icm->drdyFlag = false;
     p_icm->isr_ctx.p_flag = &p_icm->drdyFlag;
-    SPP_HAL_GPIO_configInterrupt(p_icm->intPin, p_icm->intIntrType, p_icm->intPull);
-    SPP_HAL_GPIO_registerIsr(p_icm->intPin, (void *)&p_icm->isr_ctx);
+    SPP_RetVal_t ret = SPP_HAL_GPIO_configInterrupt(p_icm->intPin, p_icm->intIntrType, p_icm->intPull);
+
+    if (ret == K_SPP_OK)
+    {
+        ret = SPP_HAL_GPIO_registerIsr(p_icm->intPin, (void *)&p_icm->isr_ctx);
+    }
+
+    return ret;
 }
 
 /**
@@ -134,6 +140,8 @@ static void SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
  */
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
 {
+    SPP_RetVal_t ret = K_SPP_OK;
+
     s_icmData.spiDevIdx = K_ICM20948_SPI_HOST_USED;
     s_icmData.intPin = K_ICM20948_INT_PIN_NUM;
     s_icmData.intIntrType = K_ICM20948_INT_INTR_TYPE;
@@ -144,17 +152,31 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
     s_icmData.icmData.intIntrType = s_icmData.intIntrType;
     s_icmData.icmData.intPull = s_icmData.intPull;
 
-    (void)SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
+    ret = SPP_SERVICES_ICM20948_initGpio(&s_icmData.icmData);
 
-    s_icmData.p_spi = SPP_HAL_SPI_getHandle(s_icmData.spiDevIdx);
-    (void)SPP_HAL_SPI_deviceInit(s_icmData.p_spi);
+    if (ret == K_SPP_OK)
+    {
+        s_icmData.p_spi = SPP_HAL_SPI_getHandle(s_icmData.spiDevIdx);
+        if (s_icmData.p_spi == NULL)
+        {
+            printf("ICM20948 INIT FAIL: SPI handle\n");
+            return K_SPP_ERROR;
+        }
+    }
 
-    SPP_LOGI(K_ICM20948_LOG_TAG, "Init (spiDevIdx=%u intPin=%u)", s_icmData.spiDevIdx, s_icmData.intPin);
+    if (ret == K_SPP_OK)
+    {
+        ret = SPP_HAL_SPI_deviceInit(s_icmData.p_spi);
+    }
 
-    SPP_RetVal_t ret = SPP_SERVICES_ICM20948_configDmpInit(s_icmData.p_spi);
+    if (ret == K_SPP_OK)
+    {
+        ret = SPP_SERVICES_ICM20948_configDmpInit(s_icmData.p_spi);
+    }
+
     if (ret != K_SPP_OK)
     {
-        SPP_LOGE(K_ICM20948_LOG_TAG, "configDmpInit failed ret=%d", (int)ret);
+        printf("ICM20948 INIT FAIL ret=%d\n", (int)ret);
     }
 
     return ret;
