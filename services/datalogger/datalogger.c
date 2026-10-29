@@ -17,7 +17,7 @@
 /* ----------------------------------------------------------------
 * CONSTANTS
 * ---------------------------------------------------------------- */
-static SPP_Packet_t s_packetBuffer[K_DATALOGGER_BUFFER_SIZE];
+static SPP_Packet_t s_packetBuffer[K_DATALOGGER_BUFFER_PACKETS];
 static spp_uint8_t s_packetIndex = 0;        /**< Index of the next packet to be written to the buffer. */
 static spp_uint32_t s_currentDataSector = 0; /**< Current sector of the data log. */
 static spp_uint16_t s_blocksWritten =
