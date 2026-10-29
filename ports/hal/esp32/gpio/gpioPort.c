@@ -60,13 +60,27 @@ SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioConfigInterrupt(spp_uint32_t pin, spp_uint3
 
 SPP_RetVal_t SPP_PORTS_HAL_ESP32_gpioRegisterIsr(spp_uint32_t pin, void *p_isrCtx)
 {
+    esp_err_t ret = ESP_FAIL;
     static spp_bool_t s_serviceInstalled = false;
     if (!s_serviceInstalled)
     {
-        gpio_install_isr_service(0);
+        ret = gpio_install_isr_service(0);
+
+        if (ret != ESP_OK)
+        {
+            return K_SPP_ERROR;
+        }
+
         s_serviceInstalled = true;
     }
-    gpio_isr_handler_add((gpio_num_t)pin, SPP_PORTS_HAL_ESP32_gpioIsr, p_isrCtx);
+
+    ret = gpio_isr_handler_add((gpio_num_t)pin, SPP_PORTS_HAL_ESP32_gpioIsr, p_isrCtx);
+
+    if (ret != ESP_OK)
+    {
+        return K_SPP_ERROR;
+    }
+
     return K_SPP_OK;
 }
 
