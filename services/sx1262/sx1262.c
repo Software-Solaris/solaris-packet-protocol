@@ -8,7 +8,6 @@
 #include "spp/hal/spi/spi.h"
 #include "spp/hal/gpio/gpio.h"
 #include "spp/hal/time/time.h"
-#include "spp/services/kpid.h"
 
 #include <stdio.h>
 
@@ -626,7 +625,7 @@ static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_
 {
     /* The maximum length of the buffer is 255 bytes
     Adding 1 byte of Opcode and 1 byte of Offset, the array maximum length is 257 bytes */
-    spp_uint8_t buffer[257];
+    spp_uint8_t buffer[257]; // TO-DO: check if this could be K_SPP_TOTAL_PACKET_SIZE + 2 instead 257
 
     buffer[0] = SX1262_OPCODE_WRITE_BUFFER;
     buffer[1] = 0x00; // the address where we start to write
@@ -661,7 +660,7 @@ static SPP_RetVal_t SX1262_SetModulationParams(void *p_handle, spp_uint8_t sf, s
 
 static SPP_RetVal_t SX1262_SetPacketParams(void *p_handle, spp_uint16_t preambleLength, spp_uint8_t payloadLength)
 {
-    // The command requires 9 bytes of parameters according the general structure (10 bytes total) (for LoRa only the 6 firsts are used)
+    // LoRa SetPacketParams: opcode + 6 parameters
     spp_uint8_t buffer[7] = {0};
 
     buffer[0] = SX1262_OPCODE_SET_PACKET_PARAMS;
