@@ -148,8 +148,19 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
     }
 
     // Get the SPI bus handler and init the SPI device
-    s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
-    (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx));
+    if (ret == K_SPP_OK)
+    {
+        s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
+        if (s_bmpData.spiConfig.p_spiHandler == NULL)
+        {
+            ret = K_SPP_ERROR;
+        }
+    }
+
+    if (ret == K_SPP_OK)
+    {
+        ret = SPP_HAL_SPI_deviceInit(s_bmpData.spiConfig.p_spiHandler);
+    }
 
     if (ret == K_SPP_OK)
     {
@@ -158,13 +169,12 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 
     if (ret == K_SPP_OK)
     {
-        (void)SPP_SERVICES_BMP390_prepareMeasure(s_bmpData.spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_prepareMeasure(s_bmpData.spiConfig.p_spiHandler);
+    }
 
+    if (ret == K_SPP_OK)
+    {
         ret = SPP_SERVICES_BMP390_intEnableDrdy(s_bmpData.spiConfig.p_spiHandler);
-        if (ret != K_SPP_OK)
-        {
-            ret = K_SPP_ERROR;
-        }
     }
 
     return ret;
