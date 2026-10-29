@@ -84,11 +84,16 @@ static float s_po1, s_po2;
 static float s_compPress;
 
 /* Calibration */
-#define K_BMP390_CALIBRATION_SAMPLES 100U
+#define K_BMP390_CALIBRATION_SAMPLES 500U
 spp_bool_t s_isCalibrated = false;
-spp_float32_t s_altitudeSum = 0;
-spp_float32_t s_altitudeOffset = 0;
 spp_uint16_t s_calibrationSamples = 0;
+
+spp_float32_t s_pressureSum = 0.0f;
+spp_float32_t s_temperatureSum = 0.0f;
+
+spp_float32_t s_referencePressure = 0.0f;
+spp_float32_t s_referenceTemperature = 0.0f;
+
 
 /* ----------------------------------------------------------------
 * PUBLIC FUNCTIONS
@@ -219,26 +224,25 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
 
     if (s_isCalibrated == false)
     {
-        s_altitudeSum += altitude;
+        s_pressureSum += pressure;
+        s_temperatureSum += temperature;
         s_calibrationSamples++;
 
         //printf("CAL [%u/%u] altitude=%.2f m\n", s_calibrationSamples, K_BMP390_CALIBRATION_SAMPLES, altitude);
 
         if (s_calibrationSamples >= K_BMP390_CALIBRATION_SAMPLES)
         {
-            s_altitudeOffset = s_altitudeSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
+            s_referencePressure = s_pressureSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
+
+            s_referenceTemperature = s_temperatureSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
 
             s_isCalibrated = true;
 
-            printf("CAL DONE offset=%.2f m\n", s_altitudeOffset);
+            printf("CAL DONE P0=%.2f Pa T0=%.2f C\n", s_referencePressure, s_referenceTemperature);
         }
 
         return K_SPP_OK; // Do not packet calibration samples
     }
-
-    altitude -= s_altitudeOffset;
-
-    //printf("ALT relative=%.2f m\n", altitude);
 
     SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
     if (p_packet == NULL)
@@ -743,7 +747,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spiHandler, const BM
  * @brief  Reads compensated altitude, pressure and temperature from the sensor.
  * @param  p_spiHandler   SPI device handle.
  * @param  p_bmp          Driver context (unused; DRDY is handled by the caller).
- * @param  altitude_m     Output: altitude in metres (barometric formula, ref 1013.25 hPa).
+ * @param  altitude_m     Output: altitude relative to launch-site reference pressure and temperature.
  * @param  pressure_pa    Output: compensated pressure in Pa.
  * @param  temperature_c  Output: compensated temperature in °C.
  * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if any pointer is NULL,
@@ -797,7 +801,17 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, float *a
 
     *temperature_c = t_lin;
     *pressure_pa = compPress;
-    *altitude_m = 44330.0f * (1.0f - powf(compPress / 101325.0f, 1.0f / 5.255f));
+
+    if (s_isCalibrated == false)
+    {
+        *altitude_m = 0.0f;
+    }
+    else
+    {
+        const spp_float32_t referenceTemperatureK = s_referenceTemperature + 273.15f;
+
+        *altitude_m = (referenceTemperatureK / 0.0065f) * (1.0f - powf(compPress / s_referencePressure, 1.0f / 5.255f));
+    }
 
     return K_SPP_OK;
 }
