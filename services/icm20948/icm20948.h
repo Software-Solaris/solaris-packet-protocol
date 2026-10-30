@@ -180,6 +180,14 @@
 #define K_ICM20948_REG_MAGNETO_Z_L 0x40U /**< Magnetometer Z low byte register. */
 #define K_ICM20948_REG_MAGNETO_Z_H 0x41U /**< Magnetometer Z high byte register. */
 
+/* Calibration offsets */
+#define K_ICM20948_ACCEL_BIAS_X (0.004621f)
+#define K_ICM20948_ACCEL_BIAS_Y (-0.001157f)
+#define K_ICM20948_ACCEL_BIAS_Z (0.010014f)
+
+#define K_ICM20948_GYRO_BIAS_X (0.681567f)
+#define K_ICM20948_GYRO_BIAS_Y (0.428753f)
+#define K_ICM20948_GYRO_BIAS_Z (-0.329620f)
 
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS

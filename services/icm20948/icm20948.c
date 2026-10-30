@@ -1749,15 +1749,18 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                                                 ((spp_int32_t)fifoBuffer[36] << 8) | (spp_int32_t)fifoBuffer[37];
                             float accuracy = (spp_int16_t)(((spp_uint16_t)fifoBuffer[38] << 8) | fifoBuffer[39]);
 
-                            float ax = accelX / 8192.0f;
-                            float ay = accelY / 8192.0f;
-                            float az = accelZ / 8192.0f;
-                            float gx = gyroX / 32.8f;
-                            float gy = gyroY / 32.8f;
-                            float gz = gyroZ / 32.8f;
+                            float ax = (accelX / 8192.0f) - K_ICM20948_ACCEL_BIAS_X;
+                            float ay = (accelY / 8192.0f) - K_ICM20948_ACCEL_BIAS_Y;
+                            float az = (accelZ / 8192.0f) - K_ICM20948_ACCEL_BIAS_Z;
+
+                            float gx = (gyroX / 32.8f) - K_ICM20948_GYRO_BIAS_X;
+                            float gy = (gyroY / 32.8f) - K_ICM20948_GYRO_BIAS_Y;
+                            float gz = (gyroZ / 32.8f) - K_ICM20948_GYRO_BIAS_Z;
+
                             float mx = magX * 0.15f;
                             float my = magY * 0.15f;
                             float mz = magZ * 0.15f;
+
                             float qx = q1Raw / 1073741824.0f;
                             float qy = q2Raw / 1073741824.0f;
                             float qz = q3Raw / 1073741824.0f;
