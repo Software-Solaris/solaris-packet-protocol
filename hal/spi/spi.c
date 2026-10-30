@@ -95,3 +95,24 @@ SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8
     }
     return ret;
 }
+
+SPP_RetVal_t SPP_HAL_SPI_transmitRaw(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
+{
+    SPP_RetVal_t ret = K_SPP_ERROR;
+
+    const SPP_HalPort_t *p_port = SPP_HAL_getPort();
+    if ((p_port == NULL) || (p_port->spi.spiTransmitRaw == NULL))
+    {
+        ret = K_SPP_ERROR_NULL_POINTER;
+    }
+    else
+    {
+        ret = p_port->spi.spiTransmitRaw(p_handle, p_data, length);
+        if (ret != K_SPP_OK)
+        {
+            ret = K_SPP_ERROR;
+        }
+    }
+
+    return ret;
+}

@@ -16,6 +16,8 @@
 #include "spp/core/pubsub/pubsub.h"
 #include "spp/services/fsm/fsm.h"
 
+#include <stdio.h>
+
 #include <string.h>
 #include <math.h>
 #ifdef SPP_DEBUG_PRINT
@@ -81,6 +83,18 @@ static float s_pd1, s_pd2, s_pd3, s_pd4;
 static float s_po1, s_po2;
 static float s_compPress;
 
+/* Calibration */
+#define K_BMP390_CALIBRATION_SAMPLES 500U
+spp_bool_t s_isCalibrated = false;
+spp_uint16_t s_calibrationSamples = 0;
+
+spp_float32_t s_pressureSum = 0.0f;
+spp_float32_t s_temperatureSum = 0.0f;
+
+spp_float32_t s_referencePressure = 0.0f;
+spp_float32_t s_referenceTemperature = 0.0f;
+
+
 /* ----------------------------------------------------------------
 * PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
@@ -139,8 +153,19 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
     }
 
     // Get the SPI bus handler and init the SPI device
-    s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
-    (void)SPP_HAL_SPI_deviceInit(SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx));
+    if (ret == K_SPP_OK)
+    {
+        s_bmpData.spiConfig.p_spiHandler = SPP_HAL_SPI_getHandle(s_bmpData.spiConfig.spiDevIdx);
+        if (s_bmpData.spiConfig.p_spiHandler == NULL)
+        {
+            ret = K_SPP_ERROR;
+        }
+    }
+
+    if (ret == K_SPP_OK)
+    {
+        ret = SPP_HAL_SPI_deviceInit(s_bmpData.spiConfig.p_spiHandler);
+    }
 
     if (ret == K_SPP_OK)
     {
@@ -149,13 +174,12 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 
     if (ret == K_SPP_OK)
     {
-        (void)SPP_SERVICES_BMP390_prepareMeasure(s_bmpData.spiConfig.p_spiHandler);
+        ret = SPP_SERVICES_BMP390_prepareMeasure(s_bmpData.spiConfig.p_spiHandler);
+    }
 
+    if (ret == K_SPP_OK)
+    {
         ret = SPP_SERVICES_BMP390_intEnableDrdy(s_bmpData.spiConfig.p_spiHandler);
-        if (ret != K_SPP_OK)
-        {
-            ret = K_SPP_ERROR;
-        }
     }
 
     return ret;
@@ -182,14 +206,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
     {
         return K_SPP_OK;
     }
-    p_bmpData->gpioConfig.drdyFlag = false;
 
-    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
-    if (p_packet == NULL)
-    {
-        SPP_LOGW(k_svcTag, "No free packet");
-        return K_SPP_ERROR;
-    }
+    p_bmpData->gpioConfig.drdyFlag = false;
 
     // spp_uint32_t t0 = SPP_HAL_TIME_getTimeUs();
 
@@ -201,10 +219,37 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
     if (ret != K_SPP_OK)
     {
         SPP_LOGE(k_svcTag, "getAltitude failed ret=%d", (int)ret);
-        (void)SPP_SERVICES_DATABANK_returnPacket(p_packet);
         return ret;
     }
 
+    if (s_isCalibrated == false)
+    {
+        s_pressureSum += pressure;
+        s_temperatureSum += temperature;
+        s_calibrationSamples++;
+
+        //printf("CAL [%u/%u] altitude=%.2f m\n", s_calibrationSamples, K_BMP390_CALIBRATION_SAMPLES, altitude);
+
+        if (s_calibrationSamples >= K_BMP390_CALIBRATION_SAMPLES)
+        {
+            s_referencePressure = s_pressureSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
+
+            s_referenceTemperature = s_temperatureSum / (spp_float32_t)K_BMP390_CALIBRATION_SAMPLES;
+
+            s_isCalibrated = true;
+
+            printf("CAL DONE P0=%.2f Pa T0=%.2f C\n", s_referencePressure, s_referenceTemperature);
+        }
+
+        return K_SPP_OK; // Do not packet calibration samples
+    }
+
+    SPP_Packet_t *p_packet = SPP_SERVICES_DATABANK_getPacket();
+    if (p_packet == NULL)
+    {
+        SPP_LOGW(k_svcTag, "No free packet");
+        return K_SPP_ERROR;
+    }
     // if (s_performanceWarmupDone == false)
     // {
     //     s_performanceWarmupDone = true;
@@ -296,6 +341,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_configCheck(void *p_spiHandler)
 
     SPP_LOGI(K_BMP390_TAG, "ID: 0x%02X", buf[8]);
 
+    printf("BMP390 ID=0x%02X\n", buf[8]);
     if (buf[8] != 0x60U)
     {
         SPP_LOGE(K_BMP390_TAG, "BMP390 not detected! Expected 0x60, got 0x%02X", buf[8]);
@@ -701,7 +747,7 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spiHandler, const BM
  * @brief  Reads compensated altitude, pressure and temperature from the sensor.
  * @param  p_spiHandler   SPI device handle.
  * @param  p_bmp          Driver context (unused; DRDY is handled by the caller).
- * @param  altitude_m     Output: altitude in metres (barometric formula, ref 1013.25 hPa).
+ * @param  altitude_m     Output: altitude relative to launch-site reference pressure and temperature.
  * @param  pressure_pa    Output: compensated pressure in Pa.
  * @param  temperature_c  Output: compensated temperature in °C.
  * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if any pointer is NULL,
@@ -755,7 +801,17 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_getAltitude(void *p_spiHandler, float *a
 
     *temperature_c = t_lin;
     *pressure_pa = compPress;
-    *altitude_m = 44330.0f * (1.0f - powf(compPress / 101325.0f, 1.0f / 5.255f));
+
+    if (s_isCalibrated == false)
+    {
+        *altitude_m = 0.0f;
+    }
+    else
+    {
+        const spp_float32_t referenceTemperatureK = s_referenceTemperature + 273.15f;
+
+        *altitude_m = (referenceTemperatureK / 0.0065f) * (1.0f - powf(compPress / s_referencePressure, 1.0f / 5.255f));
+    }
 
     return K_SPP_OK;
 }

@@ -74,6 +74,7 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerCont
         s_producers[s_registeredProducers].p_contract = p_producerData;
 
         s_producers[s_registeredProducers].kpid.value = (spp_uint16_t)(1U << (s_registeredProducers + 2));
+
         /*
         * First bit reserved to logs, second bit reserved for the FSM
         * with s_registeredProducers = 0 -> producer 0: 0000 0100
@@ -109,7 +110,6 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerCont
         s_consumers[s_registeredConsumers].p_contract = p_consumerData;
         s_consumers[s_registeredConsumers].subcription = subscription;
 
-
         s_registeredConsumers++;
         ret = K_SPP_OK;
     }
@@ -121,6 +121,11 @@ void SPP_SERVICES_PUBSUB_callProducers(void)
     s_producerReady = false;
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
+        if (s_producers[i].initResult != K_SPP_OK)
+        {
+            continue;
+        }
+
         (void)s_producers[i].p_contract->acquireData(s_producers[i].kpid);
     }
 }
@@ -128,7 +133,6 @@ void SPP_SERVICES_PUBSUB_callProducers(void)
 SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_pkt)
 {
     SPP_RetVal_t ret = K_SPP_OK;
-
     if (p_pkt == NULL)
     {
         return K_SPP_ERROR_NULL_POINTER;
@@ -155,16 +159,23 @@ void SPP_SERVICES_PUBSUB_callConsumers(void)
     SPP_SERVICES_PUBSUB_sendToMailbox();
     for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
     {
+        if (s_consumers[j].initResult != K_SPP_OK)
+        {
+            continue;
+        }
+
         if (s_consumers[j].p_contract->consumeData == NULL)
         {
             continue;
         }
+
         /* Preempt lower-priority consumers if a producer has new data pending. */
         if (s_producerReady && (s_consumers[j].p_contract->priority > K_SPP_SERVICES_PUBSUB_PREEMPT_PRIORITY))
         {
             s_producerReady = false;
             break;
         }
+
         (void)s_consumers[j].p_contract->consumeData(NULL);
     }
 }
@@ -181,37 +192,16 @@ void SPP_SERVICES_PUBSUB_signalProducerReady(void)
 
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void)
 {
-    spp_uint8_t failedConsumers = 0U;
-    spp_uint8_t failedProducers = 0U;
-
     SPP_SERVICES_PUBSUB_sortConsumers();
 
     for (spp_uint8_t i = 0U; i < s_registeredConsumers; i++)
     {
         s_consumers[i].initResult = s_consumers[i].p_contract->init();
-        if (s_consumers[i].initResult != K_SPP_OK)
-        {
-            failedConsumers++;
-        }
     }
 
     for (spp_uint8_t i = 0U; i < s_registeredProducers; i++)
     {
         s_producers[i].initResult = s_producers[i].p_contract->init();
-        if (s_producers[i].initResult != K_SPP_OK)
-        {
-            failedProducers++;
-        }
-    }
-
-    if ((s_registeredConsumers > 0U) && (failedConsumers == s_registeredConsumers))
-    {
-        return K_SPP_ERROR;
-    }
-
-    if ((s_registeredProducers > 0U) && (failedProducers == s_registeredProducers))
-    {
-        return K_SPP_ERROR;
     }
 
     return K_SPP_OK;
@@ -277,14 +267,21 @@ static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
     const SPP_Packet_t packet = s_packetBuffer[s_bufferHead];
     for (spp_uint8_t j = 0U; j < s_registeredConsumers; j++)
     {
+        if (s_consumers[j].initResult != K_SPP_OK)
+        {
+            continue;
+        }
+
         if (s_consumers[j].p_contract->deliverToMailbox == NULL)
         {
             continue;
         }
+
         if ((s_consumers[j].subcription.value & packet.primaryHeader.apid) == 0U)
         {
             continue;
         }
+
         (void)s_consumers[j].p_contract->deliverToMailbox(packet);
     }
     s_bufferHead = (spp_uint8_t)((s_bufferHead + K_SPP_SERVICES_PUBSUB_STEP) % K_SPP_SERVICES_PUBSUB_BUFFER_SIZE);

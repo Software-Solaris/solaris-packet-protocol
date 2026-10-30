@@ -77,6 +77,9 @@ typedef struct
      */
     SPP_RetVal_t (*spiDeviceSetSpeed)(void *p_handle, spp_uint32_t speedHz);
 
+    SPP_RetVal_t (*spiTransmitRaw)(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
+
+
 } SPP_HALSpi_t;
 
 /**

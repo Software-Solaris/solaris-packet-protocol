@@ -6,8 +6,6 @@
  * Call SPP_PORTS_ESP32S3_getHalPorts() to obtain a pointer to the static
  * @ref SPP_HalPort_t and pass it to SPP_HAL_init().
  *
- * Naming conventions used in this file:
- * - Public functions: SPP_PORTS_ESP32S3_*()
  */
 
 #ifndef SPP_PORTS_HAL_ESP32_H

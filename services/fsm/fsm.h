@@ -13,7 +13,8 @@
 * DEFINES
 * ---------------------------------------------------------------- */
 #define K_FSM_TIMEOUT_MS     10000U // Only executed once, np with stops
-#define K_FSM_MAX_TABLE_SIZE 10U    /*<Only allow 10 rows on the FSM table */
+#define K_FSM_MAX_TABLE_SIZE 10U    /*<Only allow 10 rows per FSM table */
+#define K_FSM_MAX_TABLES     4U     /*<Maximum number of registered tables */
 
 
 /* ----------------------------------------------------------------
@@ -76,12 +77,20 @@ typedef struct
 */
 spp_uint16_t *SPP_CORE_FSM_getErrorsBit(void);
 /**
-* @brief    Initialize the FSM.
-* @param    p_halPorts  Pointer to the HAL ports.
-* @param    p_transitiontable Pointer to the FSM table for operation.
-* @param    tableSize Size of the table.
-*/
-SPP_RetVal_t FSM_init(const FSM_Transition_t *p_transitionTable, const spp_uint8_t tableSize);
+ * @brief    Initialise the FSM with the internal service table.
+ *           The service table runs the PUBSUB produce/consume cycle in the
+ *           active states. Use @ref FSM_addTable to append application rows.
+ * @return   K_SPP_OK on success.
+ */
+SPP_RetVal_t FSM_init(void);
+
+/**
+ * @brief    Append a transition table to the FSM.
+ * @param    p_transitionTable Pointer to the table to append.
+ * @param    tableSize         Number of rows in the table.
+ * @return   K_SPP_OK on success.
+ */
+SPP_RetVal_t FSM_addTable(const FSM_Transition_t *p_transitionTable, const spp_uint8_t tableSize);
 /**
  * @brief Evaluate the transition table and advance the FSM if a guard passes.
  *        Call this once per superloop tick.

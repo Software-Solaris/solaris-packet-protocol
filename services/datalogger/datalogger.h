@@ -14,13 +14,13 @@
  * DEFINES
  * ---------------------------------------------------------------- */
 
-#define K_DATALOGGER_CONSUMER_PRIO (0)
-#define K_DATALOGGER_TIMEOUT_MS    (1000U)
-#define K_DATALOGGER_SPI_DEV_IDX   (2U)
-#define K_DATALOGGER_SECTOR_SIZE   (512U)
-#define K_DATALOGGER_FIRST_SECTOR  ((spp_uint32_t)16384U)
-#define K_DATALOGGER_BUFFER_SIZE   (2U * K_DATALOGGER_SECTOR_SIZE)
-#define K_DATALOGGER_NO_PENDING    (0xFFU)
+#define K_DATALOGGER_CONSUMER_PRIO  (0)
+#define K_DATALOGGER_TIMEOUT_MS     (1000U)
+#define K_DATALOGGER_SECTOR_SIZE    (512U)
+#define K_DATALOGGER_FIRST_SECTOR   ((spp_uint32_t)16384U)
+#define K_DATALOGGER_BUFFER_SIZE    (2U * K_DATALOGGER_SECTOR_SIZE)
+#define K_DATALOGGER_BUFFER_PACKETS (K_DATALOGGER_BUFFER_SIZE / K_SPP_TOTAL_PACKET_SIZE)
+#define K_DATALOGGER_NO_PENDING     (0xFFU)
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
