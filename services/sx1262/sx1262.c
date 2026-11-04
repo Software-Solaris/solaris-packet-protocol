@@ -552,10 +552,10 @@ static SPP_RetVal_t SX1262_SetRfFrequency(void *p_handle)
 {
     spp_uint8_t buffer[5];
     buffer[0] = SX1262_OPCODE_SET_RF_FRECUENCY;
-    buffer[1] = 0x36; // 869,55 MHz
-    buffer[2] = 0x58;
-    buffer[3] = 0xCC;
-    buffer[4] = 0xCC;
+    buffer[1] = 0x36; // 869,25 MHz
+    buffer[2] = 0x54;
+    buffer[3] = 0x00;
+    buffer[4] = 0x00;
 
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
