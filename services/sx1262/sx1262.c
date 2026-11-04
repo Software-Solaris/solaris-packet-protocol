@@ -183,9 +183,9 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     // Modulation and Lora packet parameters
     const spp_uint8_t lora_mod_params[4] = {
         0x07, // Spreading Factor = 7
-        0x04, // BW = 125 kHz
+        0x05, // BW = 250 kHz
         0x01, // Code Rate = 4/5
-        0x01  // LDRO ON (same as devkit)
+        0x00  // LDRO OFF (same as devkit)
     };
     ret = SX1262_SetModulationParams(p_spi, lora_mod_params[0], lora_mod_params[1], lora_mod_params[2],
                                      lora_mod_params[3]);
@@ -552,10 +552,10 @@ static SPP_RetVal_t SX1262_SetRfFrequency(void *p_handle)
 {
     spp_uint8_t buffer[5];
     buffer[0] = SX1262_OPCODE_SET_RF_FRECUENCY;
-    buffer[1] = 0x36; // 868 MHz
-    buffer[2] = 0x40;
-    buffer[3] = 0x00;
-    buffer[4] = 0x00;
+    buffer[1] = 0x36; // 869,55 MHz
+    buffer[2] = 0x58;
+    buffer[3] = 0xCC;
+    buffer[4] = 0xCC;
 
     SPP_RetVal_t ret = SX1262_WaitBusy();
     if (ret != K_SPP_OK)
@@ -567,8 +567,8 @@ static SPP_RetVal_t SX1262_SetPaConfig(void *p_handle)
 {
     spp_uint8_t buffer[5];
     buffer[0] = SX1262_OPCODE_SET_PA_CONFIG;
-    buffer[1] = 0x02; // paDutyCycle to +14 dBm in SX1262
-    buffer[2] = 0x02; // hpMax to +14 dBm in SX1262
+    buffer[1] = 0x04; // paDutyCycle to +22 dBm in SX1262
+    buffer[2] = 0x07; // hpMax to +14 dBm in SX1262
     buffer[3] = 0x00; // deviceSel --> SX1262
     buffer[4] = 0x01; // paLut
 
