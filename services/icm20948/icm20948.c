@@ -95,6 +95,13 @@ static const SPP_SERVICE_ProducerContract_t s_icm20948ProducerContract = {
     .acquireData = SPP_SERVICES_ICM20948_acquireData,
 };
 
+/* Magneto Calibration */
+static const spp_float32_t K_ICM20948_MAG_CAL_MATRIX[3][3] = {
+    {0.02601071f, 0.00000000f, 0.00000000f},
+    {0.00099049f, 0.02536989f, 0.00000000f},
+    {-0.00027743f, -0.00132742f, 0.02539076f},
+};
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
@@ -1757,9 +1764,27 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             float gy = (gyroY / 32.8f) - K_ICM20948_GYRO_BIAS_Y;
                             float gz = (gyroZ / 32.8f) - K_ICM20948_GYRO_BIAS_Z;
 
-                            float mx = magX * 0.15f;
-                            float my = magY * 0.15f;
-                            float mz = magZ * 0.15f;
+                            const spp_float32_t mxRaw = magX * 0.15f;
+                            const spp_float32_t myRaw = magY * 0.15f;
+                            const spp_float32_t mzRaw = magZ * 0.15f;
+
+                            const spp_float32_t mxCentered = mxRaw - K_ICM20948_MAG_BIAS_X;
+                            const spp_float32_t myCentered = myRaw - K_ICM20948_MAG_BIAS_Y;
+                            const spp_float32_t mzCentered = mzRaw - K_ICM20948_MAG_BIAS_Z;
+
+                            const spp_float32_t mx = K_ICM20948_MAG_CAL_MATRIX[0][0] * mxCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[0][1] * myCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[0][2] * mzCentered;
+
+                            const spp_float32_t my = K_ICM20948_MAG_CAL_MATRIX[1][0] * mxCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[1][1] * myCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[1][2] * mzCentered;
+
+                            const spp_float32_t mz = K_ICM20948_MAG_CAL_MATRIX[2][0] * mxCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[2][1] * myCentered +
+                                                     K_ICM20948_MAG_CAL_MATRIX[2][2] * mzCentered;
+
+                            printf("MAG,%.6f,%.6f,%.6f\n", mx, my, mz);
 
                             float qx = q1Raw / 1073741824.0f;
                             float qy = q2Raw / 1073741824.0f;

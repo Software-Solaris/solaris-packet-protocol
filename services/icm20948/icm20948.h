@@ -189,6 +189,10 @@
 #define K_ICM20948_GYRO_BIAS_Y (0.428753f)
 #define K_ICM20948_GYRO_BIAS_Z (-0.329620f)
 
+#define K_ICM20948_MAG_BIAS_X 8.6090f
+#define K_ICM20948_MAG_BIAS_Y -10.9293f
+#define K_ICM20948_MAG_BIAS_Z 16.6568f
+
 /* ----------------------------------------------------------------
  * STRUCTS AND ENUMS
  * ---------------------------------------------------------------- */
