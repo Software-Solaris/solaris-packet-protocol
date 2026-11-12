@@ -105,8 +105,8 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void)
 static spp_uint16_t packetCrc(const SPP_Packet_t *p_packet)
 {
     /* CRC covers all bytes up to (but not including) the crc field.
-     * The packet is zeroed before filling, so padding bytes are 0
-     * and contribute deterministically to the checksum. */
+     * Unused bytes are initialized to 0xFF for deterministic CRC calculation. */
+
     return SPP_UTIL_crc16((const spp_uint8_t *)p_packet, (spp_uint32_t)offsetof(SPP_Packet_t, crc));
 }
 
@@ -126,7 +126,7 @@ SPP_RetVal_t SPP_SERVICES_DATABANK_packetData(SPP_Packet_t *p_packet, spp_uint16
         return K_SPP_ERROR_INVALID_PARAMETER;
     }
 
-    /* Zero the whole struct so padding bytes are deterministic. */
+    /* Initialize the entire packet to 0xFF for deterministic serialization. */
     memset(p_packet, 0xFF, sizeof(SPP_Packet_t));
 
     p_packet->primaryHeader.version = K_SPP_PKT_VERSION;

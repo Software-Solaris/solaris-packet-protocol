@@ -3,11 +3,11 @@
  * @brief Static packet pool manager.
  *
  * The databank maintains a fixed pool of @ref SPP_Packet_t objects.
- * Producers call @ref SPP_SERVICES_DATABANK_getPacket() to acquire a free packet,
- * fill it, and pass it to the @c db_flow FIFO.  Consumers return packets
- * via @ref SPP_SERVICES_DATABANK_returnPacket() after processing.
+ * Producers acquire packets through @ref SPP_SERVICES_DATABANK_getPacket()
+ * and publish them through PUBSUB, which copies the data into its
+ * internal buffer and returns the original packet to the pool.
  *
- * The pool size is controlled by @ref K_SPP_DATABANK_SIZE (default 5).
+ * The pool size is controlled by @ref K_SPP_DATABANK_SIZE (default 50).
  *
  * Naming conventions used in this file:
  * - Constants/macros: K_SPP_DATABANK_*
@@ -31,8 +31,7 @@
 /**
  * @brief Internal databank control structure.
  *
- * Exposed here only to allow static allocation by the caller if needed;
- * treat all fields as private — use only the public API.
+ * Internal state representation. Access the databank through its public API.
  */
 typedef struct
 {
@@ -72,7 +71,7 @@ SPP_Packet_t *SPP_SERVICES_DATABANK_getPacket(void);
  *
  * @return K_SPP_OK on success.
  * @return K_SPP_ERROR_NULL_POINTER if @p p_packet is NULL.
- * @return K_SPP_ERROR if @p p_packet is not a valid pool address (double-return guard).
+ * @return K_SPP_ERROR if the pointer is outside the pool or the free list is full.
  * @return K_SPP_ERROR_ALREADY_INITIALIZED if the packet is already in the free list.
  */
 SPP_RetVal_t SPP_SERVICES_DATABANK_returnPacket(SPP_Packet_t *p_packet);
@@ -87,7 +86,7 @@ spp_uint32_t SPP_SERVICES_DATABANK_freeCount(void);
 /**
  * @brief Fill a packet with data and compute its CRC.
  *
- * Zeroes the entire packet (including any struct padding), writes all header
+ * Initializes the packet bytes to 0xFF, writes all header
  * fields, copies @p p_data into the payload, and computes a CRC-16/CCITT
  * checksum over every byte of the packet except the @c crc field itself.
  *

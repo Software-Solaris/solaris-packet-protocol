@@ -1784,8 +1784,6 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                                                      K_ICM20948_MAG_CAL_MATRIX[2][1] * myCentered +
                                                      K_ICM20948_MAG_CAL_MATRIX[2][2] * mzCentered;
 
-                            printf("MAG,%.6f,%.6f,%.6f\n", mx, my, mz);
-
                             float qx = q1Raw / 1073741824.0f;
                             float qy = q2Raw / 1073741824.0f;
                             float qz = q3Raw / 1073741824.0f;
