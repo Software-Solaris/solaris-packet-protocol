@@ -3,15 +3,14 @@
  * @brief ICM20948 IMU driver and SPP service.
  *
  * Provides SPI register access, DMP firmware loading and sensor data
- * acquisition for the TDK InvenSense ICM20948 9-axis IMU.  Supports
- * data-ready interrupt via GPIO event groups.
+ * acquisition for the TDK InvenSense ICM20948 9-axis IMU.
+ * Uses a GPIO data-ready interrupt.
  *
  * The driver follows a three-step workflow:
- * 1. Call SPP_SERVICES_ICM20948_getProducerContract() and register the result
- *    with SPP_SERVICES_PUBSUB_registerProducer().
- * 2. The service framework calls init (GPIO/SPI setup + DMP firmware load).
- * 3. On each DRDY interrupt acquireData reads the DMP FIFO and publishes
- *    a 9-axis data packet.
+ * 1. Register the producer contract through PUBSUB.
+ * 2. PUBSUB initializes the sensor and loads the DMP firmware.
+ * 3. During acquisition cycles, the driver checks DRDY, reads the
+ *    DMP FIFO and publishes an 11-float (44-byte) SPP packet.
  *
  * Hardware pin configuration is encoded in K_ICM20948_INT_* and
  * K_ICM20948_SPI_HOST_USED constants; no external instance is needed.
@@ -35,11 +34,7 @@
  * ---------------------------------------------------------------- */
 
 /* Service */
-#define K_ICM20948_TASK_PRIORITY         4U        /**< FreeRTOS task priority for the ICM20948 service task. */
-#define K_ICM20948_CONFIG_TASK_PRIORITY  5U        /**< Priority for the DMP configuration task. */
-#define K_ICM20948_READ_SENSORS_PRIORITY 4U        /**< Priority for the sensor read task. */
-#define K_ICM20948_TASK_TIMEOUT_MS       5000U     /**< Timeout in ms for the acquire task. */
-#define K_ICM20948_SERVICE_APID          (0x0002U) /**< APID produced by the ICM20948 module (bitmask scheme). */
+#define K_ICM20948_TASK_TIMEOUT_MS 5000U /**< Timeout in ms for the acquire task. */
 
 /* SPI */
 #define K_ICM20948_SPI_HOST_USED (1U)  /**< SPI host identifier (SPI2_HOST = 1 on ESP32). */
@@ -555,10 +550,10 @@ typedef struct
     float mx;             /**< Magnetometer X (uT)   */
     float my;             /**< Magnetometer Y (uT)   */
     float mz;             /**< Magnetometer Z (uT)   */
-    float qw;             /**< Quaternion W (uT)     */
-    float qx;             /**< Quaternion X (uT)     */
-    float qy;             /**< Quaternion Y (uT)     */
-    float qz;             /**< Quaternion Z (uT)     */
+    float qw;             /**< Quaternion W (-)     */
+    float qx;             /**< Quaternion X (-)     */
+    float qy;             /**< Quaternion Y (-)     */
+    float qz;             /**< Quaternion Z (-)     */
     float accuracy;       /**< Quaternion accuracy   */
     spp_bool_t dataReady; /**< Set when a FIFO packet has been parsed. */
 } ICM20948_SensorData_t;
@@ -600,6 +595,11 @@ typedef struct
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
+
+/**
+ * @brief Returns the ICM20948 producer contract for PUBSUB registration.
+ * @return Pointer to the static producer contract.
+ */
 const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_ICM20948_getProducerContract(void);
 
 #endif /* SPP_ICM20948_H */

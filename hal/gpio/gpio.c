@@ -1,8 +1,7 @@
 /**
- * @file spi.c
- * @brief HAL SPI functions implementation. Calls the function pointer and returns the result.
+ * @file gpio.c
+ * @brief HAL GPIO functions implementation. Dispatches calls through the registered HAL port.
  */
-
 
 /* ----------------------------------------------------------------
  * INCLUDES

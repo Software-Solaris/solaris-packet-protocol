@@ -56,8 +56,19 @@ SPP_RetVal_t SPP_HAL_GPIO_configInterrupt(spp_uint32_t pin, spp_uint32_t intrTyp
  */
 SPP_RetVal_t SPP_HAL_GPIO_registerIsr(spp_uint32_t pin, void *p_isrCtx);
 
+/**
+ * @brief Reads the logic level of a GPIO pin.
+ * @param pin GPIO pin number.
+ * @return Current logic level (0 or 1).
+ */
 spp_uint16_t SPP_HAL_GPIO_read(spp_uint32_t pin);
 
+/**
+ * @brief Configures a GPIO as output and sets its logic level.
+ * @param pin GPIO pin number.
+ * @param level Logic level to set.
+ * @return K_SPP_OK on success, K_SPP_ERROR on failure.
+ */
 SPP_RetVal_t SPP_HAL_GPIO_write(spp_uint32_t pin, spp_uint8_t level);
 
 #endif /* SPP_HAL_GPIO_H */

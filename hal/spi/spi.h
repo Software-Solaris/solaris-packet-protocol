@@ -83,13 +83,16 @@ void *SPP_HAL_SPI_getHandle(spp_uint8_t deviceIdx);
 SPP_RetVal_t SPP_HAL_SPI_deviceInit(void *p_handle);
 
 /**
- * @brief Perform a full-duplex SPI transaction.
+ * @brief Performs register-based SPI transactions.
  *
- * @param[in,out] p_handle  SPI device handle.
- * @param[in,out] p_data    TX data in, RX data out (in-place).
- * @param[in]     length    Number of bytes in the transaction.
+ * The ESP32 port interprets bit 7 of each command byte to distinguish
+ * reads (3 bytes) from writes (2 bytes).
  *
- * @return K_SPP_OK on success, K_SPP_ERROR_ON_SPI_TRANSACTION on failure.
+ * @param p_handle SPI device handle.
+ * @param p_data Transaction buffer, overwritten during reads.
+ * @param length Buffer length in bytes.
+ * @return K_SPP_OK on success, K_SPP_ERROR on transaction failure,
+ *         or K_SPP_ERROR_NULL_POINTER if the HAL port is unavailable.
  */
 SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
@@ -107,7 +110,17 @@ SPP_RetVal_t SPP_HAL_SPI_transmit(void *p_handle, spp_uint8_t *p_data, spp_uint8
  */
 SPP_RetVal_t SPP_HAL_SPI_deviceSetSpeed(void *p_handle, spp_uint32_t speedHz);
 
-/* Read funtion for sx1262 fix */
+/**
+ * @brief Performs a raw full-duplex SPI transaction.
+ *
+ * Transmitted data is overwritten by received data.
+ *
+ * @param p_handle SPI device handle.
+ * @param p_data Transmission and reception buffer.
+ * @param length Number of bytes to transfer.
+ * @return K_SPP_OK on success, K_SPP_ERROR on transaction failure,
+ *         or K_SPP_ERROR_NULL_POINTER if the HAL port is unavailable.
+ */
 SPP_RetVal_t SPP_HAL_SPI_transmitRaw(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length);
 
 #endif /* SPP_HAL_SPI_H */

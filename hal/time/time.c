@@ -1,15 +1,13 @@
 /**
- * @file spi.c
- * @brief HAL SPI functions implementation. Calls the function pointer and returns the result.
+ * @file time.c
+ * @brief HAL time functions implementation. Dispatches through the registered HAL port.
  */
-
 
 /* ----------------------------------------------------------------
  * INCLUDES
  * ---------------------------------------------------------------- */
 #include "spp/hal/hal.h"
 #include "spp/hal/time/time.h"
-
 
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS

@@ -6,4 +6,5 @@ Full documentation — architecture, design, API reference — lives on the webs
 
 **[softwaresolaris.com](https://softwaresolaris.com)**
 
-Licensed under CC BY-NC-SA 4.0. See `LICENSE.md`.
+For licensing terms, see [LICENSE.md](LICENSE.md).
+

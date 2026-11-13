@@ -60,9 +60,10 @@ SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void)
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */
+
 /**
- * @brief Initialise the SD card and open the log file for writing.
- * @return K_SPP_OK on success, K_SPP_ERROR on mount or file-open failure.
+ * @brief Initializes the SD card storage and resets the logging indices.
+ * @return Result returned by the storage HAL initialization.
  */
 static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
 {
@@ -70,7 +71,7 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
     s_currentDataSector = K_DATALOGGER_FIRST_SECTOR;
     s_packetIndex = 0;
 
-    /* Init SPI for SD card */
+    /* Initialize SD card storage. */
     s_initStatus = SPP_HAL_STORAGE_init();
     if (s_initStatus != K_SPP_OK)
     {
@@ -80,9 +81,9 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_init(void)
 }
 
 /**
- * @brief Receive a packet from the pub/sub router into the consumer mailbox.
- * @param  p_pkt  Packet dispatched by the router.
- * @return K_SPP_OK on success, K_SPP_ERROR_NULL_POINTER if p_pkt is NULL.
+ * @brief Copies a received packet into the internal logging buffer.
+ * @param packet Packet dispatched by PUBSUB.
+ * @return K_SPP_OK.
  */
 static SPP_RetVal_t SPP_SERVICES_DATALOGGER_deliverToMailbox(const SPP_Packet_t packet)
 {
@@ -93,9 +94,13 @@ static SPP_RetVal_t SPP_SERVICES_DATALOGGER_deliverToMailbox(const SPP_Packet_t 
 }
 
 /**
- * @brief Consume a packet from the mailbox and write it to the SD card log file.
- * @param  p_data  Unused (context pointer reserved for future use).
- * @return K_SPP_OK on success, K_SPP_ERROR if the file is not open or write fails.
+ * @brief Writes the buffered packets to consecutive SD card sectors when full.
+ *
+ * On successful writing, advances the sector index and resets the buffer.
+ * On failure, retains the buffered packets for a later attempt.
+ *
+ * @param p_data Unused.
+ * @return K_SPP_OK, regardless of the storage write result.
  */
 static SPP_RetVal_t SPP_SERVICES_DATALOGGER_consumeData(void *p_data)
 {

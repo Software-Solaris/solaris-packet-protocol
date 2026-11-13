@@ -26,7 +26,17 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
+/**
+ * @brief Returns the datalogger consumer contract.
+ * @return Pointer to the statically allocated consumer contract.
+ */
 const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_DATALOGGER_getConsumerContract(void);
+
+/**
+ * @brief Returns the stored SD card initialization status.
+ * @return K_SPP_ERROR_NOT_INITIALIZED before initialization,
+ *         or the result returned by the storage HAL.
+ */
 SPP_RetVal_t SPP_SERVICES_DATALOGGER_getInitStatus(void);
 
 #endif /* SPP_DATALOGGER_H */
