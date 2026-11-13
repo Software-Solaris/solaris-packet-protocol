@@ -16,8 +16,6 @@
  * ---------------------------------------------------------------- */
 
 /**
-
-/**
  * @brief Defines the callbacks and metadata of an SPP producer.
  *
  * The producer KPID is assigned during PUBSUB registration.
