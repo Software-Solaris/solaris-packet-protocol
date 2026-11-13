@@ -1,9 +1,9 @@
 /**
- * @file bmp390_service.c
- * @brief BMP390 pressure sensor driver + SPP service implementation.
+ * @file bmp390.c
+ * @brief BMP390 pressure sensor driver and SPP producer implementation.
  *
- * Combines the low-level SPI driver with an acquisition task that reads
- * altitude, pressure and temperature at 5 Hz and logs packets to SD card.
+ * Handles sensor configuration, SPI acquisition, compensation,
+ * reference calibration and packet publication through PUBSUB.
  */
 
 #include "spp/services/bmp390/bmp390.h"
@@ -127,12 +127,15 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(vo
 /* ----------------------------------------------------------------
 * STATIC FUNCTIONS
 * ---------------------------------------------------------------- */
+
 /**
-* @brief    BMP390 sensor instance initialisation. This function is called by the service task.
-            It is responsible for initialising the SPI bus, the GPIO ISR, and the sensor driver.
-* @param    p_data    Pointer to the BMP390 sensor instance.
-* @return   K_SPP_OK on success.
-*/
+ * @brief Initializes the BMP390 sensor and its hardware interfaces.
+ *
+ * Configures the GPIO interrupt, initializes the SPI device,
+ * configures the sensor and enables data-ready interrupts.
+ *
+ * @return K_SPP_OK on success, error code otherwise.
+ */
 static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
@@ -185,15 +188,16 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_init(void)
     return ret;
 }
 
-
 /**
- * @brief  Acquisition callback invoked by the SPP service task on each cycle.
+ * @brief Acquires BMP390 measurements and publishes them through PUBSUB.
  *
- * Checks the DRDY flag, reads compensated altitude, pressure and temperature
- * from the sensor, packs the values into an SPP packet and publishes it.
- * Silently returns if DRDY is not set or no free packet is available.
+ * Checks the DRDY flag, reads compensated measurements and performs
+ * reference calibration using the first 500 samples.
+ * After calibration, publishes altitude, pressure and temperature.
  *
- * @param  p_data  Pointer to the BMP390_t sensor instance.
+ * @param kpid Assigned producer KPID.
+ * @return K_SPP_OK on normal execution, error code on acquisition
+ *         or packet preparation failure.
  */
 static SPP_RetVal_t SPP_SERVICES_BMP390_acquireData(SPP_Kpid_t kpid)
 {
@@ -395,13 +399,6 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_prepareMeasure(void *p_spiHandler)
 
     return SPP_HAL_SPI_transmit(p_spiHandler, buf, sizeof(buf));
 }
-
-/**
- * @brief  Polls the DRDY flag until set or until the timeout elapses.
- * @param  p_bmp        Pointer to the driver context containing the ISR flag.
- * @param  timeout_ms   Maximum time to wait in milliseconds.
- * @return K_SPP_OK when data is ready, K_SPP_ERROR on timeout.
- */
 
 /* ----------------------------------------------------------------
  * Driver — temperature
@@ -744,9 +741,8 @@ static SPP_RetVal_t SPP_SERVICES_BMP390_auxGetPress(void *p_spiHandler, const BM
  * ---------------------------------------------------------------- */
 
 /**
- * @brief  Reads compensated altitude, pressure and temperature from the sensor.
+ * @brief  Reads compensated temperature and pressure, and computes relative altitude.
  * @param  p_spiHandler   SPI device handle.
- * @param  p_bmp          Driver context (unused; DRDY is handled by the caller).
  * @param  altitude_m     Output: altitude relative to launch-site reference pressure and temperature.
  * @param  pressure_pa    Output: compensated pressure in Pa.
  * @param  temperature_c  Output: compensated temperature in °C.

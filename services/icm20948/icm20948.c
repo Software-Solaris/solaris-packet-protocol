@@ -126,6 +126,7 @@ const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_ICM20948_getProducerContract(
 /**
  * @brief  Initialises the ICM20948 interrupt context and registers the GPIO ISR.
  * @param  p_icm  Pointer to the ICM20948 interrupt context to initialise.
+ * @return Result of GPIO interrupt configuration and ISR registration.
  */
 static SPP_RetVal_t SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
 {
@@ -143,7 +144,7 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_initGpio(ICM20948_Data_t *p_icm)
 
 /**
  * @brief  Service init callback — sets hardware config, registers GPIO ISR, loads DMP firmware.
- * @return K_SPP_OK on success, K_SPP_ERROR on DMP init failure.
+ * @return K_SPP_OK on success, K_SPP_ERROR on init failure.
  */
 static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
 {
@@ -190,12 +191,14 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_init(void)
 }
 
 /**
- * @brief  Service acquire callback — reads FIFO data and publishes a packet.
+ * @brief Reads DMP FIFO data and publishes an SPP packet.
  *
- * Called by the service framework on each cycle. Checks the DRDY flag, reads
- * the DMP FIFO, packs 9-axis sensor data into an SPP packet and publishes it.
+ * Checks the DRDY flag and publishes accelerometer, gyroscope
+ * and quaternion data in an 11-float payload (44 bytes).
  *
- * @return K_SPP_OK on success or no data; K_SPP_ERROR if packet allocation or packing fails.
+ * @param kpid Assigned producer KPID.
+ * @return K_SPP_OK on success or no new data, error code on
+ *         packet allocation or preparation failure.
  */
 static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
 {
@@ -249,7 +252,6 @@ static SPP_RetVal_t SPP_SERVICES_ICM20948_acquireData(SPP_Kpid_t kpid)
         return ret;
     }
 
-    //Publish the packet 1 and packet 2
     SPP_SERVICES_PUBSUB_publish(p_pkt1);
 
     return K_SPP_OK;
@@ -1706,8 +1708,6 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
 
                     for (spp_uint16_t i = 0U; i < numPackets; i++)
                     {
-                        /* fifoBuffer[0..23]: DMP packet (DATA_OUT_CTL1=0x8400).
-                         * [0-1]=header1, [2-7]=accel, [8-21]=quat9, [22-23]=footer. */
                         spp_uint8_t fifoBuffer[K_ICM20948_DMP_PACKET_SIZE_BYTES] = {0U};
 
                         ret = readFifoBurst(p_spi, fifoBuffer, K_ICM20948_DMP_PACKET_SIZE_BYTES);
@@ -1783,8 +1783,6 @@ static void SPP_SERVICES_ICM20948_checkFifoData(ICM20948_t *p_ctx)
                             const spp_float32_t mz = K_ICM20948_MAG_CAL_MATRIX[2][0] * mxCentered +
                                                      K_ICM20948_MAG_CAL_MATRIX[2][1] * myCentered +
                                                      K_ICM20948_MAG_CAL_MATRIX[2][2] * mzCentered;
-
-                            printf("MAG,%.6f,%.6f,%.6f\n", mx, my, mz);
 
                             float qx = q1Raw / 1073741824.0f;
                             float qy = q2Raw / 1073741824.0f;

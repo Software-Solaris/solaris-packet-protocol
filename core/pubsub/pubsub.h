@@ -30,11 +30,32 @@
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------------- */
 
+/**
+ * @brief Registers a producer and assigns it a unique KPID.
+ * @param p_producerData Pointer to the producer contract.
+ * @param p_assignedKpid Pointer where the assigned KPID is stored.
+ * @return K_SPP_OK, K_SPP_ERROR_NULL_POINTER or K_SPP_ERROR_REGISTRY_FULL.
+ */
 SPP_RetVal_t SPP_SERVICES_PUBSUB_registerProducer(const SPP_SERVICE_ProducerContract_t *p_producerData,
+
+                                                  /**
+ * @brief Registers a consumer with its KPID subscription bitmask.
+ * @param p_consumerData Pointer to the consumer contract.
+ * @param subscription KPID bitmask identifying subscribed producers.
+ * @return K_SPP_OK, K_SPP_ERROR_NULL_POINTER or K_SPP_ERROR_REGISTRY_FULL.
+ */
                                                   SPP_Kpid_t *p_assignedKpid);
 SPP_RetVal_t SPP_SERVICES_PUBSUB_registerConsumer(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
                                                   SPP_Kpid_t subscription);
 
+/**
+ * @brief Sorts consumers by priority and initializes registered modules.
+ *
+ * Consumers are initialized before producers. Individual initialization
+ * results are stored for later inspection.
+ *
+ * @return K_SPP_OK. Individual module failures do not change this return value.
+ */
 SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 
 /**
@@ -52,14 +73,16 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_init(void);
 SPP_RetVal_t SPP_SERVICES_PUBSUB_publish(SPP_Packet_t *p_pkt);
 
 /**
- * @brief  Calls acquireData on every registered producer.
+  * @brief Calls acquireData on every successfully initialized producer.
  */
 void SPP_SERVICES_PUBSUB_callProducers(void);
 
 /**
- * @brief  Routes all buffered packets to matching consumer mailboxes, then clears the buffer.
+ * @brief Dispatches one buffered packet and executes initialized consumers.
+ *
+ * Consumers execute in ascending priority order. Lower-priority consumers
+ * may be skipped when a producer signals that new data is ready.
  */
-
 void SPP_SERVICES_PUBSUB_callConsumers(void);
 
 /**
@@ -75,9 +98,23 @@ spp_uint8_t SPP_SERVICES_PUBSUB_queueDepth(void);
  */
 void SPP_SERVICES_PUBSUB_signalProducerReady(void);
 
+/**
+ * @brief Retrieves the initialization result of a registered producer.
+ * @param p_producerData Pointer to the producer contract.
+ * @param p_initResult Output pointer for the initialization result.
+ * @return K_SPP_OK if found, K_SPP_ERROR if not registered,
+ *         or K_SPP_ERROR_NULL_POINTER for invalid pointers.
+ */
 SPP_RetVal_t SPP_SERVICES_PUBSUB_getProducerInitResult(const SPP_SERVICE_ProducerContract_t *p_producerData,
                                                        SPP_RetVal_t *p_initResult);
 
+/**
+ * @brief Retrieves the initialization result of a registered consumer.
+ * @param p_consumerData Pointer to the consumer contract.
+ * @param p_initResult Output pointer for the initialization result.
+ * @return K_SPP_OK if found, K_SPP_ERROR if not registered,
+ *         or K_SPP_ERROR_NULL_POINTER for invalid pointers.
+ */
 SPP_RetVal_t SPP_SERVICES_PUBSUB_getConsumerInitResult(const SPP_SERVICE_ConsumerContract_t *p_consumerData,
                                                        SPP_RetVal_t *p_initResult);
 #endif /* SPP_PUBSUB_H */

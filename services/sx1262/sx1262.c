@@ -86,6 +86,16 @@ const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(vo
 /* -----------------------------------------
     STATIC FUNCTIONS IMPLEMENTATION
 --------------------------------------------*/
+
+/**
+ * @brief Initializes the SX1262 radio for LoRa transmission.
+ *
+ * Initializes SPI and GPIO, resets the radio, configures the TCXO,
+ * regulator, RF frequency, modulation, transmission parameters
+ * and DIO1 interrupts.
+ *
+ * @return K_SPP_OK on success, error code otherwise.
+ */
 static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
 {
     SPP_RetVal_t ret = K_SPP_OK;
@@ -226,6 +236,15 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_init(void)
     return ret;
 }
 
+/**
+ * @brief Copies a received SPP packet into the transmission mailbox.
+ *
+ * The mailbox is a circular buffer. If full, the oldest packet
+ * is overwritten.
+ *
+ * @param pqt Packet received from PUBSUB.
+ * @return K_SPP_OK.
+ */
 static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
 {
     mailboxData[mailboxTail] = pqt;
@@ -243,7 +262,23 @@ static SPP_RetVal_t SPP_SERVICES_SX1262_deliverToMailbox(const SPP_Packet_t pqt)
     return K_SPP_OK;
 }
 
-
+/**
+ * @brief Advances the radio transmission state machine.
+ *
+ * Processes one transmission stage per call: IDLE, WRITE_BUFFER,
+ * SET_PARAMS, SET_TX or WAIT_TX_DONE.
+ *
+ * Transmits 64-byte SPP packets individually. If more than
+ * K_SX1262_MAX_PACKETS_TO_TRANSMIT packets are queued when
+ * transmission starts, the oldest excess packets are discarded.
+ *
+ * Transmission completion is verified through DIO1 and IRQ status.
+ * Timeouts clear the transmission mailbox.
+ *
+ * @param p_data Unused.
+ * @return K_SPP_OK during normal operation, error code on
+ *         transmission failure or timeout.
+ */
 static SPP_RetVal_t SPP_SERVICES_SX1262_consumeData(void *p_data)
 {
     (void)p_data;
@@ -621,6 +656,16 @@ static SPP_RetVal_t SX1262_SetBufferBaseAddress(void *p_handle)
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
+/**
+ * @brief Writes a payload into the SX1262 internal TX buffer.
+ *
+ * Uses buffer offset 0 and prepends the SPI opcode and offset.
+ *
+ * @param p_handle SPI device handle.
+ * @param p_data Payload to transmit.
+ * @param length Payload size in bytes.
+ * @return Result of the SPI transaction.
+ */
 static SPP_RetVal_t SX1262_WriteBuffer(void *p_handle, spp_uint8_t *p_data, spp_uint8_t length)
 {
     /* The maximum length of the buffer is 255 bytes
@@ -711,6 +756,16 @@ static SPP_RetVal_t SX1262_ClearIrqStatus(void *p_handle, spp_uint16_t clearMask
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, 3);
 }
 
+/**
+ * @brief Reads the radio IRQ status register.
+ *
+ * Used to distinguish successful transmission completion
+ * from timeout or unexpected interrupts.
+ *
+ * @param p_handle SPI device handle.
+ * @param p_irqStatus Output pointer for the 16-bit IRQ flags.
+ * @return K_SPP_OK on success, error code otherwise.
+ */
 static SPP_RetVal_t SX1262_GetIrqStatus(void *p_handle, spp_uint16_t *p_irqStatus)
 {
     if (p_irqStatus == NULL)
@@ -737,6 +792,13 @@ static SPP_RetVal_t SX1262_GetIrqStatus(void *p_handle, spp_uint16_t *p_irqStatu
     return K_SPP_OK;
 }
 
+/**
+ * @brief Configures DIO1 as a rising-edge interrupt input.
+ *
+ * Registers the ISR context used to set g_txDoneFlag.
+ *
+ * @return K_SPP_OK on success, error code otherwise.
+ */
 static SPP_RetVal_t SX1262_InitInterrupts(void)
 {
     SPP_RetVal_t ret = K_SPP_ERROR;
@@ -757,7 +819,6 @@ static SPP_RetVal_t SX1262_InitInterrupts(void)
 
     return K_SPP_OK;
 }
-
 
 static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, spp_uint8_t *p_data, spp_uint8_t length)
 {
@@ -780,9 +841,14 @@ static SPP_RetVal_t SX1262_WriteRegister(void *p_handle, spp_uint16_t address, s
     return SPP_HAL_SPI_transmitRaw(p_handle, buffer, length + 3);
 }
 
-/* -----------------------------------------
-    AUXILIAR FUNCTION (Wait the chip to finish any operation that is running)
---------------------------------------------*/
+/**
+ * @brief Waits until the SX1262 BUSY pin becomes low.
+ *
+ * Polls the GPIO until the radio is ready or the timeout
+ * is reached. This function blocks during the wait.
+ *
+ * @return K_SPP_OK when ready, K_SPP_ERROR on timeout.
+ */
 static SPP_RetVal_t SX1262_WaitBusy(void)
 {
     spp_uint32_t startTime = SPP_HAL_TIME_getTimeMs();
@@ -799,10 +865,16 @@ static SPP_RetVal_t SX1262_WaitBusy(void)
     return K_SPP_OK;
 }
 
-
-/* -----------------------------------------
-    AUXILIAR FUNCTION (Execute a reset sequence when an error happens in TX)
---------------------------------------------*/
+/**
+ * @brief Resets the software transmission state after a timeout.
+ *
+ * Returns the TX FSM to IDLE, discards all queued packets
+ * and clears the TX completion flag.
+ *
+ * Does not perform a hardware reset of the radio.
+ *
+ * @return K_SPP_ERROR.
+ */
 static SPP_RetVal_t SX1262_Timeout_Sequence(void)
 {
     // When an error happens --> reset of the transmision buffer

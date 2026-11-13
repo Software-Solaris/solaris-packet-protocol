@@ -1,3 +1,8 @@
+/**
+ * @file sx1262.h
+ * @brief SX1262 LoRa telemetry consumer interface and configuration.
+ */
+
 #ifndef SPP_SERVICES_SX1262_H
 #define SPP_SERVICES_SX1262_H
 
@@ -34,7 +39,7 @@
 #define SX126X_NRESET_PIN 7
 #define K_SX1262_SPI      2U
 
-/* Debug */
+/* IRQ status */
 #define SX1262_OPCODE_GET_IRQ_STATUS 0x12
 #define SX1262_IRQ_TX_DONE           0x0001U
 #define SX1262_IRQ_TIMEOUT           0x0200U
@@ -69,7 +74,11 @@ typedef struct
 /* -----------------------------------------
     PUBLIC DECLARATIONS
 --------------------------------------------*/
-const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(void);
 
+/**
+ * @brief Returns the SX1262 consumer contract for PUBSUB registration.
+ * @return Pointer to the static consumer contract.
+ */
+const SPP_SERVICE_ConsumerContract_t *SPP_SERVICES_SX1262_getConsumerContract(void);
 
 #endif /* SPP_SERVICES_SX1262_H */

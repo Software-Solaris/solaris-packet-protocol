@@ -10,10 +10,6 @@
 #include "spp/core/commonbit.h"
 #include "spp/services/kpid.h"
 
-
-//TODO: Tener una forma de guardar los data packets que te llegan
-//      Una forma de distribuir ese data packet por consumidores prioritarios
-//      Devolver el datapacketal bank
 /* ----------------------------------------------------------------
  * CONSTANTS
  * ---------------------------------------------------------------- */
@@ -248,15 +244,15 @@ SPP_RetVal_t SPP_SERVICES_PUBSUB_getConsumerInitResult(const SPP_SERVICE_Consume
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * ---------------------------------------------------------------- */
+
 /**
- * @brief  Copies each buffered packet to every consumer whose APID subscription matches,
- *         then resets the internal FIFO (head, tail and count back to zero).
+ * @brief Dispatches one buffered packet to subscribed consumers.
  *
- * Iterates the circular packet buffer from head to head+count.  For each packet
- * it walks the registered consumer list and performs a bitmask check on
- * @c suscribeToApid vs @c primaryHeader.apid.  On a match the full
- * @ref SPP_Packet_t is copied by value into the consumer's @c p_mailBox.
- * When all consumers have been served the buffer is cleared.
+ * Copies the oldest packet from the circular buffer to each
+ * successfully initialized consumer whose KPID subscription matches.
+ * Delivery is performed through the consumer's deliverToMailbox callback.
+ *
+ * After dispatching, advances the buffer head and decrements the count.
  */
 static void SPP_SERVICES_PUBSUB_sendToMailbox(void)
 {

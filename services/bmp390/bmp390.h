@@ -1,25 +1,9 @@
 /**
  * @file bmp390.h
- * @brief BMP390 barometric pressure sensor driver and service.
+ * @brief BMP390 barometric sensor driver and SPP producer.
  *
- * Provides SPI-based communication with the Bosch BMP390 sensor for reading
- * calibrated temperature, pressure and derived altitude.  Supports data-ready
- * interrupt via GPIO event groups.
- *
- * The driver follows a three-step workflow:
- * 1. Initialise and configure the sensor (SPP_SERVICES_BMP390_init, SPP_SERVICES_BMP390_auxConfig,
- *    SPP_SERVICES_BMP390_prepareMeasure).
- * 2. Wait for the data-ready interrupt (SPP_SERVICES_BMP390_waitDrdy).
- * 3. Read compensated altitude/pressure/temperature (SPP_SERVICES_BMP390_getAltitude).
- *
- * To use the SPP service registry, declare a @ref BMP390_t with the hardware
- * pin fields filled in, then call SPP_SERVICES_register() with @ref g_bmp390Module.
- *
- * Naming conventions used in this file:
- * - Constants/macros:  K_BMP390_*
- * - Types:             BMP390_*_t
- * - Public functions:  BMP390_*()
- * - Pointer params:    p_*
+ * Provides SPI-based pressure, temperature and altitude acquisition
+ * using GPIO data-ready interrupts. Sensor data is published through PUBSUB.
  */
 
 #ifndef SPP_BMP390_H
@@ -36,10 +20,7 @@
  * ---------------------------------------------------------------- */
 
 /* Service */
-#define K_BMP_SERVICE_TASK_PRIO       (5U)    /**< FreeRTOS task priority for the BMP390 service. */
-#define K_BMP_SERVICE_TASK_DELAY_MS   (200U)  /**< Delay in ms between measurement cycles. */
-#define K_BMP_SERVICE_TASK_STACK_SIZE (4096U) /**< Stack size in bytes for the BMP390 service task. */
-#define K_BMP_SERVICE_PAYLOAD_LEN     (12U)   /**< Payload length in bytes (temp + press + alt). */
+#define K_BMP_SERVICE_PAYLOAD_LEN (12U) /**< Payload length in bytes (temp + press + alt). */
 
 /* SPI */
 #define K_BMP390_SPI_READ    0x80U /**< SPI read flag: OR with register address. */
@@ -176,12 +157,17 @@ typedef struct
 /* ----------------------------------------------------------------
 *  PUBLIC FUNCTIONS
 * ---------------------------------------------------------------- */
+
+/**
+ * @brief Returns the BMP390 producer contract for PUBSUB registration.
+ * @return Pointer to the static producer contract.
+ */
 const SPP_SERVICE_ProducerContract_t *SPP_SERVICES_BMP390_getProducerContract(void);
 
 /* Performance Test*/
-spp_uint16_t SPP_SERVICES_BMP390_getPerformanceSampleCount(void);
+// spp_uint16_t SPP_SERVICES_BMP390_getPerformanceSampleCount(void);
 
-SPP_RetVal_t SPP_SERVICES_BMP390_getPerformanceSample(spp_uint16_t index, spp_uint32_t *p_bmpUs,
-                                                      spp_uint32_t *p_tempSpiUs, spp_uint32_t *p_pressSpiUs);
+// SPP_RetVal_t SPP_SERVICES_BMP390_getPerformanceSample(spp_uint16_t index, spp_uint32_t *p_bmpUs,
+//                                                       spp_uint32_t *p_tempSpiUs, spp_uint32_t *p_pressSpiUs);
 
 #endif /* SPP_BMP390_H */

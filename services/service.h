@@ -16,18 +16,15 @@
  * ---------------------------------------------------------------- */
 
 /**
-
-* @brief Describes the contract of a producer module. This module needs to have:
-*   - a producer ID
-*   - a name
-*   - a timeout
-*   - an init function
-*   - an acquireData function
-*/
+ * @brief Defines the callbacks and metadata of an SPP producer.
+ *
+ * The producer KPID is assigned during PUBSUB registration.
+ * The timeout field is currently not enforced.
+ */
 typedef struct
 {
     const char *p_nameProducer;    /**< Human-readable module name (for logging). */
-    spp_uint16_t tiemoutMs;        /**< Timeout for the producer to send a packet */
+    spp_uint16_t tiemoutMs;        /**< Timeout for the producer to send a packet (currently unused)*/
     SPP_RetVal_t (*init)();        /**< Initialise the module. */
     SPP_RetVal_t (*acquireData)(); /**< Acquire data from the module. */
 } SPP_SERVICE_ProducerContract_t;
@@ -41,12 +38,12 @@ typedef struct
 */
 typedef struct
 {
-    spp_int8_t priority;         /**< Priority of the consumer */
-    const char *p_nameConsumer;  /**< Human-readable module name (for logging). */
-    spp_uint16_t tiemoutMs;      /**< Timeout for the consumer to receive a packet */
-    SPP_RetVal_t (*init)();      /**< Initialise the module. */
-    SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t packet);
-    SPP_RetVal_t (*consumeData)(void *p_data); /**< Consume data from the module. */
+    spp_int8_t priority;                                         /**< Priority of the consumer */
+    const char *p_nameConsumer;                                  /**< Human-readable module name (for logging). */
+    spp_uint16_t tiemoutMs;                                      /**< Timeout for the consumer to receive a packet */
+    SPP_RetVal_t (*init)();                                      /**< Initialise the module. */
+    SPP_RetVal_t (*deliverToMailbox)(const SPP_Packet_t packet); /**< Receives a packet dispatched by PUBSUB. */
+    SPP_RetVal_t (*consumeData)(void *p_data);                   /**< Consume data from the module. */
 } SPP_SERVICE_ConsumerContract_t;
 
 

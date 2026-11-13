@@ -66,16 +66,16 @@ typedef struct __attribute__((packed))
 /**
  * @brief Complete SPP packet.
  *
- * Producers fill @c primaryHeader, @c secondaryHeader, and @c payload, then
- * push the packet into the @c db_flow FIFO.  Consumers pop it, process it,
- * and return it to the databank.
+ * Producers obtain packets from the databank and publish them through PUBSUB.
+ * PUBSUB copies each packet into its internal buffer and immediately returns
+ * the original to the databank. Consumers receive copies through their mailboxes.
  */
 typedef struct __attribute__((packed))
 {
     SPP_PacketPrimary_t primaryHeader;          /**< Routing / framing header.  */
     SPP_PacketSecondary_t secondaryHeader;      /**< Timing / metadata header.  */
     spp_uint8_t payload[K_SPP_PKT_PAYLOAD_MAX]; /**< Raw payload bytes. */
-    spp_uint16_t crc;                           /**< CRC-16 over the full packet (0 = not computed). */
+    spp_uint16_t crc;                           /**< CRC-16 over all preceding packet bytes, excluding this field. */
 } SPP_Packet_t;
 
 #endif /* SPP_PACKET_H */
